@@ -1,0 +1,60 @@
+Document Name
+backgroundColor
+bio
+coursesIds
+expertiseIds
+id
+image
+name
+rating
+title
+/instructors/diop
+"#ff9933"
+"Professeur de mathématiques depuis 15 ans, spécialisé dans la logique et les algorithmes."
+["maths_algo_1", "maths_algo_2"]
+["algorithmie"]
+"diop"
+"assets/profs/diop.jpg"
+"DIOP"
+4.6
+"Professeur Mathématiques"
+/instructors/fall
+"#4444ff"
+"Développeur backend spécialisé Node.js et architectures API."
+["svt_ecosysteme_1", "svt_organes_1"]
+["node", "typescript"]
+"fall"
+"assets/profs/fall.jpg"
+"FALL"
+4.7
+"Ingénieur Logiciel"
+/instructors/kaye
+"#0066ff"
+"Développeur depuis 10 ans, passionné par la création d’applications modernes."
+["svt_ecosysteme_1", "svt_organes_1"]
+["angular", "react", "ionic", "typescript"]
+"kaye"
+"assets/profs/kaye.jpg"
+"KAYE"
+4.8
+"Expert Web & Mobile"
+/instructors/ndiaye
+"#5a5a5a"
+"Spécialiste Machine Learning, Deep Learning et Data Science."
+["maths_algo_1", "maths_algo_2"]
+["python", "algorithmie"]
+"ndiaye"
+"assets/profs/ndiaye.jpg"
+"NDIAYE"
+4.7
+"Expert Data & IA"
+/instructors/sow
+"#22aaaa"
+"Développeur full-stack passionné par l’enseignement."
+["svt_ecosysteme_1", "svt_organes_1"]
+["react", "firebase"]
+"sow"
+"assets/profs/sow.jpg"
+"SOW"
+4.8
+"Développeur Full-Stack"

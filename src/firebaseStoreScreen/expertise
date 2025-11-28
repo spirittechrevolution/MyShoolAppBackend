@@ -1,0 +1,44 @@
+Document Name
+description
+id
+name
+/expertise/algorithmie
+"Logique, raisonnement, résolution de problèmes mathématiques et informatiques."
+"algorithmie"
+"Algorithmie"
+/expertise/angular
+"Framework moderne utilisé dans les entreprises pour créer des applications web complexes."
+"angular"
+"Angular"
+/expertise/aws
+"Leader mondial du cloud computing."
+"aws"
+"AWS"
+/expertise/firebase
+"Plateforme Google pour apps temps réel avec authentification, base de données et hosting."
+"firebase"
+"Firebase"
+/expertise/ionic
+"Framework mobile hybride pour créer des applications iOS et Android."
+"ionic"
+"Ionic"
+/expertise/kubernetes
+"Orchestration de conteneurs à grande échelle."
+"kubernetes"
+"Kubernetes"
+/expertise/node
+"JavaScript côté serveur, idéal pour des APIs modernes et performantes."
+"node"
+"Node.js"
+/expertise/python
+"Langage simple et puissant, utilisé dans l’IA, data-science et automatisation."
+"python"
+"Python"
+/expertise/react
+"Bibliothèque JavaScript utilisée pour créer des interfaces rapides et dynamiques."
+"react"
+"React"
+/expertise/typescript
+"Surcouche de JavaScript avec typage fort. Standard pour les projets professionnels."
+"typescript"
+"TypeScript"

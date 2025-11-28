@@ -1,0 +1,34 @@
+Document Name
+courseId
+description
+duration
+exercisesIds
+id
+lessonsIds
+order
+title
+/chapters/chapter_1_maths_algo_2
+"svt_organes_1"
+"Découverte des concepts fondamentaux des algorithmes"
+"2h 30min"
+["exo_1_chapter_1", "exo_2_chapter_1"]
+"chapter_1_maths_algo_2"
+["lesson_1_chapter_2", "lesson_2_chapter_2", "lesson_3_chapter_3"]
+1
+"Introduction aux Algorithmes"
+/chapters/chapter_2_maths_algo_2
+"svt_organes_1"
+"Approfondissement des techniques algorithmiques"
+"3h 15min"
+["exo_1_chapter_2", "exo_2_chapter_2"]
+"chapter_2_maths_algo_2"
+2
+"Algorithmes Avancés"
+/chapters/chapter_3_maths_algo_2
+"svt_organes_1"
+"Mise en pratique des algorithmes sur des cas concrets"
+"4h 00min"
+["exo_1_chapter_3", "exo_2_chapter_3"]
+"chapter_3_maths_algo_2"
+3
+"Applications Pratiques"

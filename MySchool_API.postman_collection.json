@@ -1,0 +1,644 @@
+{
+  "info": {
+    "name": "MySchool API",
+    "description": "Collection complète des endpoints MySchool Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "Créer une inscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user_abc123\",\n  \"courseId\": \"course_def456\",\n  \"courseTitle\": \"Introduction à Python\",\n  \"courseImage\": \"https://storage.googleapis.com/myschool-f862b.appspot.com/courses/python-intro.jpg\",\n  \"enrolledAt\": \"2025-11-28T10:30:00.000Z\",\n  \"status\": \"in-progress\",\n  \"progress\": 0,\n  \"amount\": 0,\n  \"paymentMethod\": \"free-money\",\n  \"chaptersCompleted\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inscription payante Orange Money",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user_xyz789\",\n  \"courseId\": \"course_ghi789\",\n  \"courseTitle\": \"Développement Web Full Stack\",\n  \"courseImage\": \"https://storage.googleapis.com/myschool-f862b.appspot.com/courses/fullstack.jpg\",\n  \"amount\": 25000,\n  \"paymentMethod\": \"orange-money\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inscription Wave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user_lmn456\",\n  \"courseId\": \"course_opq123\",\n  \"courseTitle\": \"Machine Learning Avancé\",\n  \"courseImage\": \"https://storage.googleapis.com/myschool-f862b.appspot.com/courses/ml-advanced.jpg\",\n  \"amount\": 50000,\n  \"paymentMethod\": \"wave\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister toutes les inscriptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir une inscription par ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "enrollment_123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inscriptions d'un utilisateur",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", "user", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "user_abc123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mettre à jour la progression",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"progress\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/:id/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", ":id", "progress"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "enrollment_123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ajouter un chapitre complété",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chapterId\": \"chapter_001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/:id/chapters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", ":id", "chapters"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "enrollment_123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modifier le statut",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "enrollment_123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une inscription",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "enrollment_123"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Créer un cours",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Introduction à Python\",\n  \"description\": \"Apprenez les bases de Python\",\n  \"instructorId\": \"instructor_123\",\n  \"instructorName\": \"Jean Dupont\",\n  \"category\": \"Programmation\",\n  \"level\": \"beginner\",\n  \"price\": 0,\n  \"currency\": \"XOF\",\n  \"duration\": 8,\n  \"language\": \"Français\",\n  \"thumbnail\": \"https://example.com/python.jpg\",\n  \"tags\": [\"python\", \"programmation\", \"débutant\"],\n  \"chapters\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister tous les cours",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cours publiés",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/published",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "published"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cours par catégorie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/category/:category",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "category", ":category"],
+              "variable": [
+                {
+                  "key": "category",
+                  "value": "Programmation"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Publier un cours",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/:id/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", ":id", "publish"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "course_123"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Créer un utilisateur (SANS Auth)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Test\",\n  \"lastName\": \"Simple\",\n  \"phone\": \"+221775678901\",\n  \"level\": \"beginner\",\n  \"role\": {\n    \"libelle\": \"student\"\n  },\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer un utilisateur (avec login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Awa\",\n  \"lastName\": \"Ba\",\n  \"login\": \"221778106275\",\n  \"password\": \"Awa8909\",\n  \"phone\": \"221778106275\",\n  \"level\": \"beginner\",\n  \"role\": {\n    \"libelle\": \"student\"\n  },\n  \"status\": \"active\",\n  \"specializationId\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer un utilisateur (avec email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Moussa\",\n  \"lastName\": \"Diallo\",\n  \"email\": \"moussa.diallo@example.com\",\n  \"password\": \"Moussa123!\",\n  \"phone\": \"221776543210\",\n  \"level\": \"intermediate\",\n  \"role\": {\n    \"libelle\": \"student\"\n  },\n  \"status\": \"active\",\n  \"specializationId\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer un professeur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Fatou\",\n  \"lastName\": \"Sow\",\n  \"email\": \"fatou.sow@myschool.sn\",\n  \"login\": \"221775678901\",\n  \"password\": \"Fatou2025!\",\n  \"phone\": \"221775678901\",\n  \"level\": \"advanced\",\n  \"role\": {\n    \"libelle\": \"teacher\"\n  },\n  \"status\": \"active\",\n  \"specializationId\": \"spec_python_web\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister tous les utilisateurs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtenir un utilisateur par ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_abc123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Utilisateur par email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/email/:email",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "email", ":email"],
+              "variable": [
+                {
+                  "key": "email",
+                  "value": "user@example.com"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Chapters",
+      "item": [
+        {
+          "name": "Créer un chapitre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"course_def456\",\n  \"title\": \"Introduction à Python\",\n  \"description\": \"Premiers pas avec Python\",\n  \"order\": 1,\n  \"lessons\": [],\n  \"exercises\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chapters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chapters"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Chapitres d'un cours",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/chapters/course/:courseId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chapters", "course", ":courseId"],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "course_def456"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "item": [
+        {
+          "name": "Créer une leçon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chapterId\": \"chapter_001\",\n  \"title\": \"Variables et Types de Données\",\n  \"type\": \"video\",\n  \"content\": \"https://storage.googleapis.com/myschool-f862b.appspot.com/lessons/variables.mp4\",\n  \"duration\": 15,\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/lessons",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lessons"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Leçons d'un chapitre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/lessons/chapter/:chapterId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "lessons", "chapter", ":chapterId"],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "chapter_001"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Exercises",
+      "item": [
+        {
+          "name": "Créer un exercice QCM",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chapterId\": \"chapter_001\",\n  \"title\": \"Quiz - Variables Python\",\n  \"type\": \"qcm\",\n  \"question\": \"Quel type de données est 42 en Python?\",\n  \"options\": [\"string\", \"int\", \"float\", \"boolean\"],\n  \"correctAnswer\": \"int\",\n  \"points\": 10,\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "exercises"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer un exercice code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chapterId\": \"chapter_001\",\n  \"title\": \"Exercice - Addition\",\n  \"type\": \"code\",\n  \"question\": \"Créez une fonction qui additionne deux nombres\",\n  \"starterCode\": \"def add(a, b):\\n    # Votre code ici\\n    pass\",\n  \"testCases\": [\n    {\"input\": \"add(2, 3)\", \"expectedOutput\": \"5\"},\n    {\"input\": \"add(10, 20)\", \"expectedOutput\": \"30\"}\n  ],\n  \"points\": 20,\n  \"order\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/exercises",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "exercises"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Instructors",
+      "item": [
+        {
+          "name": "Créer un instructeur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user_teacher123\",\n  \"bio\": \"Développeur Full Stack avec 10 ans d'expérience\",\n  \"expertise\": [\"Python\", \"JavaScript\", \"React\"],\n  \"profileImage\": \"https://example.com/profile.jpg\",\n  \"rating\": 4.8,\n  \"totalStudents\": 500,\n  \"totalCourses\": 15,\n  \"courses\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/instructors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "instructors"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+Document Name
+chapterId
+courseId
+duration
+id
+order
+title
+type
+/lessons/lesson_1_chapter_1
+"chapter_1_maths_algo_2"
+"maths_algo_1"
+"3:25"
+"lesson_1_chapter_1"
+1
+"Introduction aux Algorithmes"
+"video"
+/lessons/lesson_1_chapter_2
+"chapter_1_maths_algo_2"
+"maths_algo_2"
+"3:25"
+"lesson_1_chapter_2"
+1
+"Introduction aux Algorithmes"
+"video"
+/lessons/lesson_2_chapter_1
+"chapter_1_maths_algo_2"
+"maths_algo_1"
+"4:25"
+"lesson_2_chapter_1"
+2
+"Les Structures Conditionnelles"
+"video"
+/lessons/lesson_2_chapter_2
+"chapter_1_maths_algo_2"
+"maths_algo_2"
+"4:25"
+"lesson_2_chapter_2"
+2
+"Les Structures Conditionnelles"
+"video"
+/lessons/lesson_3_chapter_1
+"chapter_1_maths_algo_2"
+"maths_algo_1"
+"5:00"
+"lesson_3_chapter_1"
+3
+"Boucles et Répétitions"
+"video"
+/lessons/lesson_3_chapter_3
+"chapter_1_maths_algo_2"
+"maths_algo_2"
+"5:00"
+"lesson_3_chapter_3"
+3
+"Boucles et Répétitions"
+"video"

@@ -1,0 +1,72 @@
+Document Name
+chapterId
+courseId
+difficulty
+duration
+id
+instructions
+questions
+templateCode
+testCases
+title
+type
+/exercises/exo_1_chapter_1
+"chapter_1_maths_algo_2"
+"svt_organes_1"
+"facile"
+"15min"
+"exo_1_chapter_1"
+[{id: "q1", question: "Qu'e...}, {id: "q2", question: "Quel...}]
+"Exercice d'introduction aux algorithmes"
+"qcm"
+/exercises/exo_1_chapter_2
+"chapter_2_maths_algo_2"
+"svt_organes_1"
+"moyen"
+"20min"
+"exo_1_chapter_2"
+[{id: "q1", question: "Quel...}]
+"Exercice sur les tris"
+"qcm"
+/exercises/exo_1_chapter_3
+"chapter_3_maths_algo_2"
+"svt_organes_1"
+"difficile"
+"30min"
+"exo_1_chapter_3"
+[{id: "q1", question: "Quel...}]
+"Problème du plus court chemin"
+"qcm"
+/exercises/exo_2_chapter_1
+"chapter_1_maths_algo_2"
+"svt_organes_1"
+"moyen"
+"25min"
+"exo_2_chapter_1"
+"Écrivez un algorithme qui calcule la factorielle d'un nombre"
+"function factorielle(n) { // Votre code ici }"
+[{input: 5, expected: 120}, {input: 0, expected: 1}, {input: 7, expected: 5040}]
+"Exercice sur les boucles"
+"code"
+/exercises/exo_2_chapter_2
+"chapter_2_maths_algo_2"
+"svt_organes_1"
+"difficile"
+"35min"
+"exo_2_chapter_2"
+"Implémentez l'algorithme de tri rapide (QuickSort)"
+"function quickSort(arr) { // Votre code ici }"
+[{input: [3, 1, 4, 2], expe...}, {input: [5, 2, 8, 1, 9], e...}]
+"Implémentation du tri rapide"
+"code"
+/exercises/exo_2_chapter_3
+"chapter_3_maths_algo_2"
+"svt_organes_1"
+"avancé"
+"45min"
+"exo_2_chapter_3"
+"Implémentez l'algorithme de Dijkstra pour trouver le plus court chemin"
+"function dijkstra(graph, start) { // Votre code ici }"
+[{input: {graph: {A: {B: 1,...}]
+"Implémentation de Dijkstra"
+"code"

@@ -1,0 +1,136 @@
+Document Name
+category
+certificateAvailable
+chapters
+chaptersIds
+createdAt
+description
+duration
+enrolledUsers
+exercises
+id
+image
+isPublished
+level
+price
+rating
+sessions
+title
+type
+updatedAt
+/courses/maths_algo_1
+"Maths au collège"
+true
+[]
+["chapter_1_maths_algo_2", "chapter_2_maths_algo_2", "chapter_3_maths_algo_2"]
+11 novembre 2025 à 13:07:24 UTC
+"Cours d'algorithmique pour collégiens"
+25
+["3L8eNUGPubQ9RQSFrkyp6Pk98e02"]
+15
+"maths_algo_1"
+"assets/images/algorithme1.jpg"
+true
+"DEBUTANT"
+0
+4.5
+25
+"Algorithme"
+"En ligne"
+21 novembre 2025 à 11:59:39 UTC
+/courses/maths_algo_2
+"Maths au collège"
+true
+[]
+["chapter_1_maths_algo_2", "chapter_2_maths_algo_2", "chapter_3_maths_algo_2"]
+11 novembre 2025 à 13:07:24 UTC
+"Algorithmique niveau avancé"
+30
+["lnVEpSL2OdPAPmOGfQAKbvWj1cB2", "b3vWn0DGhIhdHyckcYpu6nhZSSI3", "t3eFOTwSZ7TidwLr0nsO5hpeUW13"]
+8
+"maths_algo_2"
+"assets/images/algorithme2.jpg"
+true
+"INTERMEDIAIRE"
+29.99
+4.8
+30
+"Algorithme Avancé"
+"En ligne"
+20 novembre 2025 à 15:34:50 UTC
+/courses/pc_chimie_1
+"PC au collège"
+true
+[]
+["chapter_1_maths_algo_2", "chapter_2_maths_algo_2", "chapter_3_maths_algo_2"]
+11 novembre 2025 à 13:07:24 UTC
+"Introduction à la chimie"
+75
+9
+"pc_chimie_1"
+"assets/images/chimie.jpg"
+true
+"DEBUTANT"
+19.99
+4.6
+75
+"Chimie"
+"VIDEO"
+21 novembre 2025 à 12:00:22 UTC
+/courses/pc_physique_1
+"PC au collège"
+false
+[]
+["chapter_1_maths_algo_2", "chapter_2_maths_algo_2", "chapter_3_maths_algo_2"]
+11 novembre 2025 à 13:07:24 UTC
+"Cours de physique fondamentale"
+59
+10
+"pc_physique_1"
+"assets/images/physique.jpg"
+true
+"DEBUTANT"
+0
+4.3
+59
+"Physique"
+"VIDEO"
+21 novembre 2025 à 12:00:57 UTC
+/courses/svt_ecosysteme_1
+"Sciences de la Vie et de la Terre"
+true
+[]
+["chapter_1_maths_algo_2", "chapter_2_maths_algo_2", "chapter_3_maths_algo_2"]
+11 novembre 2025 à 13:07:24 UTC
+"Comprendre les écosystèmes"
+75
+9
+"svt_ecosysteme_1"
+"assets/images/ecosysteme.jpg"
+true
+"INTERMEDIAIRE"
+24.99
+4.7
+75
+"L'écosystème"
+"En ligne"
+21 novembre 2025 à 12:01:17 UTC
+/courses/svt_organes_1
+"Sciences de la Vie et de la Terre"
+false
+[]
+["chapter_1_maths_algo_2", "chapter_2_maths_algo_2", "chapter_3_maths_algo_2"]
+11 novembre 2025 à 13:07:24 UTC
+"Étude des organes humains"
+59
+10
+"svt_organes_1"
+"assets/images/organes.jpg"
+true
+"DEBUTANT"
+0
+4.4
+59
+"Les Organes"
+"En ligne"
+21 novembre 2025 à 12:01:42 UTC

@@ -91,10 +91,5 @@ secrets/
 *.key
 *.pem
 *.p12
-
-# ==================== Documentation builds ====================
-docs/_build/
-
-# ==================== Misc ====================
-.cache/
-.parcel-cache/
+serviceAccountKey.json
+.serviceAccountKey.json
