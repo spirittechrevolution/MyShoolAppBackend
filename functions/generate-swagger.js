@@ -7,7 +7,7 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'MySchool API',
-      version: '2.0.0',
+      version: '2.2.0',
       description: `API REST complète pour MySchool e-learning. 
         Gestion des utilisateurs, cours, chapitres, leçons, exercices, inscriptions et instructeurs.
         Support complet des requêtes filtrées et index Firestore optimisés.`,
@@ -167,6 +167,48 @@ const options = {
             expiresAt: { type: 'string', format: 'date-time' }
           }
         },
+        Referral: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            referrerId: { type: 'string', description: 'ID de l\'utilisateur parrain' },
+            referredUserId: { type: 'string', description: 'ID de l\'utilisateur parrainé' },
+            referralCode: { type: 'string', example: 'REF_GPL8_A1B2C3' },
+            status: { type: 'string', enum: ['PENDING', 'COMPLETED', 'EXPIRED', 'CANCELLED'], example: 'PENDING' },
+            bonusAmount: { type: 'number', example: 500, description: 'Montant en centimes' },
+            bonusType: { type: 'string', enum: ['DISCOUNT', 'FREE_COURSE', 'POINTS'], example: 'DISCOUNT' },
+            clicks: { type: 'number', example: 0 },
+            conversions: { type: 'number', example: 0 },
+            createdAt: { type: 'string', format: 'date-time' },
+            completedAt: { type: 'string', format: 'date-time' },
+            expiresAt: { type: 'string', format: 'date-time' },
+            metadata: {
+              type: 'object',
+              properties: {
+                deepLink: { type: 'string', example: 'myschool://referral?code=REF_GPL8_A1B2C3' },
+                webLink: { type: 'string', example: 'https://myschool-app.com/join?ref=REF_GPL8_A1B2C3' },
+                shareText: { type: 'string' },
+                source: { type: 'string', example: 'whatsapp' }
+              }
+            }
+          }
+        },
+        ReferralStats: {
+          type: 'object',
+          properties: {
+            totalReferrals: { type: 'number', example: 5 },
+            activeReferrals: { type: 'number', example: 2 },
+            completedReferrals: { type: 'number', example: 2 },
+            expiredReferrals: { type: 'number', example: 1 },
+            cancelledReferrals: { type: 'number', example: 0 },
+            totalClicks: { type: 'number', example: 25 },
+            totalConversions: { type: 'number', example: 2 },
+            conversionRate: { type: 'number', example: 8.0 },
+            totalEarnings: { type: 'number', example: 1000, description: 'En centimes' },
+            pendingBonus: { type: 'number', example: 1000, description: 'En centimes' },
+            referrals: { type: 'array', items: { $ref: '#/components/schemas/Referral' } }
+          }
+        },
         Error: {
           type: 'object',
           properties: {
@@ -192,7 +234,8 @@ const options = {
       { name: 'Exercises', description: 'Gestion des exercices' },
       { name: 'Enrollments', description: 'Gestion des inscriptions' },
       { name: 'Instructors', description: 'Gestion des instructeurs' },
-      { name: 'Payments', description: 'Gestion des paiements Orange Money' }
+      { name: 'Payments', description: 'Gestion des paiements Orange Money' },
+      { name: 'Referrals', description: 'Système de parrainage avec deep links' }
     ]
   },
   apis: [path.join(__dirname, 'src', 'routes', '*.ts')]

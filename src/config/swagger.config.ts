@@ -181,7 +181,8 @@ const options: swaggerJsdoc.Options = {
       { name: 'Exercises', description: 'Gestion des exercices' },
       { name: 'Enrollments', description: 'Gestion des inscriptions' },
       { name: 'Instructors', description: 'Gestion des instructeurs' },
-      { name: 'Payments', description: 'Gestion des paiements Orange Money' }
+      { name: 'Payments', description: 'Gestion des paiements Orange Money' },
+      { name: 'Referrals', description: 'Gestion des parrainages et codes de parrainage' }
     ]
   },
   apis: ['./src/routes/*.ts']
