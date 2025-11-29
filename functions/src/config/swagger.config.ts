@@ -14,8 +14,16 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
+        url: 'https://us-central1-myschool-f862b.cloudfunctions.net/api',
+        description: 'Serveur de production'
+      },
+      {
+        url: 'http://localhost:5001/myschool-f862b/us-central1/api',
+        description: 'Serveur de développement (Firebase Emulator)'
+      },
+      {
         url: 'http://localhost:3000',
-        description: 'Serveur de développement'
+        description: 'Serveur de développement local'
       }
     ],
     components: {

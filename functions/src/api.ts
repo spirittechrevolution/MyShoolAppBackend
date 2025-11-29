@@ -1,7 +1,6 @@
 import * as functions from 'firebase-functions';
 import express from 'express';
 import cors from 'cors';
-import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.config';
 import userRoutes from './routes/user.routes';
 import courseRoutes from './routes/course.routes';
@@ -49,7 +48,11 @@ app.get('/', (req, res) => {
     success: true,
     message: 'MySchool API - Firebase Cloud Functions',
     version: '1.0.0',
-    documentation: '/api-docs',
+    documentation: {
+      swagger_ui: '/api/api-docs',
+      openapi_json: '/api/openapi.json',
+      description: 'Interface Swagger UI interactive disponible sur /api/api-docs'
+    },
     endpoints: {
       users: '/api/users',
       courses: '/api/courses',
@@ -62,11 +65,62 @@ app.get('/', (req, res) => {
   });
 });
 
-// Swagger Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'MySchool API Documentation'
-}));
+// Swagger UI - Interface HTML avec CDN
+app.get('/api-docs', (req, res) => {
+  const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MySchool API - Documentation</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.0/swagger-ui.css">
+  <style>
+    body { margin: 0; padding: 0; }
+    .topbar { display: none !important; }
+    .swagger-ui .information-container { margin: 50px 0; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.0/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.0/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        url: window.location.origin + window.location.pathname.replace('/api-docs', '/openapi.json'),
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        docExpansion: "list",
+        defaultModelsExpandDepth: 1,
+        defaultModelExpandDepth: 1,
+        displayRequestDuration: true,
+        filter: true,
+        showExtensions: true,
+        showCommonExtensions: true,
+        tryItOutEnabled: true
+      });
+      window.ui = ui;
+    };
+  </script>
+</body>
+</html>`;
+  res.send(html);
+});
+
+// Endpoint JSON pour la spécification OpenAPI
+app.get('/openapi.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.json(swaggerSpec);
+});
 
 // API Routes
 app.use('/api/users', userRoutes);
