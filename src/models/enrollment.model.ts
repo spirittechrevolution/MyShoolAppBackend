@@ -1,9 +1,10 @@
 export interface Enrollment {
+  id?: string;
   userId: string;
   courseId: string;
   courseTitle: string;
   courseImage: string;
-  enrolledAt: Date;
+  enrolledAt: Date | any;
   status: 'completed' | 'in-progress' | 'cancelled';
   progress: number;
   amount: number;
@@ -12,11 +13,12 @@ export interface Enrollment {
 }
 
 export class EnrollmentModel implements Enrollment {
+  id?: string;
   userId: string;
   courseId: string;
   courseTitle: string;
   courseImage: string;
-  enrolledAt: Date;
+  enrolledAt: Date | any;
   status: 'completed' | 'in-progress' | 'cancelled';
   progress: number;
   amount: number;
@@ -24,6 +26,7 @@ export class EnrollmentModel implements Enrollment {
   chaptersCompleted: string[];
 
   constructor(data: Partial<Enrollment>) {
+    this.id = data.id;
     this.userId = data.userId || '';
     this.courseId = data.courseId || '';
     this.courseTitle = data.courseTitle || '';
@@ -37,7 +40,7 @@ export class EnrollmentModel implements Enrollment {
   }
 
   toJSON(): any {
-    return {
+    const json: any = {
       userId: this.userId,
       courseId: this.courseId,
       courseTitle: this.courseTitle,
@@ -49,5 +52,11 @@ export class EnrollmentModel implements Enrollment {
       paymentMethod: this.paymentMethod,
       chaptersCompleted: this.chaptersCompleted
     };
+    
+    if (this.id) {
+      json.id = this.id;
+    }
+    
+    return json;
   }
 }

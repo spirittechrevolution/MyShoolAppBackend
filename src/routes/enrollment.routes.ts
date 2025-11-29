@@ -36,24 +36,6 @@ router.get('/', (req, res) => enrollmentController.getAll(req, res));
 
 /**
  * @swagger
- * /api/enrollments/{id}:
- *   get:
- *     tags: [Enrollments]
- *     summary: Récupérer une inscription par ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Inscription trouvée
- */
-router.get('/:id', (req, res) => enrollmentController.getById(req, res));
-
-/**
- * @swagger
  * /api/enrollments/user/{userId}:
  *   get:
  *     tags: [Enrollments]
@@ -69,6 +51,24 @@ router.get('/:id', (req, res) => enrollmentController.getById(req, res));
  *         description: Liste des inscriptions
  */
 router.get('/user/:userId', (req, res) => enrollmentController.getByUserId(req, res));
+
+/**
+ * @swagger
+ * /api/enrollments/{id}:
+ *   get:
+ *     tags: [Enrollments]
+ *     summary: Récupérer une inscription par ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Inscription trouvée
+ */
+router.get('/:id', (req, res) => enrollmentController.getById(req, res));
 
 /**
  * @swagger

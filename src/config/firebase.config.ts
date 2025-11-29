@@ -44,19 +44,20 @@ if (!admin.apps.length) {
 // IMPORTANT: La base de données s'appelle "myschool-1" et non "(default)"
 const databaseId = process.env.FIRESTORE_DATABASE_ID || 'myschool-1';
 
-// Initialiser Firestore avec le bon database ID
-const firestoreSettings: FirebaseFirestore.Settings = {
-  ignoreUndefinedProperties: true
-};
+// Pour Firebase Admin SDK v12+, passer le databaseId dans les settings
+const db = admin.firestore();
 
-// Si ce n'est pas la base par défaut, spécifier le databaseId
+// CRITIQUE: Définir le databaseId AVANT toute autre configuration
 if (databaseId !== '(default)') {
-  (firestoreSettings as any).databaseId = databaseId;
+  // @ts-ignore - La propriété _settings existe mais n'est pas dans les types
+  db._settings = { ...db._settings, databaseId };
 }
 
-export const db = admin.firestore();
-db.settings(firestoreSettings);
+db.settings({
+  ignoreUndefinedProperties: true
+});
 
+export { db };
 export const auth = admin.auth();
 export const storage = admin.storage();
 

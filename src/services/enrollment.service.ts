@@ -15,7 +15,7 @@ export class EnrollmentService {
     const doc = await db.collection(this.collectionName).doc(id).get();
     
     if (doc.exists) {
-      return new EnrollmentModel(doc.data() as Enrollment);
+      return new EnrollmentModel({ ...doc.data() as Enrollment, id: doc.id });
     }
     return null;
   }
@@ -23,19 +23,25 @@ export class EnrollmentService {
   async getAll(): Promise<EnrollmentModel[]> {
     const snapshot = await db.collection(this.collectionName).get();
     return snapshot.docs.map(doc => 
-      new EnrollmentModel(doc.data() as Enrollment)
+      new EnrollmentModel({ ...doc.data() as Enrollment, id: doc.id })
     );
   }
 
   async getByUserId(userId: string): Promise<EnrollmentModel[]> {
     const snapshot = await db.collection(this.collectionName)
       .where('userId', '==', userId)
-      .orderBy('enrolledAt', 'desc')
       .get();
     
-    return snapshot.docs.map(doc => 
-      new EnrollmentModel(doc.data() as Enrollment)
+    const enrollments = snapshot.docs.map(doc => 
+      new EnrollmentModel({ ...doc.data() as Enrollment, id: doc.id })
     );
+    
+    // Tri côté client par date décroissante
+    return enrollments.sort((a, b) => {
+      const dateA = a.enrolledAt?.toDate ? a.enrolledAt.toDate() : new Date(a.enrolledAt);
+      const dateB = b.enrolledAt?.toDate ? b.enrolledAt.toDate() : new Date(b.enrolledAt);
+      return dateB.getTime() - dateA.getTime();
+    });
   }
 
   async getByCourseId(courseId: string): Promise<EnrollmentModel[]> {
@@ -44,7 +50,7 @@ export class EnrollmentService {
       .get();
     
     return snapshot.docs.map(doc => 
-      new EnrollmentModel(doc.data() as Enrollment)
+      new EnrollmentModel({ ...doc.data() as Enrollment, id: doc.id })
     );
   }
 
@@ -54,7 +60,7 @@ export class EnrollmentService {
       .get();
     
     return snapshot.docs.map(doc => 
-      new EnrollmentModel(doc.data() as Enrollment)
+      new EnrollmentModel({ ...doc.data() as Enrollment, id: doc.id })
     );
   }
 
@@ -65,7 +71,7 @@ export class EnrollmentService {
       .get();
     
     if (!snapshot.empty) {
-      return new EnrollmentModel(snapshot.docs[0].data() as Enrollment);
+      return new EnrollmentModel({ ...snapshot.docs[0].data() as Enrollment, id: snapshot.docs[0].id });
     }
     return null;
   }
