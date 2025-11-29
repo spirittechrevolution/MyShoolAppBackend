@@ -1,0 +1,1995 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MySchool API",
+    "version": "2.0.0",
+    "description": "API REST complète pour MySchool e-learning. \n        Gestion des utilisateurs, cours, chapitres, leçons, exercices, inscriptions et instructeurs.\n        Support complet des requêtes filtrées et index Firestore optimisés.",
+    "contact": {
+      "name": "MySchool Support",
+      "email": "support@myschool.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api-xa66eyezzq-uc.a.run.app",
+      "description": "Serveur de production"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Serveur de développement local"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": [
+          "firstName",
+          "lastName",
+          "phone",
+          "level",
+          "role",
+          "status"
+        ],
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": "ID Firebase Auth (auto-généré)"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+221771234567"
+          },
+          "login": {
+            "type": "string",
+            "example": "+221771234567"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123",
+            "description": "Requis à la création uniquement"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "example": "beginner"
+          },
+          "role": {
+            "type": "object",
+            "properties": {
+              "libelle": {
+                "type": "string",
+                "enum": [
+                  "student",
+                  "instructor",
+                  "admin"
+                ],
+                "example": "student"
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "suspended"
+            ],
+            "example": "active"
+          },
+          "profileImage": {
+            "type": "string",
+            "description": "URL de l'image de profil"
+          },
+          "specializationId": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Course": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "level"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Introduction à JavaScript"
+          },
+          "description": {
+            "type": "string",
+            "example": "Apprendre les bases de JavaScript"
+          },
+          "image": {
+            "type": "string",
+            "description": "URL de l'image du cours"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "DEBUTANT",
+              "INTERMEDIAIRE",
+              "AVANCE"
+            ],
+            "example": "DEBUTANT"
+          },
+          "duration": {
+            "type": "number",
+            "example": 120,
+            "description": "Durée en minutes"
+          },
+          "price": {
+            "type": "number",
+            "example": 0,
+            "description": "Prix (0 = gratuit)"
+          },
+          "category": {
+            "type": "string",
+            "example": "Programmation"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "VIDEO",
+              "En ligne",
+              "Hybride"
+            ],
+            "example": "En ligne"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.5
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Chapter": {
+        "type": "object",
+        "required": [
+          "title",
+          "courseId",
+          "order"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Chapitre 1: Variables"
+          },
+          "description": {
+            "type": "string",
+            "example": "Introduction aux variables"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number",
+            "example": 1
+          },
+          "duration": {
+            "type": "number",
+            "example": 30
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Lesson": {
+        "type": "object",
+        "required": [
+          "title",
+          "chapterId",
+          "order"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Les variables en JavaScript"
+          },
+          "content": {
+            "type": "string",
+            "example": "Contenu de la leçon..."
+          },
+          "videoUrl": {
+            "type": "string",
+            "example": "https://youtube.com/watch?v=..."
+          },
+          "chapterId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number",
+            "example": 1
+          },
+          "duration": {
+            "type": "number",
+            "example": 15
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Exercise": {
+        "type": "object",
+        "required": [
+          "title",
+          "lessonId",
+          "type"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Quiz: Les variables"
+          },
+          "description": {
+            "type": "string",
+            "example": "Testez vos connaissances"
+          },
+          "lessonId": {
+            "type": "string"
+          },
+          "chapterId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "quiz",
+              "coding",
+              "essay"
+            ],
+            "example": "quiz"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "points": {
+            "type": "number",
+            "example": 10
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Enrollment": {
+        "type": "object",
+        "required": [
+          "userId",
+          "courseId"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "courseTitle": {
+            "type": "string"
+          },
+          "courseImage": {
+            "type": "string"
+          },
+          "enrolledAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "cancelled"
+            ],
+            "example": "active"
+          },
+          "progress": {
+            "type": "number",
+            "example": 0,
+            "minimum": 0,
+            "maximum": 100
+          },
+          "amount": {
+            "type": "number",
+            "example": 0
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "free-money",
+              "wave",
+              "orange-money",
+              "card"
+            ],
+            "example": "free-money"
+          },
+          "chaptersCompleted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Instructor": {
+        "type": "object",
+        "required": [
+          "userId",
+          "bio",
+          "specialization"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Développeur web avec 10 ans d'expérience"
+          },
+          "specialization": {
+            "type": "string",
+            "example": "web-development"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.5,
+            "minimum": 0,
+            "maximum": 5
+          },
+          "totalStudents": {
+            "type": "number",
+            "example": 150
+          },
+          "totalCourses": {
+            "type": "number",
+            "example": 5
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Message d'erreur"
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Gestion des utilisateurs"
+    },
+    {
+      "name": "Courses",
+      "description": "Gestion des cours"
+    },
+    {
+      "name": "Chapters",
+      "description": "Gestion des chapitres"
+    },
+    {
+      "name": "Lessons",
+      "description": "Gestion des leçons"
+    },
+    {
+      "name": "Exercises",
+      "description": "Gestion des exercices"
+    },
+    {
+      "name": "Enrollments",
+      "description": "Gestion des inscriptions"
+    },
+    {
+      "name": "Instructors",
+      "description": "Gestion des instructeurs"
+    }
+  ],
+  "paths": {
+    "/api/chapters": {
+      "post": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Créer un nouveau chapitre",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Chapter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Chapitre créé"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Récupérer tous les chapitres",
+        "responses": {
+          "200": {
+            "description": "Liste des chapitres"
+          }
+        }
+      }
+    },
+    "/api/chapters/{id}": {
+      "get": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Récupérer un chapitre par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chapitre trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Mettre à jour un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Chapter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chapitre mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Supprimer un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chapitre supprimé"
+          }
+        }
+      }
+    },
+    "/api/chapters/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Récupérer les chapitres d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des chapitres"
+          }
+        }
+      }
+    },
+    "/api/courses": {
+      "post": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Créer un nouveau cours",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Course"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cours créé avec succès"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer tous les cours",
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/published": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours publiés",
+        "responses": {
+          "200": {
+            "description": "Liste des cours publiés"
+          }
+        }
+      }
+    },
+    "/api/courses/{id}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer un cours par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours trouvé"
+          },
+          "404": {
+            "description": "Cours non trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Mettre à jour un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Course"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cours mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Supprimer un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours supprimé"
+          }
+        }
+      }
+    },
+    "/api/courses/category/{category}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par catégorie",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/level/{level}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par niveau",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "level",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "beginner",
+                "intermediate",
+                "advanced"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/type/{type}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/{id}/publish": {
+      "patch": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Publier un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours publié"
+          }
+        }
+      }
+    },
+    "/api/courses/{id}/unpublish": {
+      "patch": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Dépublier un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours dépublié"
+          }
+        }
+      }
+    },
+    "/api/enrollments": {
+      "post": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Créer une nouvelle inscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enrollment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Inscription créée avec succès"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer toutes les inscriptions",
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/user/{userId}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer les inscriptions d'un utilisateur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/{id}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer une inscription par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Mettre à jour une inscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enrollment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inscription mise à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Supprimer une inscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription supprimée"
+          }
+        }
+      }
+    },
+    "/api/enrollments/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer les inscriptions d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/status/{status}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer les inscriptions par statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/user/{userId}/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer l'inscription d'un utilisateur à un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription trouvée"
+          }
+        }
+      }
+    },
+    "/api/enrollments/{id}/progress": {
+      "patch": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Mettre à jour la progression",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "progress": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Progression mise à jour"
+          }
+        }
+      }
+    },
+    "/api/enrollments/{id}/status": {
+      "patch": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Mettre à jour le statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "completed",
+                      "cancelled"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Statut mis à jour"
+          }
+        }
+      }
+    },
+    "/api/exercises": {
+      "post": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Créer un nouvel exercice",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exercise"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exercice créé"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer tous les exercices",
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/{id}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer un exercice par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exercice trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Mettre à jour un exercice",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exercise"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exercice mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Supprimer un exercice",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exercice supprimé"
+          }
+        }
+      }
+    },
+    "/api/exercises/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/chapter/{chapterId}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices d'un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chapterId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/type/{type}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices par type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "quiz",
+                "coding",
+                "essay"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/difficulty/{difficulty}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices par difficulté",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "difficulty",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/instructors": {
+      "post": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Créer un nouvel instructeur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Instructor"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Instructeur créé"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer tous les instructeurs",
+        "responses": {
+          "200": {
+            "description": "Liste des instructeurs"
+          }
+        }
+      }
+    },
+    "/api/instructors/{id}": {
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer un instructeur par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instructeur trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Mettre à jour un instructeur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Instructor"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Instructeur mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Supprimer un instructeur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instructeur supprimé"
+          }
+        }
+      }
+    },
+    "/api/instructors/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer les instructeurs d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des instructeurs"
+          }
+        }
+      }
+    },
+    "/api/instructors/expertise/{expertiseId}": {
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer les instructeurs par expertise",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "expertiseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des instructeurs"
+          }
+        }
+      }
+    },
+    "/api/lessons": {
+      "post": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Créer une nouvelle leçon",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Leçon créée"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer toutes les leçons",
+        "responses": {
+          "200": {
+            "description": "Liste des leçons"
+          }
+        }
+      }
+    },
+    "/api/lessons/{id}": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer une leçon par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leçon trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Mettre à jour une leçon",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Leçon mise à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Supprimer une leçon",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leçon supprimée"
+          }
+        }
+      }
+    },
+    "/api/lessons/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer les leçons d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des leçons"
+          }
+        }
+      }
+    },
+    "/api/lessons/chapter/{chapterId}": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer les leçons d'un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chapterId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des leçons"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Créer un nouvel utilisateur",
+        "description": "Crée un utilisateur avec authentification Firebase automatique",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Utilisateur créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur de validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer tous les utilisateurs",
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    },
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer un utilisateur par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du document Firestore"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur trouvé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Mettre à jour un utilisateur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Utilisateur mis à jour"
+          },
+          "400": {
+            "description": "Erreur de validation"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Supprimer un utilisateur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur supprimé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/users/email/{email}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer un utilisateur par email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur trouvé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      }
+    },
+    "/api/users/phone/{phone}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer un utilisateur par téléphone",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "phone",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "+221771234567"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur trouvé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      }
+    },
+    "/api/users/role/{role}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer les utilisateurs par rôle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "role",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "student",
+                "instructor",
+                "admin"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs"
+          }
+        }
+      }
+    },
+    "/api/users/status/{status}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer les utilisateurs par statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "suspended"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/profile-image": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Mettre à jour l'image de profil",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profileImageBase64": {
+                    "type": "string",
+                    "description": "Image en base64"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image mise à jour"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/status": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Mettre à jour le statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "inactive",
+                      "suspended"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Statut mis à jour"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,11 +5,17 @@ const options: swaggerJsdoc.Options = {
     openapi: '3.0.0',
     info: {
       title: 'MySchool API',
-      version: '1.0.0',
-      description: 'API REST pour la plateforme e-learning MySchool',
+      version: '2.0.0',
+      description: `API REST complète pour MySchool e-learning. 
+        Gestion des utilisateurs, cours, chapitres, leçons, exercices, inscriptions et instructeurs.
+        Support complet des requêtes filtrées et index Firestore optimisés.`,
       contact: {
         name: 'MySchool Support',
         email: 'support@myschool.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
       }
     },
     servers: [
@@ -161,7 +167,10 @@ const options: swaggerJsdoc.Options = {
       { name: 'Instructors', description: 'Gestion des instructeurs' }
     ]
   },
-  apis: ['./src/routes/*.ts']
+  apis: [
+    __dirname + '/../routes/*.ts',
+    __dirname + '/../routes/*.js'
+  ]
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

@@ -17,7 +17,8 @@
       "sourceType": "module"
     },
     "ignorePatterns": [
-      "/lib/**/*"
+      "/lib/**/*",
+      "generate-swagger.js"
     ],
     "plugins": [
       "@typescript-eslint",

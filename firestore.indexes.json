@@ -1,6 +1,76 @@
 {
     "indexes": [
       {
+        "collectionGroup": "chapters",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "courseId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "order",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "lessons",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "chapterId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "order",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "lessons",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "courseId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "order",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "exercises",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "chapterId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "order",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "exercises",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "courseId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "order",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
         "collectionGroup": "enrollments",
         "queryScope": "COLLECTION",
         "fields": [

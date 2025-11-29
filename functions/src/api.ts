@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import express from 'express';
 import cors from 'cors';
-import { swaggerSpec } from './config/swagger.config';
+import * as swaggerDocument from './swagger.json';
 import userRoutes from './routes/user.routes';
 import courseRoutes from './routes/course.routes';
 import chapterRoutes from './routes/chapter.routes';
@@ -119,7 +119,7 @@ app.get('/api-docs', (req, res) => {
 // Endpoint JSON pour la spécification OpenAPI
 app.get('/openapi.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  res.json(swaggerSpec);
+  res.json(swaggerDocument);
 });
 
 // API Routes

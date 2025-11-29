@@ -2,6 +2,34 @@ import request from 'supertest';
 import app from '../../server';
 
 describe('User API Endpoints', () => {
+  let testUserId: string;
+  const testUserPhone = '221777777777';
+
+  // Créer un utilisateur de test avant tous les tests
+  beforeAll(async () => {
+    const response = await request(app)
+      .post('/api/users')
+      .send({
+        firstName: 'UpdatedFirstName',
+        lastName: 'User',
+        phone: testUserPhone,
+        level: 'beginner',
+        role: { libelle: 'student' },
+        status: 'active'
+      });
+    
+    if (response.body.success) {
+      testUserId = response.body.data.uid;
+    }
+  });
+
+  // Nettoyer l'utilisateur de test après tous les tests
+  afterAll(async () => {
+    if (testUserId) {
+      await request(app).delete(`/api/users/${testUserId}`);
+    }
+  });
+
   describe('GET /api/users', () => {
     it('should return all users', async () => {
       const response = await request(app)
@@ -18,17 +46,14 @@ describe('User API Endpoints', () => {
 
   describe('GET /api/users/:id', () => {
     it('should return a user by ID', async () => {
-      // Utiliser un ID existant de votre base de données
-      const userId = '7Zuxf5BUwyQjQrHPbnBstZ7SkC22';
-      
       const response = await request(app)
-        .get(`/api/users/${userId}`)
+        .get(`/api/users/${testUserId}`)
         .expect('Content-Type', /json/)
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toBeDefined();
-      expect(response.body.data.uid).toBe(userId);
+      expect(response.body.data.uid).toBe(testUserId);
     });
 
     it('should return 404 for non-existent user', async () => {
@@ -44,16 +69,14 @@ describe('User API Endpoints', () => {
 
   describe('GET /api/users/phone/:phone', () => {
     it('should return a user by phone number', async () => {
-      const phone = '221777777777';
-      
       const response = await request(app)
-        .get(`/api/users/phone/${phone}`)
+        .get(`/api/users/phone/${testUserPhone}`)
         .expect('Content-Type', /json/)
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toBeDefined();
-      expect(response.body.data.phone).toBe(phone);
+      expect(response.body.data.phone).toBe(testUserPhone);
     });
 
     it('should return 404 for non-existent phone', async () => {
@@ -109,13 +132,12 @@ describe('User API Endpoints', () => {
 
   describe('PUT /api/users/:id', () => {
     it('should update an existing user', async () => {
-      const userId = '7Zuxf5BUwyQjQrHPbnBstZ7SkC22';
       const updateData = {
         firstName: 'UpdatedFirstName',
       };
 
       const response = await request(app)
-        .put(`/api/users/${userId}`)
+        .put(`/api/users/${testUserId}`)
         .send(updateData)
         .expect('Content-Type', /json/);
 

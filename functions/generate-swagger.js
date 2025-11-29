@@ -1,12 +1,16 @@
-import swaggerJsdoc from 'swagger-jsdoc';
+const swaggerJsdoc = require('swagger-jsdoc');
+const fs = require('fs');
+const path = require('path');
 
-const options: swaggerJsdoc.Options = {
+const options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'MySchool API',
       version: '2.0.0',
-      description: 'API REST complète pour la plateforme e-learning MySchool. Inclut la gestion des utilisateurs, cours, chapitres, leçons, exercices, inscriptions et instructeurs avec support complet des requêtes filtrées.',
+      description: `API REST complète pour MySchool e-learning. 
+        Gestion des utilisateurs, cours, chapitres, leçons, exercices, inscriptions et instructeurs.
+        Support complet des requêtes filtrées et index Firestore optimisés.`,
       contact: {
         name: 'MySchool Support',
         email: 'support@myschool.com'
@@ -18,8 +22,12 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
+        url: 'https://api-xa66eyezzq-uc.a.run.app',
+        description: 'Serveur de production'
+      },
+      {
         url: 'http://localhost:3000',
-        description: 'Serveur de développement'
+        description: 'Serveur de développement local'
       }
     ],
     components: {
@@ -49,18 +57,18 @@ const options: swaggerJsdoc.Options = {
         },
         Course: {
           type: 'object',
-          required: ['title', 'description', 'level', 'expertiseId'],
+          required: ['title', 'description', 'level'],
           properties: {
             title: { type: 'string', example: 'Introduction à JavaScript' },
             description: { type: 'string', example: 'Apprendre les bases de JavaScript' },
             image: { type: 'string', description: 'URL de l\'image du cours' },
-            level: { type: 'string', enum: ['beginner', 'intermediate', 'advanced'], example: 'beginner' },
+            level: { type: 'string', enum: ['DEBUTANT', 'INTERMEDIAIRE', 'AVANCE'], example: 'DEBUTANT' },
             duration: { type: 'number', example: 120, description: 'Durée en minutes' },
             price: { type: 'number', example: 0, description: 'Prix (0 = gratuit)' },
-            expertiseId: { type: 'string', example: 'web-development' },
-            instructorId: { type: 'string' },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' }
+            category: { type: 'string', example: 'Programmation' },
+            type: { type: 'string', enum: ['VIDEO', 'En ligne', 'Hybride'], example: 'En ligne' },
+            rating: { type: 'number', example: 4.5 },
+            createdAt: { type: 'string', format: 'date-time' }
           }
         },
         Chapter: {
@@ -83,6 +91,7 @@ const options: swaggerJsdoc.Options = {
             content: { type: 'string', example: 'Contenu de la leçon...' },
             videoUrl: { type: 'string', example: 'https://youtube.com/watch?v=...' },
             chapterId: { type: 'string' },
+            courseId: { type: 'string' },
             order: { type: 'number', example: 1 },
             duration: { type: 'number', example: 15 },
             createdAt: { type: 'string', format: 'date-time' }
@@ -95,6 +104,8 @@ const options: swaggerJsdoc.Options = {
             title: { type: 'string', example: 'Quiz: Les variables' },
             description: { type: 'string', example: 'Testez vos connaissances' },
             lessonId: { type: 'string' },
+            chapterId: { type: 'string' },
+            courseId: { type: 'string' },
             type: { type: 'string', enum: ['quiz', 'coding', 'essay'], example: 'quiz' },
             questions: { type: 'array', items: { type: 'object' } },
             points: { type: 'number', example: 10 },
@@ -157,7 +168,14 @@ const options: swaggerJsdoc.Options = {
       { name: 'Instructors', description: 'Gestion des instructeurs' }
     ]
   },
-  apis: ['./src/routes/*.ts']
+  apis: [path.join(__dirname, 'src', 'routes', '*.ts')]
 };
 
-export const swaggerSpec = swaggerJsdoc(options);
+const spec = swaggerJsdoc(options);
+const outputPath = path.join(__dirname, 'src', 'swagger.json');
+
+fs.writeFileSync(outputPath, JSON.stringify(spec, null, 2));
+
+console.log('✅ Swagger specification generated successfully!');
+console.log(`📄 File: ${outputPath}`);
+console.log(`📊 Endpoints documented: ${Object.keys(spec.paths || {}).length}`);
