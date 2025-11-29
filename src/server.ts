@@ -1,6 +1,9 @@
+// Load environment variables FIRST
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.config';
 import userRoutes from './routes/user.routes';
@@ -10,10 +13,8 @@ import lessonRoutes from './routes/lesson.routes';
 import exerciseRoutes from './routes/exercise.routes';
 import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
+import paymentRoutes from './routes/payment.routes';
 import './config/firebase.config'; // Initialize Firebase
-
-// Load environment variables
-dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -60,7 +61,8 @@ app.get('/', (req: Request, res: Response) => {
       lessons: '/api/lessons',
       exercises: '/api/exercises',
       enrollments: '/api/enrollments',
-      instructors: '/api/instructors'
+      instructors: '/api/instructors',
+      payments: '/api/payments'
     }
   });
 });
@@ -79,6 +81,7 @@ app.use('/api/lessons', lessonRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/instructors', instructorRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {

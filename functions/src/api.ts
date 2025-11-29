@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import * as swaggerDocument from './swagger.json';
 import userRoutes from './routes/user.routes';
 import courseRoutes from './routes/course.routes';
@@ -9,6 +10,10 @@ import lessonRoutes from './routes/lesson.routes';
 import exerciseRoutes from './routes/exercise.routes';
 import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
+import paymentRoutes from './routes/payment.routes';
+
+// Load environment variables (for local development)
+dotenv.config();
 
 const app = express();
 
@@ -60,7 +65,8 @@ app.get('/', (req, res) => {
       lessons: '/api/lessons',
       exercises: '/api/exercises',
       enrollments: '/api/enrollments',
-      instructors: '/api/instructors'
+      instructors: '/api/instructors',
+      payments: '/api/payments'
     }
   });
 });
@@ -130,6 +136,7 @@ app.use('/api/lessons', lessonRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/instructors', instructorRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // 404 Handler
 app.use((req, res) => {
