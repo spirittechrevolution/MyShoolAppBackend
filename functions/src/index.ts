@@ -5,6 +5,17 @@ import * as admin from 'firebase-admin';
 admin.initializeApp();
 const db = admin.firestore();
 
+// Configurer Firestore pour utiliser la bonne base de données
+db.settings({
+  databaseId: 'myschool-1',
+  ignoreUndefinedProperties: true
+});
+
+// ============ EXPORT DE L'API EXPRESS ============
+export { api } from './api';
+
+// ============ CLOUD FUNCTIONS TRIGGERS ============
+
 /**
  * Trigger: Quand un enrollment est créé
  * Action: Initialiser les métadonnées du cours et envoyer une notification
@@ -313,10 +324,10 @@ export const getCourseStatistics = functions.https.onCall(async (data, context) 
       const enrollment = doc.data();
       
       switch (enrollment.status) {
-        case 'active': activeCount++; break;
-        case 'completed': completedCount++; break;
-        case 'suspended': suspendedCount++; break;
-        case 'cancelled': cancelledCount++; break;
+      case 'active': activeCount++; break;
+      case 'completed': completedCount++; break;
+      case 'suspended': suspendedCount++; break;
+      case 'cancelled': cancelledCount++; break;
       }
 
       totalProgress += enrollment.progress?.progressPercentage || 0;
