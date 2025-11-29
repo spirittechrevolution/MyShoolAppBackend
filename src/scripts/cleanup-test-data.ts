@@ -11,14 +11,14 @@ async function cleanupTestData() {
   try {
     // 1. Supprimer les utilisateurs de test
     console.log('📝 Suppression des utilisateurs de test...');
-    const usersSnapshot = await db.collection('users').get();
+    const usersSnapshot = await db.collection('utilisateur').get();
     let usersDeleted = 0;
     
     for (const doc of usersSnapshot.docs) {
       const data = doc.data();
       // Supprimer si firstName contient "Test" ou "Updated"
       if (data.firstName && (data.firstName.includes('Test') || data.firstName.includes('Updated'))) {
-        await db.collection('users').doc(doc.id).delete();
+        await db.collection('utilisateur').doc(doc.id).delete();
         console.log(`  ✓ Utilisateur supprimé: ${doc.id} (${data.firstName} ${data.lastName || ''})`);
         usersDeleted++;
       }
@@ -98,7 +98,10 @@ async function cleanupTestData() {
     
     for (const doc of instructorsSnapshot.docs) {
       const data = doc.data();
-      if ((data.name && data.name.includes('Test')) || doc.id.startsWith('test-')) {
+      // Supprimer si name contient "Test", "TEST", "TO DELETE" ou id commence par "test-"
+      if ((data.name && (data.name.includes('Test') || data.name.includes('TEST') || data.name.includes('TO DELETE'))) || 
+          (data.bio && data.bio.includes('Test')) ||
+          doc.id.startsWith('test-')) {
         await db.collection('instructors').doc(doc.id).delete();
         console.log(`  ✓ Instructeur supprimé: ${doc.id} (${data.name || ''})`);
         instructorsDeleted++;
@@ -106,19 +109,18 @@ async function cleanupTestData() {
     }
     console.log(`✅ ${instructorsDeleted} instructeurs de test supprimés\n`);
 
-    // 7. Supprimer les inscriptions de test (enrollments créées récemment)
+    // 7. Supprimer les inscriptions de test
     console.log('📋 Suppression des inscriptions de test...');
     const enrollmentsSnapshot = await db.collection('enrollments').get();
     let enrollmentsDeleted = 0;
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     
     for (const doc of enrollmentsSnapshot.docs) {
       const data = doc.data();
-      // Supprimer les inscriptions créées il y a moins de 24h (probablement des tests)
-      const enrolledAt = data.enrolledAt?.toDate();
-      if (enrolledAt && enrolledAt > oneDayAgo) {
+      // Supprimer si userId ou courseId contient "test"
+      if ((data.userId && data.userId.includes('test')) || 
+          (data.courseId && data.courseId.includes('test'))) {
         await db.collection('enrollments').doc(doc.id).delete();
-        console.log(`  ✓ Inscription supprimée: ${doc.id}`);
+        console.log(`  ✓ Inscription supprimée: ${doc.id} (user: ${data.userId}, course: ${data.courseId})`);
         enrollmentsDeleted++;
       }
     }
