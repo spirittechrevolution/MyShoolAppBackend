@@ -22,8 +22,8 @@ const options = {
     },
     servers: [
       {
-        url: 'https://api-xa66eyezzq-uc.a.run.app',
-        description: 'Serveur de production'
+        url: 'https://us-central1-myschool-f862b.cloudfunctions.net/api',
+        description: 'Serveur de production (Firebase Functions)'
       },
       {
         url: 'http://localhost:3000',
@@ -141,6 +141,32 @@ const options = {
             createdAt: { type: 'string', format: 'date-time' }
           }
         },
+        Payment: {
+          type: 'object',
+          required: ['userId', 'enrollmentId', 'courseId', 'amount', 'paymentMethod'],
+          properties: {
+            id: { type: 'string' },
+            userId: { type: 'string' },
+            enrollmentId: { type: 'string' },
+            courseId: { type: 'string' },
+            amount: { type: 'number', example: 10000 },
+            currency: { type: 'string', example: 'XOF', default: 'XOF' },
+            paymentMethod: { type: 'string', enum: ['orange-money', 'wave', 'free-money', 'card'], example: 'orange-money' },
+            status: { type: 'string', enum: ['PENDING', 'SUCCESS', 'FAILED', 'CANCELLED', 'EXPIRED'], example: 'PENDING' },
+            orderReferenceNumber: { type: 'string', example: 'MS-1701234567-8901' },
+            payToken: { type: 'string' },
+            paymentUrl: { type: 'string' },
+            customerPhoneNumber: { type: 'string', example: '+221771234567' },
+            customerFirstName: { type: 'string', example: 'Amadou' },
+            customerLastName: { type: 'string', example: 'Diallo' },
+            transactionId: { type: 'string' },
+            description: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+            completedAt: { type: 'string', format: 'date-time' },
+            expiresAt: { type: 'string', format: 'date-time' }
+          }
+        },
         Error: {
           type: 'object',
           properties: {
@@ -165,7 +191,8 @@ const options = {
       { name: 'Lessons', description: 'Gestion des leçons' },
       { name: 'Exercises', description: 'Gestion des exercices' },
       { name: 'Enrollments', description: 'Gestion des inscriptions' },
-      { name: 'Instructors', description: 'Gestion des instructeurs' }
+      { name: 'Instructors', description: 'Gestion des instructeurs' },
+      { name: 'Payments', description: 'Gestion des paiements Orange Money' }
     ]
   },
   apis: [path.join(__dirname, 'src', 'routes', '*.ts')]

@@ -15,8 +15,8 @@
   },
   "servers": [
     {
-      "url": "https://api-xa66eyezzq-uc.a.run.app",
-      "description": "Serveur de production"
+      "url": "https://us-central1-myschool-f862b.cloudfunctions.net/api",
+      "description": "Serveur de production (Firebase Functions)"
     },
     {
       "url": "http://localhost:3000",
@@ -391,6 +391,104 @@
           }
         }
       },
+      "Payment": {
+        "type": "object",
+        "required": [
+          "userId",
+          "enrollmentId",
+          "courseId",
+          "amount",
+          "paymentMethod"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "enrollmentId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "example": 10000
+          },
+          "currency": {
+            "type": "string",
+            "example": "XOF",
+            "default": "XOF"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "orange-money",
+              "wave",
+              "free-money",
+              "card"
+            ],
+            "example": "orange-money"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SUCCESS",
+              "FAILED",
+              "CANCELLED",
+              "EXPIRED"
+            ],
+            "example": "PENDING"
+          },
+          "orderReferenceNumber": {
+            "type": "string",
+            "example": "MS-1701234567-8901"
+          },
+          "payToken": {
+            "type": "string"
+          },
+          "paymentUrl": {
+            "type": "string"
+          },
+          "customerPhoneNumber": {
+            "type": "string",
+            "example": "+221771234567"
+          },
+          "customerFirstName": {
+            "type": "string",
+            "example": "Amadou"
+          },
+          "customerLastName": {
+            "type": "string",
+            "example": "Diallo"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "Error": {
         "type": "object",
         "properties": {
@@ -449,6 +547,10 @@
     {
       "name": "Instructors",
       "description": "Gestion des instructeurs"
+    },
+    {
+      "name": "Payments",
+      "description": "Gestion des paiements Orange Money"
     }
   ],
   "paths": {
@@ -1638,6 +1740,276 @@
         "responses": {
           "200": {
             "description": "Liste des leçons"
+          }
+        }
+      }
+    },
+    "/api/payments": {
+      "post": {
+        "summary": "Crée un nouveau paiement",
+        "tags": [
+          "Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "enrollmentId",
+                  "courseId",
+                  "amount",
+                  "paymentMethod"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "enrollmentId": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "default": "XOF"
+                  },
+                  "paymentMethod": {
+                    "type": "string",
+                    "enum": [
+                      "orange-money",
+                      "wave",
+                      "free-money",
+                      "card"
+                    ]
+                  },
+                  "customerPhoneNumber": {
+                    "type": "string",
+                    "description": "Requis pour orange-money"
+                  },
+                  "customerFirstName": {
+                    "type": "string"
+                  },
+                  "customerLastName": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Paiement créé avec succès"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupère tous les paiements",
+        "tags": [
+          "Payments"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/{id}": {
+      "get": {
+        "summary": "Récupère un paiement par ID",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiement trouvé"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprime un paiement",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiement supprimé"
+          }
+        }
+      }
+    },
+    "/api/payments/user/{userId}": {
+      "get": {
+        "summary": "Récupère tous les paiements d'un utilisateur",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/enrollment/{enrollmentId}": {
+      "get": {
+        "summary": "Récupère tous les paiements d'une inscription",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/status/{status}": {
+      "get": {
+        "summary": "Récupère tous les paiements par statut",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "SUCCESS",
+                "FAILED",
+                "CANCELLED",
+                "EXPIRED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/{id}/check": {
+      "get": {
+        "summary": "Vérifie le statut d'un paiement Orange Money",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statut du paiement"
+          }
+        }
+      }
+    },
+    "/api/payments/{id}/cancel": {
+      "post": {
+        "summary": "Annule un paiement en attente",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiement annulé"
+          }
+        }
+      }
+    },
+    "/api/payments/webhook/orange-money": {
+      "post": {
+        "summary": "Webhook pour les notifications Orange Money",
+        "tags": [
+          "Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook traité"
           }
         }
       }
