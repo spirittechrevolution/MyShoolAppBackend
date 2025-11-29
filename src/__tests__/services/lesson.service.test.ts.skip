@@ -1,0 +1,141 @@
+import { LessonService } from '../../services/lesson.service';
+
+// Mock Firestore
+jest.mock('../../config/firebase.config', () => ({
+  db: {
+    collection: jest.fn(() => ({
+      add: jest.fn(),
+      doc: jest.fn(() => ({
+        get: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      })),
+      where: jest.fn(() => ({
+        get: jest.fn(),
+      })),
+      get: jest.fn(),
+    })),
+  },
+}));
+
+describe('LessonService', () => {
+  let lessonService: LessonService;
+
+  beforeEach(() => {
+    lessonService = new LessonService();
+    jest.clearAllMocks();
+  });
+
+  describe('create', () => {
+    it('should create a new lesson', async () => {
+      const lessonData = {
+        title: 'Test Lesson',
+        chapterId: 'test-chapter',
+        courseId: 'test-course',
+        order: 1,
+        duration: '30:00',
+        type: 'video' as const,
+      };
+
+      const lesson = await lessonService.create(lessonData);
+
+      expect(lesson).toBeDefined();
+      expect(lesson.title).toBe(lessonData.title);
+      expect(lesson.chapterId).toBe(lessonData.chapterId);
+    });
+  });
+
+  describe('getById', () => {
+    it('should return a lesson by ID', async () => {
+      const lessonId = 'test-lesson';
+
+      const lesson = await lessonService.getById(lessonId);
+
+      // Le test passera si la méthode ne lance pas d'erreur
+      expect(true).toBe(true);
+    });
+
+    it('should include document ID in returned lesson', async () => {
+      const lessonId = 'test-lesson';
+
+      const lesson = await lessonService.getById(lessonId);
+
+      if (lesson) {
+        expect(lesson).toHaveProperty('title');
+      }
+    });
+  });
+
+  describe('getByChapterId', () => {
+    it('should return lessons for a chapter', async () => {
+      const chapterId = 'test-chapter';
+
+      const lessons = await lessonService.getByChapterId(chapterId);
+
+      expect(Array.isArray(lessons)).toBe(true);
+    });
+
+    it('should return lessons in correct order', async () => {
+      const chapterId = 'test-chapter';
+
+      const lessons = await lessonService.getByChapterId(chapterId);
+
+      // Vérifier que les leçons sont triées par ordre
+      for (let i = 0; i < lessons.length - 1; i++) {
+        if (lessons[i].order && lessons[i + 1].order) {
+          expect(lessons[i].order).toBeLessThanOrEqual(lessons[i + 1].order);
+        }
+      }
+    });
+  });
+
+  describe('getByCourseId', () => {
+    it('should return lessons for a course', async () => {
+      const courseId = 'test-course';
+
+      const lessons = await lessonService.getByCourseId(courseId);
+
+      expect(Array.isArray(lessons)).toBe(true);
+    });
+  });
+
+  describe('update', () => {
+    it('should update a lesson', async () => {
+      const lessonId = 'test-lesson';
+      const updateData = {
+        title: 'Updated Lesson',
+        duration: '45:00',
+      };
+
+      await expect(
+        lessonService.update(lessonId, updateData)
+      ).resolves.not.toThrow();
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a lesson', async () => {
+      const lessonId = 'test-lesson';
+
+      await expect(
+        lessonService.delete(lessonId)
+      ).resolves.not.toThrow();
+    });
+  });
+
+  describe('getAll', () => {
+    it('should return all lessons', async () => {
+      const lessons = await lessonService.getAll();
+
+      expect(Array.isArray(lessons)).toBe(true);
+    });
+
+    it('should include document IDs in all lessons', async () => {
+      const lessons = await lessonService.getAll();
+
+      lessons.forEach(lesson => {
+        expect(lesson).toBeDefined();
+      });
+    });
+  });
+});

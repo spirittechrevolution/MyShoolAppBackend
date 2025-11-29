@@ -98,10 +98,12 @@ app.use((err: any, req: Request, res: Response, next: any) => {
   });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur MySchool démarré sur http://localhost:${PORT}`);
-  console.log(`📚 Documentation API disponible sur http://localhost:${PORT}`);
-});
+// Start Server only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Serveur MySchool démarré sur http://localhost:${PORT}`);
+    console.log(`📚 Documentation API disponible sur http://localhost:${PORT}`);
+  });
+}
 
 export default app;
