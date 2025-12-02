@@ -702,6 +702,14 @@
     {
       "name": "Push Notifications",
       "description": "Gestion des notifications push Firebase Cloud Messaging"
+    },
+    {
+      "name": "FAQ",
+      "description": "Gestion des questions fréquemment posées"
+    },
+    {
+      "name": "AI Chat",
+      "description": "Chatbot intelligent avec Gemini AI"
     }
   ],
   "paths": {
@@ -3242,6 +3250,486 @@
         "responses": {
           "200": {
             "description": "Liste des tokens"
+          }
+        }
+      }
+    },
+    "/faqs": {
+      "post": {
+        "tags": ["FAQ"],
+        "summary": "Créer une nouvelle FAQ",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["question", "answer", "category"],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "description": "La question de la FAQ"
+                  },
+                  "answer": {
+                    "type": "string",
+                    "description": "La réponse à la question"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"],
+                    "description": "Catégorie de la FAQ"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tags pour la recherche"
+                  },
+                  "isActive": {
+                    "type": "boolean",
+                    "description": "Si la FAQ est active",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "FAQ créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      },
+      "get": {
+        "tags": ["FAQ"],
+        "summary": "Obtenir toutes les FAQs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string",
+              "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
+            },
+            "description": "Filtrer par catégorie"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filtrer par statut actif"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "description": "Nombre maximum de résultats"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Nombre de résultats à ignorer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des FAQs"
+          }
+        }
+      }
+    },
+    "/faqs/search": {
+      "get": {
+        "tags": ["FAQ"],
+        "summary": "Rechercher dans les FAQs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Terme de recherche"
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string",
+              "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
+            },
+            "description": "Filtrer par catégorie"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Résultats de recherche"
+          },
+          "400": {
+            "description": "Paramètre de recherche manquant"
+          }
+        }
+      }
+    },
+    "/faqs/stats": {
+      "get": {
+        "tags": ["FAQ"],
+        "summary": "Obtenir les statistiques des FAQs",
+        "responses": {
+          "200": {
+            "description": "Statistiques des FAQs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "byCategory": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      }
+                    },
+                    "active": {
+                      "type": "integer"
+                    },
+                    "inactive": {
+                      "type": "integer"
+                    },
+                    "mostHelpful": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/faqs/category/{category}": {
+      "get": {
+        "tags": ["FAQ"],
+        "summary": "Obtenir les FAQs par catégorie",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQs de la catégorie"
+          }
+        }
+      }
+    },
+    "/faqs/{id}": {
+      "get": {
+        "tags": ["FAQ"],
+        "summary": "Obtenir une FAQ par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ trouvée"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": ["FAQ"],
+        "summary": "Mettre à jour une FAQ",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "answer": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "FAQ mise à jour"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["FAQ"],
+        "summary": "Supprimer une FAQ",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ supprimée"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      }
+    },
+    "/faqs/{id}/helpful": {
+      "post": {
+        "tags": ["FAQ"],
+        "summary": "Marquer une FAQ comme utile ou non",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["helpful"],
+                "properties": {
+                  "helpful": {
+                    "type": "boolean",
+                    "description": "Si la FAQ est utile"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback enregistré"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      }
+    },
+    "/chat/ask": {
+      "post": {
+        "tags": ["AI Chat"],
+        "summary": "Poser une question au chatbot IA",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "question"],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur"
+                  },
+                  "question": {
+                    "type": "string",
+                    "description": "La question à poser"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Réponse du chatbot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "answer": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string",
+                      "enum": ["faq", "ai"]
+                    },
+                    "faqId": {
+                      "type": "string"
+                    },
+                    "conversationId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      }
+    },
+    "/chat/history/{userId}": {
+      "get": {
+        "tags": ["AI Chat"],
+        "summary": "Obtenir l'historique de conversation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historique de conversation"
+          },
+          "404": {
+            "description": "Aucun historique trouvé"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["AI Chat"],
+        "summary": "Effacer l'historique de conversation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historique effacé"
+          }
+        }
+      }
+    },
+    "/chat/feedback": {
+      "post": {
+        "tags": ["AI Chat"],
+        "summary": "Donner un feedback sur une réponse",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "messageIndex", "helpful"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "messageIndex": {
+                    "type": "integer",
+                    "description": "Index du message dans l'historique"
+                  },
+                  "helpful": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback enregistré"
+          },
+          "404": {
+            "description": "Message non trouvé"
           }
         }
       }

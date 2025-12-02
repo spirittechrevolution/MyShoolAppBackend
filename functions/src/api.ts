@@ -13,6 +13,8 @@ import instructorRoutes from './routes/instructor.routes';
 import paymentRoutes from './routes/payment.routes';
 import referralRoutes from './routes/referral.routes';
 import pushNotificationRoutes from './routes/push-notification.routes';
+import faqRoutes from './routes/faq.routes';
+import chatRoutes from './routes/chat.routes';
 
 // Load environment variables (for local development)
 dotenv.config();
@@ -27,14 +29,24 @@ const allowedOrigins = [
   'http://localhost:4203',
   'http://localhost:4204',
   'http://localhost:4205',
-  // Ajouter vos domaines de production ici
+  // Domaines de production
   'https://myschool-f862b.web.app',
-  'https://myschool-f862b.firebaseapp.com'
+  'https://myschool-f862b.firebaseapp.com',
+  // URLs Cloud Functions pour Swagger UI
+  'https://us-central1-myschool-f862b.cloudfunctions.net',
+  'https://api-xa66eyezzq-uc.a.run.app'
 ];
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Autoriser les requêtes sans origin (ex: Postman, curl, server-to-server)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    
+    // Vérifier si l'origin est dans la liste autorisée
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Non autorisé par CORS'));
@@ -70,7 +82,9 @@ app.get('/', (req, res) => {
       instructors: '/instructors',
       payments: '/payments',
       referrals: '/referrals',
-      pushNotifications: '/push-notifications'
+      pushNotifications: '/push-notifications',
+      faqs: '/faqs',
+      chat: '/chat'
     }
   });
 });
@@ -143,6 +157,8 @@ app.use('/instructors', instructorRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/referrals', referralRoutes);
 app.use('/push-notifications', pushNotificationRoutes);
+app.use('/faqs', faqRoutes);
+app.use('/chat', chatRoutes);
 
 // 404 Handler
 app.use((req, res) => {
@@ -162,5 +178,5 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Export de l'app Express comme Cloud Function
+// Export de l'app Express comme Cloud Function (v2)
 export const api = functions.https.onRequest(app);
