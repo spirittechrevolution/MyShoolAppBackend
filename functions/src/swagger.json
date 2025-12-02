@@ -698,10 +698,14 @@
     {
       "name": "Referrals",
       "description": "Système de parrainage avec deep links"
+    },
+    {
+      "name": "Push Notifications",
+      "description": "Gestion des notifications push Firebase Cloud Messaging"
     }
   ],
   "paths": {
-    "/api/chapters": {
+    "/chapters": {
       "post": {
         "tags": [
           "Chapters"
@@ -735,7 +739,7 @@
         }
       }
     },
-    "/api/chapters/{id}": {
+    "/chapters/{id}": {
       "get": {
         "tags": [
           "Chapters"
@@ -810,7 +814,7 @@
         }
       }
     },
-    "/api/chapters/course/{courseId}": {
+    "/chapters/course/{courseId}": {
       "get": {
         "tags": [
           "Chapters"
@@ -833,7 +837,7 @@
         }
       }
     },
-    "/api/courses": {
+    "/courses": {
       "post": {
         "tags": [
           "Courses"
@@ -867,7 +871,7 @@
         }
       }
     },
-    "/api/courses/published": {
+    "/courses/published": {
       "get": {
         "tags": [
           "Courses"
@@ -880,7 +884,7 @@
         }
       }
     },
-    "/api/courses/{id}": {
+    "/courses/{id}": {
       "get": {
         "tags": [
           "Courses"
@@ -958,7 +962,7 @@
         }
       }
     },
-    "/api/courses/category/{category}": {
+    "/courses/category/{category}": {
       "get": {
         "tags": [
           "Courses"
@@ -981,7 +985,7 @@
         }
       }
     },
-    "/api/courses/level/{level}": {
+    "/courses/level/{level}": {
       "get": {
         "tags": [
           "Courses"
@@ -1009,7 +1013,7 @@
         }
       }
     },
-    "/api/courses/type/{type}": {
+    "/courses/type/{type}": {
       "get": {
         "tags": [
           "Courses"
@@ -1032,7 +1036,7 @@
         }
       }
     },
-    "/api/courses/{id}/publish": {
+    "/courses/{id}/publish": {
       "patch": {
         "tags": [
           "Courses"
@@ -1055,7 +1059,7 @@
         }
       }
     },
-    "/api/courses/{id}/unpublish": {
+    "/courses/{id}/unpublish": {
       "patch": {
         "tags": [
           "Courses"
@@ -1078,7 +1082,7 @@
         }
       }
     },
-    "/api/enrollments": {
+    "/enrollments": {
       "post": {
         "tags": [
           "Enrollments"
@@ -1112,7 +1116,7 @@
         }
       }
     },
-    "/api/enrollments/user/{userId}": {
+    "/enrollments/user/{userId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1135,7 +1139,7 @@
         }
       }
     },
-    "/api/enrollments/{id}": {
+    "/enrollments/{id}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1210,7 +1214,7 @@
         }
       }
     },
-    "/api/enrollments/course/{courseId}": {
+    "/enrollments/course/{courseId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1233,7 +1237,7 @@
         }
       }
     },
-    "/api/enrollments/status/{status}": {
+    "/enrollments/status/{status}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1261,7 +1265,7 @@
         }
       }
     },
-    "/api/enrollments/user/{userId}/course/{courseId}": {
+    "/enrollments/user/{userId}/course/{courseId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1292,7 +1296,7 @@
         }
       }
     },
-    "/api/enrollments/{id}/progress": {
+    "/enrollments/{id}/progress": {
       "patch": {
         "tags": [
           "Enrollments"
@@ -1332,7 +1336,7 @@
         }
       }
     },
-    "/api/enrollments/{id}/status": {
+    "/enrollments/{id}/status": {
       "patch": {
         "tags": [
           "Enrollments"
@@ -1375,7 +1379,7 @@
         }
       }
     },
-    "/api/exercises": {
+    "/exercises": {
       "post": {
         "tags": [
           "Exercises"
@@ -1409,7 +1413,7 @@
         }
       }
     },
-    "/api/exercises/{id}": {
+    "/exercises/{id}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1484,7 +1488,7 @@
         }
       }
     },
-    "/api/exercises/course/{courseId}": {
+    "/exercises/course/{courseId}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1507,7 +1511,7 @@
         }
       }
     },
-    "/api/exercises/chapter/{chapterId}": {
+    "/exercises/chapter/{chapterId}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1530,7 +1534,7 @@
         }
       }
     },
-    "/api/exercises/type/{type}": {
+    "/exercises/type/{type}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1558,7 +1562,7 @@
         }
       }
     },
-    "/api/exercises/difficulty/{difficulty}": {
+    "/exercises/difficulty/{difficulty}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1581,7 +1585,7 @@
         }
       }
     },
-    "/api/instructors": {
+    "/instructors": {
       "post": {
         "tags": [
           "Instructors"
@@ -1615,7 +1619,7 @@
         }
       }
     },
-    "/api/instructors/{id}": {
+    "/instructors/{id}": {
       "get": {
         "tags": [
           "Instructors"
@@ -1690,7 +1694,7 @@
         }
       }
     },
-    "/api/instructors/course/{courseId}": {
+    "/instructors/course/{courseId}": {
       "get": {
         "tags": [
           "Instructors"
@@ -1713,7 +1717,7 @@
         }
       }
     },
-    "/api/instructors/expertise/{expertiseId}": {
+    "/instructors/expertise/{expertiseId}": {
       "get": {
         "tags": [
           "Instructors"
@@ -1736,7 +1740,7 @@
         }
       }
     },
-    "/api/lessons": {
+    "/lessons": {
       "post": {
         "tags": [
           "Lessons"
@@ -1770,7 +1774,7 @@
         }
       }
     },
-    "/api/lessons/{id}": {
+    "/lessons/{id}": {
       "get": {
         "tags": [
           "Lessons"
@@ -1845,7 +1849,7 @@
         }
       }
     },
-    "/api/lessons/course/{courseId}": {
+    "/lessons/course/{courseId}": {
       "get": {
         "tags": [
           "Lessons"
@@ -1868,7 +1872,7 @@
         }
       }
     },
-    "/api/lessons/chapter/{chapterId}": {
+    "/lessons/chapter/{chapterId}": {
       "get": {
         "tags": [
           "Lessons"
@@ -1891,7 +1895,7 @@
         }
       }
     },
-    "/api/payments": {
+    "/payments": {
       "post": {
         "summary": "Crée un nouveau paiement",
         "tags": [
@@ -1972,7 +1976,7 @@
         }
       }
     },
-    "/api/payments/{id}": {
+    "/payments/{id}": {
       "get": {
         "summary": "Récupère un paiement par ID",
         "tags": [
@@ -2016,7 +2020,7 @@
         }
       }
     },
-    "/api/payments/user/{userId}": {
+    "/payments/user/{userId}": {
       "get": {
         "summary": "Récupère tous les paiements d'un utilisateur",
         "tags": [
@@ -2039,7 +2043,7 @@
         }
       }
     },
-    "/api/payments/enrollment/{enrollmentId}": {
+    "/payments/enrollment/{enrollmentId}": {
       "get": {
         "summary": "Récupère tous les paiements d'une inscription",
         "tags": [
@@ -2062,7 +2066,7 @@
         }
       }
     },
-    "/api/payments/status/{status}": {
+    "/payments/status/{status}": {
       "get": {
         "summary": "Récupère tous les paiements par statut",
         "tags": [
@@ -2092,7 +2096,7 @@
         }
       }
     },
-    "/api/payments/{id}/check": {
+    "/payments/{id}/check": {
       "get": {
         "summary": "Vérifie le statut d'un paiement Orange Money",
         "tags": [
@@ -2115,7 +2119,7 @@
         }
       }
     },
-    "/api/payments/{id}/cancel": {
+    "/payments/{id}/cancel": {
       "post": {
         "summary": "Annule un paiement en attente",
         "tags": [
@@ -2138,7 +2142,7 @@
         }
       }
     },
-    "/api/payments/webhook/orange-money": {
+    "/payments/webhook/orange-money": {
       "post": {
         "summary": "Webhook pour les notifications Orange Money",
         "tags": [
@@ -2161,7 +2165,7 @@
         }
       }
     },
-    "/api/referrals/generate": {
+    "/referrals/generate": {
       "post": {
         "summary": "Génère un nouveau lien de parrainage",
         "tags": [
@@ -2247,7 +2251,7 @@
         }
       }
     },
-    "/api/referrals/user/{userId}": {
+    "/referrals/user/{userId}": {
       "get": {
         "summary": "Récupère tous les parrainages d'un utilisateur",
         "tags": [
@@ -2295,7 +2299,7 @@
         }
       }
     },
-    "/api/referrals/user/{userId}/stats": {
+    "/referrals/user/{userId}/stats": {
       "get": {
         "summary": "Récupère les statistiques de parrainage d'un utilisateur",
         "tags": [
@@ -2337,7 +2341,7 @@
         }
       }
     },
-    "/api/referrals/track-click": {
+    "/referrals/track-click": {
       "post": {
         "summary": "Enregistre un clic sur un lien de parrainage",
         "tags": [
@@ -2408,7 +2412,7 @@
         }
       }
     },
-    "/api/referrals/validate": {
+    "/referrals/validate": {
       "post": {
         "summary": "Valide un code de parrainage lors de l'inscription",
         "tags": [
@@ -2483,7 +2487,7 @@
         }
       }
     },
-    "/api/referrals/code/{code}": {
+    "/referrals/code/{code}": {
       "get": {
         "summary": "Récupère un parrainage par son code",
         "tags": [
@@ -2528,7 +2532,7 @@
         }
       }
     },
-    "/api/referrals/{id}": {
+    "/referrals/{id}": {
       "get": {
         "summary": "Récupère un parrainage par ID",
         "tags": [
@@ -2613,7 +2617,7 @@
         }
       }
     },
-    "/api/referrals": {
+    "/referrals": {
       "get": {
         "summary": "Récupère tous les parrainages (Admin)",
         "tags": [
@@ -2650,7 +2654,7 @@
         }
       }
     },
-    "/api/referrals/{id}/cancel": {
+    "/referrals/{id}/cancel": {
       "post": {
         "summary": "Annule un parrainage",
         "tags": [
@@ -2692,7 +2696,7 @@
         }
       }
     },
-    "/api/users": {
+    "/users": {
       "post": {
         "tags": [
           "Users"
@@ -2765,7 +2769,7 @@
         }
       }
     },
-    "/api/users/{id}": {
+    "/users/{id}": {
       "get": {
         "tags": [
           "Users"
@@ -2850,7 +2854,7 @@
         }
       }
     },
-    "/api/users/email/{email}": {
+    "/users/email/{email}": {
       "get": {
         "tags": [
           "Users"
@@ -2876,7 +2880,7 @@
         }
       }
     },
-    "/api/users/phone/{phone}": {
+    "/users/phone/{phone}": {
       "get": {
         "tags": [
           "Users"
@@ -2903,7 +2907,7 @@
         }
       }
     },
-    "/api/users/role/{role}": {
+    "/users/role/{role}": {
       "get": {
         "tags": [
           "Users"
@@ -2931,7 +2935,7 @@
         }
       }
     },
-    "/api/users/status/{status}": {
+    "/users/status/{status}": {
       "get": {
         "tags": [
           "Users"
@@ -2959,7 +2963,7 @@
         }
       }
     },
-    "/api/users/{id}/profile-image": {
+    "/users/{id}/profile-image": {
       "patch": {
         "tags": [
           "Users"
@@ -2998,7 +3002,7 @@
         }
       }
     },
-    "/api/users/{id}/status": {
+    "/users/{id}/status": {
       "patch": {
         "tags": [
           "Users"
@@ -3037,6 +3041,207 @@
         "responses": {
           "200": {
             "description": "Statut mis à jour"
+          }
+        }
+      }
+    },
+    "/push-notifications/register-token": {
+      "post": {
+        "summary": "Enregistrer un token FCM",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "token",
+                  "platform"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token FCM du device"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "web"
+                    ],
+                    "description": "Plateforme du device"
+                  },
+                  "deviceId": {
+                    "type": "string",
+                    "description": "ID unique du device"
+                  },
+                  "deviceName": {
+                    "type": "string",
+                    "description": "Nom du device"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token enregistré avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      }
+    },
+    "/push-notifications/remove-token": {
+      "delete": {
+        "summary": "Supprimer un token FCM",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "token"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token supprimé avec succès"
+          }
+        }
+      }
+    },
+    "/push-notifications/send-test": {
+      "post": {
+        "summary": "Envoyer une notification test",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification envoyée"
+          }
+        }
+      }
+    },
+    "/push-notifications/user/{userId}": {
+      "get": {
+        "summary": "Récupérer les notifications d'un utilisateur",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des notifications"
+          }
+        }
+      }
+    },
+    "/push-notifications/{id}/read": {
+      "patch": {
+        "summary": "Marquer une notification comme lue",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marquée comme lue"
+          }
+        }
+      }
+    },
+    "/push-notifications/tokens/{userId}": {
+      "get": {
+        "summary": "Récupérer les tokens FCM d'un utilisateur (debug)",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des tokens"
           }
         }
       }

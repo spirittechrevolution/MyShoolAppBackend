@@ -13,6 +13,21 @@ db.settings({
 // ============ EXPORT DE L'API EXPRESS ============
 export { api } from './api';
 
+// ============ CLOUD FUNCTIONS SMS ============
+export { 
+  sendSmsOnCreate, 
+  retrySendFailedSms, 
+  cleanupOldSms 
+} from './sms-sender.function';
+
+// ============ CLOUD FUNCTIONS NOTIFICATIONS ============
+export {
+  sendSmsOnPaymentCreated,
+  sendSmsOnPaymentUpdated,
+  sendSmsOnEnrollment,
+  sendSmsOnCertificateEarned
+} from './notification-triggers.function';
+
 // ============ CLOUD FUNCTIONS TRIGGERS ============
 // NOTE: Les triggers Firestore et scheduled functions sont temporairement désactivés
 // pour résoudre les problèmes de compatibilité avec firebase-functions v2

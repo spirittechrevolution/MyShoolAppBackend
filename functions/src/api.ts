@@ -12,6 +12,7 @@ import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
 import paymentRoutes from './routes/payment.routes';
 import referralRoutes from './routes/referral.routes';
+import pushNotificationRoutes from './routes/push-notification.routes';
 
 // Load environment variables (for local development)
 dotenv.config();
@@ -60,14 +61,16 @@ app.get('/', (req, res) => {
       description: 'Interface Swagger UI interactive disponible sur /api/api-docs'
     },
     endpoints: {
-      users: '/api/users',
-      courses: '/api/courses',
-      chapters: '/api/chapters',
-      lessons: '/api/lessons',
-      exercises: '/api/exercises',
-      enrollments: '/api/enrollments',
-      instructors: '/api/instructors',
-      payments: '/api/payments'
+      users: '/users',
+      courses: '/courses',
+      chapters: '/chapters',
+      lessons: '/lessons',
+      exercises: '/exercises',
+      enrollments: '/enrollments',
+      instructors: '/instructors',
+      payments: '/payments',
+      referrals: '/referrals',
+      pushNotifications: '/push-notifications'
     }
   });
 });
@@ -129,16 +132,17 @@ app.get('/openapi.json', (req, res) => {
   res.json(swaggerDocument);
 });
 
-// API Routes
-app.use('/api/users', userRoutes);
-app.use('/api/courses', courseRoutes);
-app.use('/api/chapters', chapterRoutes);
-app.use('/api/lessons', lessonRoutes);
-app.use('/api/exercises', exerciseRoutes);
-app.use('/api/enrollments', enrollmentRoutes);
-app.use('/api/instructors', instructorRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/referrals', referralRoutes);
+// API Routes (sans préfixe /api pour éviter le double /api dans l'URL)
+app.use('/users', userRoutes);
+app.use('/courses', courseRoutes);
+app.use('/chapters', chapterRoutes);
+app.use('/lessons', lessonRoutes);
+app.use('/exercises', exerciseRoutes);
+app.use('/enrollments', enrollmentRoutes);
+app.use('/instructors', instructorRoutes);
+app.use('/payments', paymentRoutes);
+app.use('/referrals', referralRoutes);
+app.use('/push-notifications', pushNotificationRoutes);
 
 // 404 Handler
 app.use((req, res) => {

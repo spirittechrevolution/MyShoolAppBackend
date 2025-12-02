@@ -4,6 +4,7 @@
 
 import { Request, Response } from 'express';
 import { ReferralService } from '../services/referral.service';
+import { smsService } from '../services/sms.service';
 
 const referralService = new ReferralService();
 
@@ -29,6 +30,22 @@ export class ReferralController {
         bonusAmount || 500,
         bonusType || 'DISCOUNT'
       );
+
+      // Si un numéro de téléphone est fourni, envoie un SMS d'invitation
+      if (req.body.phoneNumber && req.body.referrerName) {
+        try {
+          await smsService.sendReferralSms(
+            req.body.phoneNumber,
+            req.body.referrerName,
+            referral.referralCode,
+            referral.bonusAmount
+          );
+          console.log(`📱 SMS d'invitation envoyé à ${req.body.phoneNumber}`);
+        } catch (smsError: any) {
+          console.error('❌ Erreur envoi SMS:', smsError.message);
+          // Continue même si le SMS échoue
+        }
+      }
 
       res.status(201).json({
         success: true,
@@ -164,6 +181,33 @@ export class ReferralController {
           message: 'Code de parrainage invalide'
         });
         return;
+      }
+
+      // Envoie SMS de bienvenue au nouveau utilisateur et SMS de succès au parrain
+      try {
+        // SMS de bienvenue au filleul (si numéro fourni)
+        if (req.body.phoneNumber && req.body.firstName) {
+          await smsService.sendWelcomeSms(
+            req.body.phoneNumber,
+            req.body.firstName,
+            referral.bonusAmount
+          );
+          console.log(`📱 SMS de bienvenue envoyé à ${req.body.phoneNumber}`);
+        }
+
+        // SMS de succès au parrain (nécessite de récupérer les infos du parrain)
+        if (req.body.referrerPhone && req.body.referrerName) {
+          await smsService.sendReferralSuccessSms(
+            req.body.referrerPhone,
+            req.body.referrerName,
+            req.body.firstName || 'Un ami',
+            referral.bonusAmount
+          );
+          console.log(`📱 SMS de succès envoyé au parrain ${req.body.referrerPhone}`);
+        }
+      } catch (smsError: any) {
+        console.error('❌ Erreur envoi SMS:', smsError.message);
+        // Continue même si le SMS échoue
       }
 
       res.status(200).json({
