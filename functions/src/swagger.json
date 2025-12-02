@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "MySchool API",
-    "version": "2.0.0",
+    "version": "2.2.0",
     "description": "API REST complète pour MySchool e-learning. \n        Gestion des utilisateurs, cours, chapitres, leçons, exercices, inscriptions et instructeurs.\n        Support complet des requêtes filtrées et index Firestore optimisés.",
     "contact": {
       "name": "MySchool Support",
@@ -489,6 +489,149 @@
           }
         }
       },
+      "Referral": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID du parrainage"
+          },
+          "referrerId": {
+            "type": "string",
+            "description": "ID de l'utilisateur parrain"
+          },
+          "referredUserId": {
+            "type": "string",
+            "description": "ID de l'utilisateur parrainé"
+          },
+          "referralCode": {
+            "type": "string",
+            "example": "REF_GPL8_A1B2C3",
+            "description": "Code de parrainage (REF_XXXX_XXXXXX)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED"
+            ],
+            "example": "PENDING",
+            "description": "Statut du parrainage"
+          },
+          "bonusAmount": {
+            "type": "number",
+            "example": 500,
+            "description": "Montant du bonus en centimes"
+          },
+          "bonusType": {
+            "type": "string",
+            "enum": [
+              "DISCOUNT",
+              "FREE_COURSE",
+              "POINTS"
+            ],
+            "example": "DISCOUNT",
+            "description": "Type de bonus"
+          },
+          "clicks": {
+            "type": "number",
+            "example": 0,
+            "description": "Nombre de clics sur le lien"
+          },
+          "conversions": {
+            "type": "number",
+            "example": 0,
+            "description": "Nombre de conversions réussies"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "deepLink": {
+                "type": "string",
+                "example": "myschool://referral?code=REF_GPL8_A1B2C3"
+              },
+              "webLink": {
+                "type": "string",
+                "example": "https://myschool-app.com/join?ref=REF_GPL8_A1B2C3"
+              },
+              "shareText": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string",
+                "example": "whatsapp"
+              }
+            }
+          }
+        }
+      },
+      "ReferralStats": {
+        "type": "object",
+        "properties": {
+          "totalReferrals": {
+            "type": "number",
+            "example": 5
+          },
+          "activeReferrals": {
+            "type": "number",
+            "example": 2
+          },
+          "completedReferrals": {
+            "type": "number",
+            "example": 2
+          },
+          "expiredReferrals": {
+            "type": "number",
+            "example": 1
+          },
+          "cancelledReferrals": {
+            "type": "number",
+            "example": 0
+          },
+          "totalClicks": {
+            "type": "number",
+            "example": 25
+          },
+          "totalConversions": {
+            "type": "number",
+            "example": 2
+          },
+          "conversionRate": {
+            "type": "number",
+            "example": 8
+          },
+          "totalEarnings": {
+            "type": "number",
+            "example": 1000,
+            "description": "En centimes"
+          },
+          "pendingBonus": {
+            "type": "number",
+            "example": 1000,
+            "description": "En centimes"
+          },
+          "referrals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Referral"
+            }
+          }
+        }
+      },
       "Error": {
         "type": "object",
         "properties": {
@@ -551,6 +694,10 @@
     {
       "name": "Payments",
       "description": "Gestion des paiements Orange Money"
+    },
+    {
+      "name": "Referrals",
+      "description": "Système de parrainage avec deep links"
     }
   ],
   "paths": {
@@ -2010,6 +2157,537 @@
         "responses": {
           "200": {
             "description": "Webhook traité"
+          }
+        }
+      }
+    },
+    "/api/referrals/generate": {
+      "post": {
+        "summary": "Génère un nouveau lien de parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur parrain"
+                  },
+                  "bonusAmount": {
+                    "type": "number",
+                    "description": "Montant du bonus en centimes (défaut 500)"
+                  },
+                  "bonusType": {
+                    "type": "string",
+                    "enum": [
+                      "DISCOUNT",
+                      "FREE_COURSE",
+                      "POINTS"
+                    ],
+                    "description": "Type de bonus (défaut DISCOUNT)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lien de parrainage créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "deepLink": {
+                          "type": "string"
+                        },
+                        "webLink": {
+                          "type": "string"
+                        },
+                        "shareText": {
+                          "type": "string"
+                        },
+                        "bonusAmount": {
+                          "type": "number"
+                        },
+                        "expiresAt": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/user/{userId}": {
+      "get": {
+        "summary": "Récupère tous les parrainages d'un utilisateur",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des parrainages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Referral"
+                      }
+                    },
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/user/{userId}/stats": {
+      "get": {
+        "summary": "Récupère les statistiques de parrainage d'un utilisateur",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistiques de parrainage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReferralStats"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/track-click": {
+      "post": {
+        "summary": "Enregistre un clic sur un lien de parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Code de parrainage"
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "Source du clic (whatsapp, sms, email, etc.)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Clic enregistré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "clicks": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Code manquant"
+          },
+          "404": {
+            "description": "Code non trouvé ou expiré"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/validate": {
+      "post": {
+        "summary": "Valide un code de parrainage lors de l'inscription",
+        "tags": [
+          "Referrals"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code",
+                  "userId"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Code de parrainage"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID du nouvel utilisateur"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Code validé et bonus appliqué",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "bonusAmount": {
+                          "type": "number"
+                        },
+                        "bonusType": {
+                          "type": "string"
+                        },
+                        "referrerId": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides ou code invalide"
+          },
+          "404": {
+            "description": "Code non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/code/{code}": {
+      "get": {
+        "summary": "Récupère un parrainage par son code",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Code de parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails du parrainage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Referral"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Code non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/{id}": {
+      "get": {
+        "summary": "Récupère un parrainage par ID",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails du parrainage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Referral"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parrainage non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprime un parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parrainage supprimé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals": {
+      "get": {
+        "summary": "Récupère tous les parrainages (Admin)",
+        "tags": [
+          "Referrals"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de tous les parrainages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Referral"
+                      }
+                    },
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/{id}/cancel": {
+      "post": {
+        "summary": "Annule un parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parrainage annulé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
           }
         }
       }

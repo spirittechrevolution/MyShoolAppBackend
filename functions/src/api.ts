@@ -11,6 +11,7 @@ import exerciseRoutes from './routes/exercise.routes';
 import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
 import paymentRoutes from './routes/payment.routes';
+import referralRoutes from './routes/referral.routes';
 
 // Load environment variables (for local development)
 dotenv.config();
@@ -137,6 +138,7 @@ app.use('/api/exercises', exerciseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/instructors', instructorRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/referrals', referralRoutes);
 
 // 404 Handler
 app.use((req, res) => {

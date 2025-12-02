@@ -14,6 +14,7 @@ import exerciseRoutes from './routes/exercise.routes';
 import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
 import paymentRoutes from './routes/payment.routes';
+import referralRoutes from './routes/referral.routes';
 import './config/firebase.config'; // Initialize Firebase
 
 const app: Application = express();
@@ -62,7 +63,8 @@ app.get('/', (req: Request, res: Response) => {
       exercises: '/api/exercises',
       enrollments: '/api/enrollments',
       instructors: '/api/instructors',
-      payments: '/api/payments'
+      payments: '/api/payments',
+      referrals: '/api/referrals'
     }
   });
 });
@@ -82,6 +84,7 @@ app.use('/api/exercises', exerciseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/instructors', instructorRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/referrals', referralRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
