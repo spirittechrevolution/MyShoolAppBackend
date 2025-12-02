@@ -12,8 +12,8 @@ import { Timestamp } from 'firebase-admin/firestore';
 const CHAT_COLLECTION = 'chat_conversations';
 
 export class AiChatService {
-  private genAI: GoogleGenerativeAI;
-  private faqService: FaqService;
+  private readonly genAI: GoogleGenerativeAI;
+  private readonly faqService: FaqService;
 
   constructor() {
     // Initialiser Gemini AI
@@ -27,9 +27,9 @@ export class AiChatService {
 
   /**
    * Répondre à une question utilisateur
-   * @param {string} userId - ID de l'utilisateur
-   * @param {string} question - Question posée
-   * @return {Promise<{ answer: string; source: 'faq' | 'ai'; faqId?: string }>} Réponse
+   * @param userId - ID de l'utilisateur
+   * @param question - Question posée
+   * @returns Réponse avec la source (FAQ ou IA)
    */
   async askQuestion(userId: string, question: string): Promise<{
     answer: string;
@@ -75,8 +75,8 @@ export class AiChatService {
 
   /**
    * Générer une réponse avec Gemini AI
-   * @param {string} question - Question de l'utilisateur
-   * @return {Promise<string>} Réponse générée
+   * @param question - Question de l'utilisateur
+   * @returns Réponse générée
    */
   private async generateAiResponse(question: string): Promise<string> {
     try {
@@ -84,10 +84,28 @@ export class AiChatService {
         return 'Le service de chat intelligent n\'est pas configuré. Veuillez contacter le support.';
       }
 
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Liste des modèles à essayer dans l'ordre (Gemini 2.0 puis 1.5 puis 1.0)
+      const modelsToTry = [
+        'gemini-2.0-flash-exp',
+        'gemini-exp-1206',
+        'gemini-2.0-flash-thinking-exp-1219',
+        'gemini-1.5-flash-002',
+        'gemini-1.5-pro-002',
+        'gemini-1.5-flash-8b',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro',
+        'gemini-pro'
+      ];
 
-      // Contexte pour MySchool
-      const context = `Tu es un assistant virtuel pour MySchool, une plateforme d'e-learning.
+      let lastError: any = null;
+
+      // Essayer chaque modèle jusqu'à ce qu'un fonctionne
+      for (const modelName of modelsToTry) {
+        try {
+          const model = this.genAI.getGenerativeModel({ model: modelName });
+
+          // Contexte pour MySchool
+          const context = `Tu es un assistant virtuel pour MySchool, une plateforme d'e-learning.
       
 Informations sur MySchool :
 - Plateforme de cours en ligne
@@ -106,9 +124,20 @@ Règles de réponse :
 
 Question de l'utilisateur : ${question}`;
 
-      const result = await model.generateContent(context);
-      const response = await result.response;
-      return response.text();
+          const result = await model.generateContent(context);
+          const response = result.response;
+          console.log(`✅ Modèle utilisé avec succès: ${modelName}`);
+          return response.text();
+        } catch (error: any) {
+          lastError = error;
+          console.log(`⚠️ Modèle ${modelName} non disponible, essai suivant...`);
+          continue; // Essayer le modèle suivant
+        }
+      }
+
+      // Si aucun modèle n'a fonctionné
+      console.error('Erreur Gemini AI - Aucun modèle disponible:', lastError);
+      return 'Le service de chat intelligent est temporairement indisponible. Veuillez réessayer plus tard ou contacter notre support.';
     } catch (error: any) {
       console.error('Erreur Gemini AI:', error);
       return 'Une erreur est survenue lors du traitement de votre question. Veuillez contacter notre support.';
@@ -117,11 +146,10 @@ Question de l'utilisateur : ${question}`;
 
   /**
    * Sauvegarder un message dans l'historique
-   * @param {string} userId - ID utilisateur
-   * @param {string} question - Question
-   * @param {string} answer - Réponse
-   * @param {string} faqId - ID de la FAQ (optionnel)
-   * @return {Promise<void>} Résultat
+   * @param userId - ID utilisateur
+   * @param question - Question
+   * @param answer - Réponse
+   * @param faqId - ID de la FAQ (optionnel)
    */
   private async saveMessage(
     userId: string,
@@ -172,8 +200,8 @@ Question de l'utilisateur : ${question}`;
 
   /**
    * Récupérer l'historique de conversation d'un utilisateur
-   * @param {string} userId - ID utilisateur
-   * @return {Promise<ChatConversation | null>} Conversation
+   * @param userId - ID utilisateur
+   * @returns Conversation ou null
    */
   async getConversationHistory(userId: string): Promise<ChatConversation | null> {
     try {
@@ -195,10 +223,10 @@ Question de l'utilisateur : ${question}`;
 
   /**
    * Marquer une réponse comme utile/pas utile
-   * @param {string} userId - ID utilisateur
-   * @param {number} messageIndex - Index du message
-   * @param {boolean} helpful - Utile ou non
-   * @return {Promise<{ success: boolean; message: string }>} Résultat
+   * @param userId - ID utilisateur
+   * @param messageIndex - Index du message
+   * @param helpful - Utile ou non
+   * @returns Résultat de l'opération
    */
   async markMessageHelpful(
     userId: string,
@@ -247,8 +275,8 @@ Question de l'utilisateur : ${question}`;
 
   /**
    * Supprimer l'historique de conversation
-   * @param {string} userId - ID utilisateur
-   * @return {Promise<{ success: boolean; message: string }>} Résultat
+   * @param userId - ID utilisateur
+   * @returns Résultat de l'opération
    */
   async clearConversation(userId: string): Promise<{ success: boolean; message: string }> {
     try {
