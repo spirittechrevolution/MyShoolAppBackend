@@ -93,7 +93,7 @@ export const sendSmsOnPaymentCreated = onDocumentCreated(
             screen: 'PaymentStatus',
           }
         );
-        console.log(`✅ Notification push de paiement initié envoyée`);
+        console.log('✅ Notification push de paiement initié envoyée');
       } catch (pushError) {
         console.log('⚠️ Notification push non envoyée (tokens manquants)');
       }
@@ -185,7 +185,7 @@ export const sendSmsOnPaymentUpdated = onDocumentUpdated(
             courseName,
             after.orderId || after.id
           );
-          console.log(`✅ Notification push de paiement réussi envoyée`);
+          console.log('✅ Notification push de paiement réussi envoyée');
         } catch (pushError) {
           console.log('⚠️ Notification push non envoyée');
         }
@@ -206,7 +206,7 @@ export const sendSmsOnPaymentUpdated = onDocumentUpdated(
             after.amount,
             after.failureReason || 'Transaction refusée'
           );
-          console.log(`✅ Notification push de paiement échoué envoyée`);
+          console.log('✅ Notification push de paiement échoué envoyée');
         } catch (pushError) {
           console.log('⚠️ Notification push non envoyée');
         }
@@ -284,7 +284,7 @@ export const sendSmsOnEnrollment = onDocumentCreated(
           course?.title || 'Nouveau cours',
           enrollment.courseId
         );
-        console.log(`✅ Notification push d'inscription envoyée`);
+        console.log('✅ Notification push d\'inscription envoyée');
       } catch (pushError) {
         console.log('⚠️ Notification push non envoyée');
       }
@@ -368,7 +368,7 @@ export const sendSmsOnCertificateEarned = onDocumentUpdated(
           course?.title || 'Cours',
           event.params.enrollmentId
         );
-        console.log(`✅ Notification push de certificat envoyée`);
+        console.log('✅ Notification push de certificat envoyée');
       } catch (pushError) {
         console.log('⚠️ Notification push non envoyée');
       }

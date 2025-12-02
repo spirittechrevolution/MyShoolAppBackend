@@ -13,6 +13,8 @@ import instructorRoutes from './routes/instructor.routes';
 import paymentRoutes from './routes/payment.routes';
 import referralRoutes from './routes/referral.routes';
 import pushNotificationRoutes from './routes/push-notification.routes';
+import faqRoutes from './routes/faq.routes';
+import chatRoutes from './routes/chat.routes';
 
 // Load environment variables (for local development)
 dotenv.config();
@@ -70,7 +72,9 @@ app.get('/', (req, res) => {
       instructors: '/instructors',
       payments: '/payments',
       referrals: '/referrals',
-      pushNotifications: '/push-notifications'
+      pushNotifications: '/push-notifications',
+      faqs: '/faqs',
+      chat: '/chat'
     }
   });
 });
@@ -143,6 +147,8 @@ app.use('/instructors', instructorRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/referrals', referralRoutes);
 app.use('/push-notifications', pushNotificationRoutes);
+app.use('/faqs', faqRoutes);
+app.use('/chat', chatRoutes);
 
 // 404 Handler
 app.use((req, res) => {

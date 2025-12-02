@@ -15,6 +15,8 @@ import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
 import paymentRoutes from './routes/payment.routes';
 import referralRoutes from './routes/referral.routes';
+import faqRoutes from './routes/faq.routes';
+import chatRoutes from './routes/chat.routes';
 import './config/firebase.config'; // Initialize Firebase
 
 const app: Application = express();
@@ -64,7 +66,9 @@ app.get('/', (req: Request, res: Response) => {
       enrollments: '/api/enrollments',
       instructors: '/api/instructors',
       payments: '/api/payments',
-      referrals: '/api/referrals'
+      referrals: '/api/referrals',
+      faqs: '/api/faqs',
+      chat: '/api/chat'
     }
   });
 });
@@ -80,11 +84,13 @@ app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/lessons', lessonRoutes);
-app.use('/api/exercises', exerciseRoutes);
-app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/instructors', instructorRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/referrals', referralRoutes);
+app.use('/api/faqs', faqRoutes);
+app.use('/api/chat', chatRoutes);
+
+// 404 Handlerreferrals', referralRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
