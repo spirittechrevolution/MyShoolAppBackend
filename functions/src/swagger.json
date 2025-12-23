@@ -700,20 +700,20 @@
       "description": "Système de parrainage avec deep links"
     },
     {
-      "name": "Push Notifications",
-      "description": "Gestion des notifications push Firebase Cloud Messaging"
+      "name": "AI Chat",
+      "description": "Chatbot intelligent avec Gemini AI"
     },
     {
       "name": "FAQ",
       "description": "Gestion des questions fréquemment posées"
     },
     {
-      "name": "AI Chat",
-      "description": "Chatbot intelligent avec Gemini AI"
+      "name": "Push Notifications",
+      "description": "Gestion des notifications push Firebase Cloud Messaging"
     }
   ],
   "paths": {
-    "/chapters": {
+    "/api/chapters": {
       "post": {
         "tags": [
           "Chapters"
@@ -747,7 +747,7 @@
         }
       }
     },
-    "/chapters/{id}": {
+    "/api/chapters/{id}": {
       "get": {
         "tags": [
           "Chapters"
@@ -822,7 +822,7 @@
         }
       }
     },
-    "/chapters/course/{courseId}": {
+    "/api/chapters/course/{courseId}": {
       "get": {
         "tags": [
           "Chapters"
@@ -845,7 +845,261 @@
         }
       }
     },
-    "/courses": {
+    "/chat/ask": {
+      "post": {
+        "summary": "Poser une question au chatbot",
+        "tags": [
+          "AI Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "question"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "example": "user123"
+                  },
+                  "question": {
+                    "type": "string",
+                    "example": "Comment obtenir mon certificat ?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Réponse du chatbot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "answer": {
+                          "type": "string"
+                        },
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "faq",
+                            "ai"
+                          ]
+                        },
+                        "faqId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      }
+    },
+    "/chat/history/{userId}": {
+      "get": {
+        "summary": "Récupérer l'historique de conversation",
+        "tags": [
+          "AI Chat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historique de conversation"
+          },
+          "404": {
+            "description": "Aucune conversation trouvée"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer l'historique de conversation",
+        "tags": [
+          "AI Chat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historique supprimé"
+          }
+        }
+      }
+    },
+    "/chat/last/{userId}": {
+      "get": {
+        "summary": "Récupérer le dernier message de chat d'un utilisateur",
+        "tags": [
+          "AI Chat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dernier message de chat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "lastMessage": {
+                          "type": "object",
+                          "properties": {
+                            "role": {
+                              "type": "string",
+                              "enum": [
+                                "user",
+                                "assistant"
+                              ],
+                              "example": "assistant"
+                            },
+                            "content": {
+                              "type": "string",
+                              "example": "Voici la réponse à votre question..."
+                            },
+                            "timestamp": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "faqId": {
+                              "type": "string",
+                              "description": "ID de la FAQ source (si applicable)"
+                            },
+                            "helpful": {
+                              "type": "boolean",
+                              "description": "Feedback utilisateur"
+                            }
+                          }
+                        },
+                        "userId": {
+                          "type": "string",
+                          "example": "uGbrU72VFWfWZcUkvk31QaOi7tG3"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Aucun message trouvé pour cet utilisateur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Aucun message trouvé pour cet utilisateur"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/chat/feedback": {
+      "post": {
+        "summary": "Marquer un message comme utile ou pas",
+        "tags": [
+          "AI Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "messageIndex",
+                  "helpful"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "messageIndex": {
+                    "type": "number"
+                  },
+                  "helpful": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback enregistré"
+          }
+        }
+      }
+    },
+    "/api/courses": {
       "post": {
         "tags": [
           "Courses"
@@ -879,7 +1133,7 @@
         }
       }
     },
-    "/courses/published": {
+    "/api/courses/published": {
       "get": {
         "tags": [
           "Courses"
@@ -892,7 +1146,7 @@
         }
       }
     },
-    "/courses/{id}": {
+    "/api/courses/{id}": {
       "get": {
         "tags": [
           "Courses"
@@ -970,7 +1224,7 @@
         }
       }
     },
-    "/courses/category/{category}": {
+    "/api/courses/category/{category}": {
       "get": {
         "tags": [
           "Courses"
@@ -993,7 +1247,7 @@
         }
       }
     },
-    "/courses/level/{level}": {
+    "/api/courses/level/{level}": {
       "get": {
         "tags": [
           "Courses"
@@ -1021,7 +1275,7 @@
         }
       }
     },
-    "/courses/type/{type}": {
+    "/api/courses/type/{type}": {
       "get": {
         "tags": [
           "Courses"
@@ -1044,7 +1298,7 @@
         }
       }
     },
-    "/courses/{id}/publish": {
+    "/api/courses/{id}/publish": {
       "patch": {
         "tags": [
           "Courses"
@@ -1067,7 +1321,7 @@
         }
       }
     },
-    "/courses/{id}/unpublish": {
+    "/api/courses/{id}/unpublish": {
       "patch": {
         "tags": [
           "Courses"
@@ -1090,7 +1344,7 @@
         }
       }
     },
-    "/enrollments": {
+    "/api/enrollments": {
       "post": {
         "tags": [
           "Enrollments"
@@ -1124,7 +1378,7 @@
         }
       }
     },
-    "/enrollments/user/{userId}": {
+    "/api/enrollments/user/{userId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1147,7 +1401,7 @@
         }
       }
     },
-    "/enrollments/{id}": {
+    "/api/enrollments/{id}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1222,7 +1476,7 @@
         }
       }
     },
-    "/enrollments/course/{courseId}": {
+    "/api/enrollments/course/{courseId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1245,7 +1499,7 @@
         }
       }
     },
-    "/enrollments/status/{status}": {
+    "/api/enrollments/status/{status}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1273,7 +1527,7 @@
         }
       }
     },
-    "/enrollments/user/{userId}/course/{courseId}": {
+    "/api/enrollments/user/{userId}/course/{courseId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1304,7 +1558,7 @@
         }
       }
     },
-    "/enrollments/{id}/progress": {
+    "/api/enrollments/{id}/progress": {
       "patch": {
         "tags": [
           "Enrollments"
@@ -1344,7 +1598,7 @@
         }
       }
     },
-    "/enrollments/{id}/status": {
+    "/api/enrollments/{id}/status": {
       "patch": {
         "tags": [
           "Enrollments"
@@ -1387,7 +1641,7 @@
         }
       }
     },
-    "/exercises": {
+    "/api/exercises": {
       "post": {
         "tags": [
           "Exercises"
@@ -1421,7 +1675,7 @@
         }
       }
     },
-    "/exercises/{id}": {
+    "/api/exercises/{id}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1496,7 +1750,7 @@
         }
       }
     },
-    "/exercises/course/{courseId}": {
+    "/api/exercises/course/{courseId}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1519,7 +1773,7 @@
         }
       }
     },
-    "/exercises/chapter/{chapterId}": {
+    "/api/exercises/chapter/{chapterId}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1542,7 +1796,7 @@
         }
       }
     },
-    "/exercises/type/{type}": {
+    "/api/exercises/type/{type}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1570,7 +1824,7 @@
         }
       }
     },
-    "/exercises/difficulty/{difficulty}": {
+    "/api/exercises/difficulty/{difficulty}": {
       "get": {
         "tags": [
           "Exercises"
@@ -1593,7 +1847,318 @@
         }
       }
     },
-    "/instructors": {
+    "/faqs": {
+      "post": {
+        "summary": "Créer une nouvelle FAQ",
+        "tags": [
+          "FAQ"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question",
+                  "answer",
+                  "category",
+                  "order"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "example": "Comment payer un cours ?"
+                  },
+                  "answer": {
+                    "type": "string",
+                    "example": "Vous pouvez payer via Orange Money, Wave ou Free Money"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "general",
+                      "payments",
+                      "courses",
+                      "enrollment",
+                      "certificates",
+                      "technical",
+                      "account",
+                      "referral"
+                    ]
+                  },
+                  "order": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "paiement",
+                      "orange-money"
+                    ]
+                  },
+                  "isActive": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "FAQ créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupérer toutes les FAQs",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrer par catégorie"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filtrer par statut actif"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nombre maximum de résultats"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des FAQs"
+          }
+        }
+      }
+    },
+    "/faqs/search": {
+      "get": {
+        "summary": "Rechercher des FAQs",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Texte à rechercher"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Résultats de la recherche"
+          }
+        }
+      }
+    },
+    "/faqs/stats": {
+      "get": {
+        "summary": "Récupérer les statistiques des FAQs",
+        "tags": [
+          "FAQ"
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistiques"
+          }
+        }
+      }
+    },
+    "/faqs/category/{category}": {
+      "get": {
+        "summary": "Récupérer les FAQs par catégorie",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "general",
+                "payments",
+                "courses",
+                "enrollment",
+                "certificates",
+                "technical",
+                "account",
+                "referral"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQs de la catégorie"
+          }
+        }
+      }
+    },
+    "/faqs/{id}": {
+      "get": {
+        "summary": "Récupérer une FAQ par ID",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ trouvée"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      },
+      "put": {
+        "summary": "Mettre à jour une FAQ",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "FAQ mise à jour"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer une FAQ",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ supprimée"
+          }
+        }
+      }
+    },
+    "/faqs/{id}/helpful": {
+      "post": {
+        "summary": "Marquer une FAQ comme utile ou pas",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "helpful"
+                ],
+                "properties": {
+                  "helpful": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback enregistré"
+          }
+        }
+      }
+    },
+    "/api/instructors": {
       "post": {
         "tags": [
           "Instructors"
@@ -1627,7 +2192,7 @@
         }
       }
     },
-    "/instructors/{id}": {
+    "/api/instructors/{id}": {
       "get": {
         "tags": [
           "Instructors"
@@ -1702,7 +2267,7 @@
         }
       }
     },
-    "/instructors/course/{courseId}": {
+    "/api/instructors/course/{courseId}": {
       "get": {
         "tags": [
           "Instructors"
@@ -1725,7 +2290,7 @@
         }
       }
     },
-    "/instructors/expertise/{expertiseId}": {
+    "/api/instructors/expertise/{expertiseId}": {
       "get": {
         "tags": [
           "Instructors"
@@ -1748,7 +2313,7 @@
         }
       }
     },
-    "/lessons": {
+    "/api/lessons": {
       "post": {
         "tags": [
           "Lessons"
@@ -1782,7 +2347,7 @@
         }
       }
     },
-    "/lessons/{id}": {
+    "/api/lessons/{id}": {
       "get": {
         "tags": [
           "Lessons"
@@ -1857,7 +2422,7 @@
         }
       }
     },
-    "/lessons/course/{courseId}": {
+    "/api/lessons/course/{courseId}": {
       "get": {
         "tags": [
           "Lessons"
@@ -1880,7 +2445,7 @@
         }
       }
     },
-    "/lessons/chapter/{chapterId}": {
+    "/api/lessons/chapter/{chapterId}": {
       "get": {
         "tags": [
           "Lessons"
@@ -1903,7 +2468,7 @@
         }
       }
     },
-    "/payments": {
+    "/api/payments": {
       "post": {
         "summary": "Crée un nouveau paiement",
         "tags": [
@@ -1984,7 +2549,7 @@
         }
       }
     },
-    "/payments/{id}": {
+    "/api/payments/{id}": {
       "get": {
         "summary": "Récupère un paiement par ID",
         "tags": [
@@ -2028,7 +2593,7 @@
         }
       }
     },
-    "/payments/user/{userId}": {
+    "/api/payments/user/{userId}": {
       "get": {
         "summary": "Récupère tous les paiements d'un utilisateur",
         "tags": [
@@ -2051,7 +2616,7 @@
         }
       }
     },
-    "/payments/enrollment/{enrollmentId}": {
+    "/api/payments/enrollment/{enrollmentId}": {
       "get": {
         "summary": "Récupère tous les paiements d'une inscription",
         "tags": [
@@ -2074,7 +2639,7 @@
         }
       }
     },
-    "/payments/status/{status}": {
+    "/api/payments/status/{status}": {
       "get": {
         "summary": "Récupère tous les paiements par statut",
         "tags": [
@@ -2104,7 +2669,7 @@
         }
       }
     },
-    "/payments/{id}/check": {
+    "/api/payments/{id}/check": {
       "get": {
         "summary": "Vérifie le statut d'un paiement Orange Money",
         "tags": [
@@ -2127,7 +2692,7 @@
         }
       }
     },
-    "/payments/{id}/cancel": {
+    "/api/payments/{id}/cancel": {
       "post": {
         "summary": "Annule un paiement en attente",
         "tags": [
@@ -2150,7 +2715,7 @@
         }
       }
     },
-    "/payments/webhook/orange-money": {
+    "/api/payments/webhook/orange-money": {
       "post": {
         "summary": "Webhook pour les notifications Orange Money",
         "tags": [
@@ -2173,7 +2738,208 @@
         }
       }
     },
-    "/referrals/generate": {
+    "/api/push-notifications/register-token": {
+      "post": {
+        "summary": "Enregistrer un token FCM",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "token",
+                  "platform"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token FCM du device"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "web"
+                    ],
+                    "description": "Plateforme du device"
+                  },
+                  "deviceId": {
+                    "type": "string",
+                    "description": "ID unique du device"
+                  },
+                  "deviceName": {
+                    "type": "string",
+                    "description": "Nom du device"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token enregistré avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      }
+    },
+    "/api/push-notifications/remove-token": {
+      "delete": {
+        "summary": "Supprimer un token FCM",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "token"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token supprimé avec succès"
+          }
+        }
+      }
+    },
+    "/api/push-notifications/send-test": {
+      "post": {
+        "summary": "Envoyer une notification test",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification envoyée"
+          }
+        }
+      }
+    },
+    "/api/push-notifications/user/{userId}": {
+      "get": {
+        "summary": "Récupérer les notifications d'un utilisateur",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des notifications"
+          }
+        }
+      }
+    },
+    "/api/push-notifications/{id}/read": {
+      "patch": {
+        "summary": "Marquer une notification comme lue",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marquée comme lue"
+          }
+        }
+      }
+    },
+    "/api/push-notifications/tokens/{userId}": {
+      "get": {
+        "summary": "Récupérer les tokens FCM d'un utilisateur (debug)",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des tokens"
+          }
+        }
+      }
+    },
+    "/api/referrals/generate": {
       "post": {
         "summary": "Génère un nouveau lien de parrainage",
         "tags": [
@@ -2259,7 +3025,7 @@
         }
       }
     },
-    "/referrals/user/{userId}": {
+    "/api/referrals/user/{userId}": {
       "get": {
         "summary": "Récupère tous les parrainages d'un utilisateur",
         "tags": [
@@ -2307,7 +3073,7 @@
         }
       }
     },
-    "/referrals/user/{userId}/stats": {
+    "/api/referrals/user/{userId}/stats": {
       "get": {
         "summary": "Récupère les statistiques de parrainage d'un utilisateur",
         "tags": [
@@ -2349,7 +3115,7 @@
         }
       }
     },
-    "/referrals/track-click": {
+    "/api/referrals/track-click": {
       "post": {
         "summary": "Enregistre un clic sur un lien de parrainage",
         "tags": [
@@ -2420,7 +3186,7 @@
         }
       }
     },
-    "/referrals/validate": {
+    "/api/referrals/validate": {
       "post": {
         "summary": "Valide un code de parrainage lors de l'inscription",
         "tags": [
@@ -2495,7 +3261,7 @@
         }
       }
     },
-    "/referrals/code/{code}": {
+    "/api/referrals/code/{code}": {
       "get": {
         "summary": "Récupère un parrainage par son code",
         "tags": [
@@ -2540,7 +3306,7 @@
         }
       }
     },
-    "/referrals/{id}": {
+    "/api/referrals/{id}": {
       "get": {
         "summary": "Récupère un parrainage par ID",
         "tags": [
@@ -2625,7 +3391,7 @@
         }
       }
     },
-    "/referrals": {
+    "/api/referrals": {
       "get": {
         "summary": "Récupère tous les parrainages (Admin)",
         "tags": [
@@ -2662,7 +3428,7 @@
         }
       }
     },
-    "/referrals/{id}/cancel": {
+    "/api/referrals/{id}/cancel": {
       "post": {
         "summary": "Annule un parrainage",
         "tags": [
@@ -2704,7 +3470,7 @@
         }
       }
     },
-    "/users": {
+    "/api/users": {
       "post": {
         "tags": [
           "Users"
@@ -2777,7 +3543,7 @@
         }
       }
     },
-    "/users/{id}": {
+    "/api/users/{id}": {
       "get": {
         "tags": [
           "Users"
@@ -2862,7 +3628,7 @@
         }
       }
     },
-    "/users/email/{email}": {
+    "/api/users/email/{email}": {
       "get": {
         "tags": [
           "Users"
@@ -2888,7 +3654,7 @@
         }
       }
     },
-    "/users/phone/{phone}": {
+    "/api/users/phone/{phone}": {
       "get": {
         "tags": [
           "Users"
@@ -2915,7 +3681,7 @@
         }
       }
     },
-    "/users/role/{role}": {
+    "/api/users/role/{role}": {
       "get": {
         "tags": [
           "Users"
@@ -2943,7 +3709,7 @@
         }
       }
     },
-    "/users/status/{status}": {
+    "/api/users/status/{status}": {
       "get": {
         "tags": [
           "Users"
@@ -2971,7 +3737,7 @@
         }
       }
     },
-    "/users/{id}/profile-image": {
+    "/api/users/{id}/profile-image": {
       "patch": {
         "tags": [
           "Users"
@@ -3010,7 +3776,7 @@
         }
       }
     },
-    "/users/{id}/status": {
+    "/api/users/{id}/status": {
       "patch": {
         "tags": [
           "Users"
@@ -3049,687 +3815,6 @@
         "responses": {
           "200": {
             "description": "Statut mis à jour"
-          }
-        }
-      }
-    },
-    "/push-notifications/register-token": {
-      "post": {
-        "summary": "Enregistrer un token FCM",
-        "tags": [
-          "Push Notifications"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "userId",
-                  "token",
-                  "platform"
-                ],
-                "properties": {
-                  "userId": {
-                    "type": "string",
-                    "description": "ID de l'utilisateur"
-                  },
-                  "token": {
-                    "type": "string",
-                    "description": "Token FCM du device"
-                  },
-                  "platform": {
-                    "type": "string",
-                    "enum": [
-                      "ios",
-                      "android",
-                      "web"
-                    ],
-                    "description": "Plateforme du device"
-                  },
-                  "deviceId": {
-                    "type": "string",
-                    "description": "ID unique du device"
-                  },
-                  "deviceName": {
-                    "type": "string",
-                    "description": "Nom du device"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Token enregistré avec succès"
-          },
-          "400": {
-            "description": "Données invalides"
-          }
-        }
-      }
-    },
-    "/push-notifications/remove-token": {
-      "delete": {
-        "summary": "Supprimer un token FCM",
-        "tags": [
-          "Push Notifications"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "userId",
-                  "token"
-                ],
-                "properties": {
-                  "userId": {
-                    "type": "string"
-                  },
-                  "token": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Token supprimé avec succès"
-          }
-        }
-      }
-    },
-    "/push-notifications/send-test": {
-      "post": {
-        "summary": "Envoyer une notification test",
-        "tags": [
-          "Push Notifications"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "userId"
-                ],
-                "properties": {
-                  "userId": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Notification envoyée"
-          }
-        }
-      }
-    },
-    "/push-notifications/user/{userId}": {
-      "get": {
-        "summary": "Récupérer les notifications d'un utilisateur",
-        "tags": [
-          "Push Notifications"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer",
-              "default": 50
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des notifications"
-          }
-        }
-      }
-    },
-    "/push-notifications/{id}/read": {
-      "patch": {
-        "summary": "Marquer une notification comme lue",
-        "tags": [
-          "Push Notifications"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Notification marquée comme lue"
-          }
-        }
-      }
-    },
-    "/push-notifications/tokens/{userId}": {
-      "get": {
-        "summary": "Récupérer les tokens FCM d'un utilisateur (debug)",
-        "tags": [
-          "Push Notifications"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des tokens"
-          }
-        }
-      }
-    },
-    "/faqs": {
-      "post": {
-        "tags": ["FAQ"],
-        "summary": "Créer une nouvelle FAQ",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["question", "answer", "category"],
-                "properties": {
-                  "question": {
-                    "type": "string",
-                    "description": "La question de la FAQ"
-                  },
-                  "answer": {
-                    "type": "string",
-                    "description": "La réponse à la question"
-                  },
-                  "category": {
-                    "type": "string",
-                    "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"],
-                    "description": "Catégorie de la FAQ"
-                  },
-                  "tags": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Tags pour la recherche"
-                  },
-                  "isActive": {
-                    "type": "boolean",
-                    "description": "Si la FAQ est active",
-                    "default": true
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "FAQ créée avec succès"
-          },
-          "400": {
-            "description": "Données invalides"
-          }
-        }
-      },
-      "get": {
-        "tags": ["FAQ"],
-        "summary": "Obtenir toutes les FAQs",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "category",
-            "schema": {
-              "type": "string",
-              "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
-            },
-            "description": "Filtrer par catégorie"
-          },
-          {
-            "in": "query",
-            "name": "isActive",
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Filtrer par statut actif"
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer",
-              "default": 50
-            },
-            "description": "Nombre maximum de résultats"
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "schema": {
-              "type": "integer",
-              "default": 0
-            },
-            "description": "Nombre de résultats à ignorer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des FAQs"
-          }
-        }
-      }
-    },
-    "/faqs/search": {
-      "get": {
-        "tags": ["FAQ"],
-        "summary": "Rechercher dans les FAQs",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "q",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Terme de recherche"
-          },
-          {
-            "in": "query",
-            "name": "category",
-            "schema": {
-              "type": "string",
-              "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
-            },
-            "description": "Filtrer par catégorie"
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Résultats de recherche"
-          },
-          "400": {
-            "description": "Paramètre de recherche manquant"
-          }
-        }
-      }
-    },
-    "/faqs/stats": {
-      "get": {
-        "tags": ["FAQ"],
-        "summary": "Obtenir les statistiques des FAQs",
-        "responses": {
-          "200": {
-            "description": "Statistiques des FAQs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "total": {
-                      "type": "integer"
-                    },
-                    "byCategory": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "integer"
-                      }
-                    },
-                    "active": {
-                      "type": "integer"
-                    },
-                    "inactive": {
-                      "type": "integer"
-                    },
-                    "mostHelpful": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/faqs/category/{category}": {
-      "get": {
-        "tags": ["FAQ"],
-        "summary": "Obtenir les FAQs par catégorie",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "category",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "FAQs de la catégorie"
-          }
-        }
-      }
-    },
-    "/faqs/{id}": {
-      "get": {
-        "tags": ["FAQ"],
-        "summary": "Obtenir une FAQ par ID",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "FAQ trouvée"
-          },
-          "404": {
-            "description": "FAQ non trouvée"
-          }
-        }
-      },
-      "put": {
-        "tags": ["FAQ"],
-        "summary": "Mettre à jour une FAQ",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "question": {
-                    "type": "string"
-                  },
-                  "answer": {
-                    "type": "string"
-                  },
-                  "category": {
-                    "type": "string",
-                    "enum": ["general", "payments", "courses", "enrollment", "certificates", "technical", "account", "referral"]
-                  },
-                  "tags": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "isActive": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "FAQ mise à jour"
-          },
-          "404": {
-            "description": "FAQ non trouvée"
-          }
-        }
-      },
-      "delete": {
-        "tags": ["FAQ"],
-        "summary": "Supprimer une FAQ",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "FAQ supprimée"
-          },
-          "404": {
-            "description": "FAQ non trouvée"
-          }
-        }
-      }
-    },
-    "/faqs/{id}/helpful": {
-      "post": {
-        "tags": ["FAQ"],
-        "summary": "Marquer une FAQ comme utile ou non",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["helpful"],
-                "properties": {
-                  "helpful": {
-                    "type": "boolean",
-                    "description": "Si la FAQ est utile"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Feedback enregistré"
-          },
-          "404": {
-            "description": "FAQ non trouvée"
-          }
-        }
-      }
-    },
-    "/chat/ask": {
-      "post": {
-        "tags": ["AI Chat"],
-        "summary": "Poser une question au chatbot IA",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["userId", "question"],
-                "properties": {
-                  "userId": {
-                    "type": "string",
-                    "description": "ID de l'utilisateur"
-                  },
-                  "question": {
-                    "type": "string",
-                    "description": "La question à poser"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Réponse du chatbot",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "answer": {
-                      "type": "string"
-                    },
-                    "source": {
-                      "type": "string",
-                      "enum": ["faq", "ai"]
-                    },
-                    "faqId": {
-                      "type": "string"
-                    },
-                    "conversationId": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Données invalides"
-          }
-        }
-      }
-    },
-    "/chat/history/{userId}": {
-      "get": {
-        "tags": ["AI Chat"],
-        "summary": "Obtenir l'historique de conversation",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Historique de conversation"
-          },
-          "404": {
-            "description": "Aucun historique trouvé"
-          }
-        }
-      },
-      "delete": {
-        "tags": ["AI Chat"],
-        "summary": "Effacer l'historique de conversation",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Historique effacé"
-          }
-        }
-      }
-    },
-    "/chat/feedback": {
-      "post": {
-        "tags": ["AI Chat"],
-        "summary": "Donner un feedback sur une réponse",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["userId", "messageIndex", "helpful"],
-                "properties": {
-                  "userId": {
-                    "type": "string"
-                  },
-                  "messageIndex": {
-                    "type": "integer",
-                    "description": "Index du message dans l'historique"
-                  },
-                  "helpful": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Feedback enregistré"
-          },
-          "404": {
-            "description": "Message non trouvé"
           }
         }
       }

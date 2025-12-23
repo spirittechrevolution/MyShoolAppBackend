@@ -222,6 +222,35 @@ Question de l'utilisateur : ${question}`;
   }
 
   /**
+   * Récupérer le dernier message de chat d'un utilisateur
+   * @param userId - ID utilisateur
+   * @returns Dernier message ou null
+   */
+  async getLastChatMessage(userId: string): Promise<ChatMessage | null> {
+    try {
+      const doc = await db.collection(CHAT_COLLECTION).doc(userId).get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      const conversation = doc.data() as ChatConversation;
+      
+      if (!conversation.messages || conversation.messages.length === 0) {
+        return null;
+      }
+
+      // Récupérer le dernier message (le plus récent)
+      const lastMessage = conversation.messages[conversation.messages.length - 1];
+      
+      return lastMessage;
+    } catch (error: any) {
+      console.error('Erreur récupération dernier message:', error);
+      return null;
+    }
+  }
+
+  /**
    * Marquer une réponse comme utile/pas utile
    * @param userId - ID utilisateur
    * @param messageIndex - Index du message

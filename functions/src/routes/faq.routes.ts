@@ -18,7 +18,7 @@ const faqController = new FaqController();
 
 /**
  * @swagger
- * /api/faqs:
+ * /faqs:
  *   post:
  *     summary: Créer une nouvelle FAQ
  *     tags: [FAQ]
@@ -64,7 +64,7 @@ router.post('/', (req, res) => faqController.create(req, res));
 
 /**
  * @swagger
- * /api/faqs:
+ * /faqs:
  *   get:
  *     summary: Récupérer toutes les FAQs
  *     tags: [FAQ]
@@ -97,7 +97,7 @@ router.get('/', (req, res) => faqController.getAll(req, res));
 
 /**
  * @swagger
- * /api/faqs/search:
+ * /faqs/search:
  *   get:
  *     summary: Rechercher des FAQs
  *     tags: [FAQ]
@@ -116,7 +116,7 @@ router.get('/search', (req, res) => faqController.search(req, res));
 
 /**
  * @swagger
- * /api/faqs/stats:
+ * /faqs/stats:
  *   get:
  *     summary: Récupérer les statistiques des FAQs
  *     tags: [FAQ]
@@ -128,7 +128,7 @@ router.get('/stats', (req, res) => faqController.getStats(req, res));
 
 /**
  * @swagger
- * /api/faqs/category/{category}:
+ * /faqs/category/{category}:
  *   get:
  *     summary: Récupérer les FAQs par catégorie
  *     tags: [FAQ]
@@ -147,7 +147,7 @@ router.get('/category/:category', (req, res) => faqController.getByCategory(req,
 
 /**
  * @swagger
- * /api/faqs/{id}:
+ * /faqs/{id}:
  *   get:
  *     summary: Récupérer une FAQ par ID
  *     tags: [FAQ]
@@ -167,7 +167,7 @@ router.get('/:id', (req, res) => faqController.getById(req, res));
 
 /**
  * @swagger
- * /api/faqs/{id}:
+ * /faqs/{id}:
  *   put:
  *     summary: Mettre à jour une FAQ
  *     tags: [FAQ]
@@ -193,7 +193,7 @@ router.put('/:id', (req, res) => faqController.update(req, res));
 
 /**
  * @swagger
- * /api/faqs/{id}:
+ * /faqs/{id}:
  *   delete:
  *     summary: Supprimer une FAQ
  *     tags: [FAQ]
@@ -211,7 +211,7 @@ router.delete('/:id', (req, res) => faqController.delete(req, res));
 
 /**
  * @swagger
- * /api/faqs/{id}/helpful:
+ * /faqs/{id}/helpful:
  *   post:
  *     summary: Marquer une FAQ comme utile ou pas
  *     tags: [FAQ]
