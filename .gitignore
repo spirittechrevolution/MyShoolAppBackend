@@ -93,3 +93,22 @@ secrets/
 *.p12
 serviceAccountKey.json
 .serviceAccountKey.json
+
+# ==================== API Keys & Credentials ====================
+# Wave API Keys
+wave_credentials.json
+*.wave
+# Orange Money
+orange_money_credentials.json
+# Gemini API
+gemini_api_key.txt
+
+# ==================== Test Files ====================
+test-*.js
+debug-*.js
+*-test-*.js
+
+# ==================== Sensitive Config ====================
+config/production.json
+config/secrets.json
+.secrets

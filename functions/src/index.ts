@@ -33,3 +33,8 @@ export {
 // pour résoudre les problèmes de compatibilité avec firebase-functions v2
 // Ils seront réactivés après la mise à jour vers firebase-functions@latest
 // Voir le fichier index.ts.backup pour le code complet des triggers
+
+// ============ CLOUD FUNCTIONS MANUAL CHECKS ============
+export {
+  manualCheckExpiredSubscriptions
+} from './subscription-cron.function';

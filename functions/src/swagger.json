@@ -710,6 +710,14 @@
     {
       "name": "Push Notifications",
       "description": "Gestion des notifications push Firebase Cloud Messaging"
+    },
+    {
+      "name": "Subscriptions",
+      "description": "Gestion des abonnements profil (accès illimité à tous les cours)"
+    },
+    {
+      "name": "Wave Payments",
+      "description": "Intégration des paiements Wave"
     }
   ],
   "paths": {
@@ -3470,6 +3478,270 @@
         }
       }
     },
+    "/api/subscriptions/create-payment": {
+      "post": {
+        "summary": "Créer un paiement Wave pour un abonnement",
+        "tags": [
+          "Subscriptions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plan",
+                  "userId"
+                ],
+                "properties": {
+                  "plan": {
+                    "type": "string",
+                    "enum": [
+                      "MONTHLY",
+                      "QUARTERLY",
+                      "ANNUAL"
+                    ],
+                    "description": "Plan d'abonnement",
+                    "example": "MONTHLY"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur",
+                    "example": "VLzZCBlJstQOWhJy9Xg4MEO7ESK2"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "paymentUrl": {
+                          "type": "string",
+                          "description": "URL de redirection vers Wave",
+                          "example": "https://checkout.wave.com/pay/abc123"
+                        },
+                        "paymentId": {
+                          "type": "string",
+                          "example": "wave_12345"
+                        },
+                        "subscriptionId": {
+                          "type": "string",
+                          "example": "sub_abc123"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 5000
+                        },
+                        "plan": {
+                          "type": "string",
+                          "example": "MONTHLY"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "XOF"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Paiement d'abonnement créé avec succès"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides ou abonnement actif existant"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/plans": {
+      "get": {
+        "summary": "Obtenir les plans d'abonnement disponibles",
+        "tags": [
+          "Subscriptions"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des plans disponibles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "plan": {
+                            "type": "string",
+                            "example": "MONTHLY"
+                          },
+                          "price": {
+                            "type": "number",
+                            "example": 5000
+                          },
+                          "duration": {
+                            "type": "string",
+                            "example": "1 mois"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subscriptions/active/{userId}": {
+      "get": {
+        "summary": "Obtenir l'abonnement actif d'un utilisateur",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abonnement actif trouvé"
+          },
+          "404": {
+            "description": "Aucun abonnement actif"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/user/{userId}": {
+      "get": {
+        "summary": "Obtenir tous les abonnements d'un utilisateur",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des abonnements"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/{subscriptionId}/cancel": {
+      "post": {
+        "summary": "Annuler un abonnement",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscriptionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'abonnement"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abonnement annulé avec succès"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/check-access/{userId}": {
+      "get": {
+        "summary": "Vérifier si un utilisateur a un accès illimité",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statut d'accès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "hasUnlimitedAccess": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users": {
       "post": {
         "tags": [
@@ -3815,6 +4087,281 @@
         "responses": {
           "200": {
             "description": "Statut mis à jour"
+          }
+        }
+      }
+    },
+    "/api/wave/create-payment": {
+      "post": {
+        "summary": "Créer un paiement Wave pour un cours",
+        "tags": [
+          "Wave Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "courseId",
+                  "userId"
+                ],
+                "properties": {
+                  "courseId": {
+                    "type": "string",
+                    "description": "ID du cours à acheter",
+                    "example": "javascript-intro-001"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur",
+                    "example": "uGbrU72VFWfWZcUkvk31QaOi7tG3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "paymentUrl": {
+                          "type": "string",
+                          "description": "URL de redirection vers Wave",
+                          "example": "https://checkout.wave.com/pay/abc123"
+                        },
+                        "paymentId": {
+                          "type": "string",
+                          "example": "wave_12345"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 15000
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "XOF"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Paiement Wave créé avec succès"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données manquantes ou invalides"
+          },
+          "404": {
+            "description": "Cours ou utilisateur non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/wave/payment-status/{paymentId}": {
+      "get": {
+        "summary": "Vérifier le statut d'un paiement Wave",
+        "tags": [
+          "Wave Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du paiement Wave"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statut du paiement récupéré",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "wave_12345"
+                        },
+                        "checkout_status": {
+                          "type": "string",
+                          "enum": [
+                            "pending",
+                            "successful",
+                            "cancelled",
+                            "failed"
+                          ],
+                          "example": "successful"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 15000
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "XOF"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur lors de la récupération du statut"
+          }
+        }
+      }
+    },
+    "/api/wave/confirm-payment": {
+      "post": {
+        "summary": "Confirmer un paiement après retour depuis Wave",
+        "tags": [
+          "Wave Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "paymentId",
+                  "userId",
+                  "courseId"
+                ],
+                "properties": {
+                  "paymentId": {
+                    "type": "string",
+                    "description": "ID du paiement Wave",
+                    "example": "wave_12345"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur",
+                    "example": "uGbrU72VFWfWZcUkvk31QaOi7tG3"
+                  },
+                  "courseId": {
+                    "type": "string",
+                    "description": "ID du cours",
+                    "example": "javascript-intro-001"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement confirmé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "completed"
+                        },
+                        "enrollmentCreated": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Paiement confirmé et inscription créée"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Paiement non confirmé ou données invalides"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/wave/webhook": {
+      "post": {
+        "summary": "Webhook Wave pour les notifications de paiement",
+        "tags": [
+          "Wave Payments"
+        ],
+        "description": "Endpoint appelé par Wave pour notifier les changements de statut de paiement",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "checkout.completed"
+                  },
+                  "data": {
+                    "type": "object",
+                    "description": "Données du paiement Wave"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook traité avec succès"
+          },
+          "401": {
+            "description": "Signature invalide"
+          },
+          "500": {
+            "description": "Erreur lors du traitement du webhook"
           }
         }
       }

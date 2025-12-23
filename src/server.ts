@@ -18,6 +18,7 @@ import referralRoutes from './routes/referral.routes';
 import faqRoutes from './routes/faq.routes';
 import chatRoutes from './routes/chat.routes';
 import pushNotificationRoutes from './routes/push-notification.routes';
+import waveRoutes from './routes/wave.routes';
 import './config/firebase.config'; // Initialize Firebase
 
 const app: Application = express();
@@ -91,6 +92,7 @@ app.use('/api/referrals', referralRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/push-notifications', pushNotificationRoutes);
+app.use('/api/wave', waveRoutes);
 
 // 404 Handlerreferrals', referralRoutes);
 
