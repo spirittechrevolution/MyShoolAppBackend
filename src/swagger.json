@@ -2738,7 +2738,7 @@
         }
       }
     },
-    "/push-notifications/register-token": {
+    "/api/push-notifications/register-token": {
       "post": {
         "summary": "Enregistrer un token FCM",
         "tags": [
@@ -2796,7 +2796,7 @@
         }
       }
     },
-    "/push-notifications/remove-token": {
+    "/api/push-notifications/remove-token": {
       "delete": {
         "summary": "Supprimer un token FCM",
         "tags": [
@@ -2831,7 +2831,7 @@
         }
       }
     },
-    "/push-notifications/send-test": {
+    "/api/push-notifications/send-test": {
       "post": {
         "summary": "Envoyer une notification test",
         "tags": [
@@ -2862,7 +2862,7 @@
         }
       }
     },
-    "/push-notifications/user/{userId}": {
+    "/api/push-notifications/user/{userId}": {
       "get": {
         "summary": "Récupérer les notifications d'un utilisateur",
         "tags": [
@@ -2893,7 +2893,7 @@
         }
       }
     },
-    "/push-notifications/{id}/read": {
+    "/api/push-notifications/{id}/read": {
       "patch": {
         "summary": "Marquer une notification comme lue",
         "tags": [
@@ -2916,7 +2916,7 @@
         }
       }
     },
-    "/push-notifications/tokens/{userId}": {
+    "/api/push-notifications/tokens/{userId}": {
       "get": {
         "summary": "Récupérer les tokens FCM d'un utilisateur (debug)",
         "tags": [
