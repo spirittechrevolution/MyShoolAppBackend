@@ -102,6 +102,9 @@ wave_credentials.json
 orange_money_credentials.json
 # Gemini API
 gemini_api_key.txt
+# All env yaml files
+*.env.yaml
+.env.yaml
 
 # ==================== Test Files ====================
 test-*.js

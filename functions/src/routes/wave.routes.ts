@@ -211,4 +211,7 @@ router.post('/confirm-payment', (req, res) => waveController.confirmPayment(req,
  */
 router.post('/webhook', (req, res) => waveController.handleWebhook(req, res));
 
+// Endpoint de test pour simuler confirmation de paiement
+router.post('/test-confirm/:wavePaymentId', (req, res) => waveController.testConfirmPayment(req, res));
+
 export default router;

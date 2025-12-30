@@ -64,8 +64,14 @@ export class WaveSubscriptionService extends WaveService {
 
       const payment = await this.createPayment(transaction);
 
+      console.log('💰 Paiement Wave reçu:', {
+        id: payment.id,
+        wave_launch_url: payment.wave_launch_url,
+        has_wave_launch_url: !!payment.wave_launch_url
+      });
+
       return {
-        paymentUrl: payment.checkout_url,
+        paymentUrl: payment.wave_launch_url,
         paymentId: payment.id,
         amount: amount,
         subscriptionId: subscription.id!

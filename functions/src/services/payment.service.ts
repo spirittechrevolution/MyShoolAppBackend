@@ -21,13 +21,33 @@ export class PaymentService {
    */
   async create(paymentData: Partial<Payment>): Promise<PaymentModel> {
     try {
-      // Validation
-      if (!paymentData.userId || !paymentData.enrollmentId || !paymentData.courseId) {
-        throw new Error('userId, enrollmentId et courseId sont requis');
+      console.log('🔍 PaymentService.create - Données reçues:', {
+        userId: paymentData.userId,
+        paymentType: paymentData.paymentType,
+        courseId: paymentData.courseId,
+        enrollmentId: paymentData.enrollmentId,
+        subscriptionId: paymentData.subscriptionId
+      });
+
+      // Validation de base
+      if (!paymentData.userId) {
+        throw new Error('userId est requis');
       }
 
       if (!paymentData.amount || paymentData.amount <= 0) {
         throw new Error('Le montant doit être supérieur à 0');
+      }
+
+      // Validation selon le type de paiement
+      if (paymentData.paymentType === 'subscription') {
+        if (!paymentData.subscriptionId) {
+          throw new Error('subscriptionId est requis pour un paiement d\'abonnement');
+        }
+      } else if (paymentData.paymentType === 'course') {
+        // Paiement de cours
+        if (!paymentData.enrollmentId || !paymentData.courseId) {
+          throw new Error('enrollmentId et courseId sont requis pour un paiement de cours');
+        }
       }
 
       // Génération de la référence de commande
@@ -98,6 +118,30 @@ export class PaymentService {
       return new PaymentModel({ id: doc.id, ...doc.data() });
     } catch (error) {
       console.error('❌ Erreur récupération paiement:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Récupère un paiement par wavePaymentId depuis metadata
+   * @param {string} wavePaymentId - ID du paiement Wave
+   * @return {Promise<PaymentModel | null>} Le paiement ou null
+   */
+  async getByWavePaymentId(wavePaymentId: string): Promise<PaymentModel | null> {
+    try {
+      const snapshot = await db.collection(this.collectionName)
+        .where('metadata.wavePaymentId', '==', wavePaymentId)
+        .limit(1)
+        .get();
+      
+      if (snapshot.empty) {
+        return null;
+      }
+
+      const doc = snapshot.docs[0];
+      return new PaymentModel({ id: doc.id, ...doc.data() });
+    } catch (error) {
+      console.error('❌ Erreur récupération paiement par wavePaymentId:', error);
       throw error;
     }
   }

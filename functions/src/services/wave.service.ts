@@ -30,21 +30,19 @@ export interface WaveTransaction {
  */
 export interface WavePaymentResponse {
   id: string;
-  checkout_status: 'pending' | 'successful' | 'cancelled' | 'failed';
-  client_reference?: string;
-  payment_status: string;
-  checkout_url: string;
-  amount: number;
+  amount: string;
+  checkout_status: 'open' | 'complete' | 'cancelled';
+  client_reference?: string | null;
   currency: string;
-  payment_method: string;
+  error_url: string;
+  last_payment_error?: string | null;
+  business_name: string;
+  payment_status: 'processing' | 'successful' | 'failed';
+  success_url: string;
+  wave_launch_url: string;  // URL pour rediriger l'utilisateur
+  when_completed?: string | null;
   when_created: string;
-  when_completed?: string;
-  receipt_url?: string;
-  customer?: {
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
+  when_expires: string;
 }
 
 /**
@@ -72,20 +70,19 @@ export class WaveService {
     try {
       console.log('💳 Création d\'un paiement Wave:', transactionData);
 
+      // Construction du payload selon la doc Wave
+      const payload: any = {
+        amount: String(transactionData.amount), // Doit être une string
+        currency: transactionData.currency || 'XOF',
+        error_url: transactionData.cancel_url || `${process.env.FRONTEND_URL}/payment/error`,
+        success_url: transactionData.redirect_url || `${process.env.FRONTEND_URL}/payment/success`
+      };
+
+      console.log('📤 Payload Wave:', payload);
+
       const response: AxiosResponse<WavePaymentResponse> = await axios.post(
         `${this.baseUrl}/checkout/sessions`,
-        {
-          amount: transactionData.amount,
-          currency: transactionData.currency || 'XOF', // Franc CFA par défaut
-          success_url: transactionData.redirect_url,
-          cancel_url: transactionData.cancel_url,
-          webhook_url: transactionData.webhook_url,
-          customer_phone: transactionData.customer_phone,
-          customer_firstname: transactionData.customer_firstname,
-          customer_lastname: transactionData.customer_lastname,
-          description: transactionData.description,
-          metadata: transactionData.metadata
-        },
+        payload,
         {
           headers: {
             'Authorization': `Bearer ${this.apiKey}`,
@@ -95,6 +92,7 @@ export class WaveService {
       );
 
       console.log('✅ Paiement Wave créé:', response.data.id);
+      console.log('📋 Réponse Wave complète:', JSON.stringify(response.data, null, 2));
       return response.data;
 
     } catch (error: any) {
@@ -193,7 +191,7 @@ export class WaveService {
       const payment = await this.createPayment(transaction);
 
       return {
-        paymentUrl: payment.checkout_url,
+        paymentUrl: payment.wave_launch_url,
         paymentId: payment.id,
         amount: course.price
       };

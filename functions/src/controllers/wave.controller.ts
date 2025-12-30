@@ -40,6 +40,27 @@ export class WaveController {
         return;
       }
 
+      // Vérifier si l'utilisateur a un abonnement actif
+      const activeSubscription = await subscriptionService.getActiveSubscription(userId);
+      if (activeSubscription) {
+        res.status(400).json({
+          success: false,
+          message: 'Vous avez déjà un abonnement actif qui vous donne accès à tous les cours'
+        });
+        return;
+      }
+
+      // Créer une inscription en attente
+      const { EnrollmentService } = await import('../services/enrollment.service');
+      const enrollmentService = new EnrollmentService();
+      
+      const enrollment = await enrollmentService.create({
+        userId: userId,
+        courseId: courseId,
+        status: 'in-progress',
+        progress: 0
+      });
+
       // Créer le paiement Wave
       const paymentData = await waveService.createCoursePayment(courseId, userId, {
         phone: user.phone,
@@ -50,7 +71,9 @@ export class WaveController {
       // Enregistrer la transaction en attente dans Firestore
       await paymentService.create({
         userId: userId,
+        paymentType: 'course',
         courseId: courseId,
+        enrollmentId: enrollment.id,
         amount: paymentData.amount,
         currency: 'XOF',
         paymentMethod: 'wave',
@@ -66,6 +89,7 @@ export class WaveController {
         data: {
           paymentUrl: paymentData.paymentUrl,
           paymentId: paymentData.paymentId,
+          enrollmentId: enrollment.id,
           amount: paymentData.amount,
           currency: 'XOF'
         },
@@ -193,21 +217,26 @@ export class WaveController {
       return;
     }
 
-    // Mettre à jour le statut du paiement
-    await paymentService.updateStatus(wavePaymentId, 'SUCCESS' as PaymentStatus);
+    // Trouver le paiement par wavePaymentId et mettre à jour le statut
+    const payment = await paymentService.getByWavePaymentId(wavePaymentId);
+    if (!payment || !payment.id) {
+      console.error('❌ Paiement non trouvé pour wavePaymentId:', wavePaymentId);
+      return;
+    }
 
-    // Inscrire l'utilisateur au cours
-    const { EnrollmentService } = await import('../services/enrollment.service');
-    const enrollmentService = new EnrollmentService();
-    await enrollmentService.create({
-      userId: userId,
-      courseId: courseId,
-      enrolledAt: new Date(),
-      status: 'in-progress',
-      paymentMethod: 'wave'
-    });
+    await paymentService.updateStatus(payment.id, 'SUCCESS' as PaymentStatus);
 
-    console.log(`✅ Inscription au cours créée - User: ${userId}, Course: ${courseId}`);
+    // Activer l'inscription existante (créée lors de create-payment)
+    if (payment.enrollmentId) {
+      const { EnrollmentService } = await import('../services/enrollment.service');
+      const enrollmentService = new EnrollmentService();
+      await enrollmentService.update(payment.enrollmentId, {
+        enrolledAt: new Date() // Confirmer la date d'inscription
+      });
+      console.log(`✅ Inscription confirmée - EnrollmentId: ${payment.enrollmentId}`);
+    }
+
+    console.log(`✅ Paiement de cours confirmé - User: ${userId}, Course: ${courseId}`);
   }
 
   /**
@@ -222,8 +251,14 @@ export class WaveController {
       return;
     }
 
-    // Mettre à jour le statut du paiement
-    await paymentService.updateStatus(wavePaymentId, 'SUCCESS' as PaymentStatus);
+    // Trouver le paiement par wavePaymentId et mettre à jour le statut
+    const payment = await paymentService.getByWavePaymentId(wavePaymentId);
+    if (!payment || !payment.id) {
+      console.error('❌ Paiement non trouvé pour wavePaymentId:', wavePaymentId);
+      return;
+    }
+
+    await paymentService.updateStatus(payment.id, 'SUCCESS' as PaymentStatus);
 
     // Activer l'abonnement (sans les paramètres supplémentaires)
     await subscriptionService.activateSubscription(subscriptionId, wavePaymentId, 'wave');
@@ -239,13 +274,55 @@ export class WaveController {
       const { data } = webhookData;
       const wavePaymentId = data.id;
 
-      // Mettre à jour le statut du paiement
-      await paymentService.updateStatus(wavePaymentId, 'FAILED' as PaymentStatus);
+      // Trouver le paiement par wavePaymentId et mettre à jour le statut
+      const payment = await paymentService.getByWavePaymentId(wavePaymentId);
+      if (!payment || !payment.id) {
+        console.error('❌ Paiement non trouvé pour wavePaymentId:', wavePaymentId);
+        return;
+      }
+
+      await paymentService.updateStatus(payment.id, 'FAILED' as PaymentStatus);
 
       console.log(`❌ Paiement Wave échoué - PaymentId: ${wavePaymentId}`);
 
     } catch (error) {
       console.error('❌ Erreur traitement paiement échoué:', error);
+    }
+  }
+
+  /**
+   * ENDPOINT DE TEST: Simuler un webhook Wave pour confirmer un paiement
+   * POST /api/wave/test-confirm/:wavePaymentId
+   */
+  async testConfirmPayment(req: Request, res: Response): Promise<void> {
+    try {
+      const { wavePaymentId } = req.params;
+
+      console.log('🧪 TEST: Simulation webhook pour wavePaymentId:', wavePaymentId);
+
+      // Simuler l'événement webhook
+      const webhookData = {
+        type: 'checkout.session.completed',
+        data: {
+          id: wavePaymentId,
+          payment_status: 'successful'
+        }
+      };
+
+      // Appeler directement le handler
+      await this.handlePaymentCompleted(webhookData);
+
+      res.status(200).json({
+        success: true,
+        message: `Paiement ${wavePaymentId} confirmé avec succès (TEST)`
+      });
+
+    } catch (error: any) {
+      console.error('❌ Erreur test confirmation:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Erreur test confirmation'
+      });
     }
   }
 
@@ -268,7 +345,7 @@ export class WaveController {
       // Vérifier le statut du paiement chez Wave
       const wavePayment = await waveService.getPaymentStatus(paymentId);
 
-      if (wavePayment.checkout_status === 'successful') {
+      if (wavePayment.payment_status === 'successful') {
         // Vérifier si l'inscription existe déjà
         const { EnrollmentService } = await import('../services/enrollment.service');
         const enrollmentService = new EnrollmentService();
