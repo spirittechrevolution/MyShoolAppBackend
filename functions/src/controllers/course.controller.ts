@@ -181,4 +181,20 @@ export class CourseController {
       });
     }
   }
+
+  async getByInstructor(req: Request, res: Response): Promise<void> {
+    try {
+      const courses = await courseService.getByInstructor(req.params.instructorId);
+      res.status(200).json({
+        success: true,
+        data: courses,
+        count: courses.length
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
 }

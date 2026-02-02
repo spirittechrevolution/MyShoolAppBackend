@@ -163,6 +163,11 @@
             "type": "number",
             "example": 4.5
           },
+          "instructorId": {
+            "type": "string",
+            "description": "ID du professeur qui enseigne ce cours",
+            "example": "abc123xyz"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -1340,6 +1345,51 @@
         "responses": {
           "200": {
             "description": "Cours dépublié"
+          }
+        }
+      }
+    },
+    "/api/courses/instructor/{instructorId}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours d'un professeur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "instructorId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du professeur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours du professeur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Course"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

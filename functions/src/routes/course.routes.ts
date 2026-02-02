@@ -199,4 +199,36 @@ router.patch('/:id/publish', (req, res) => courseController.publish(req, res));
  */
 router.patch('/:id/unpublish', (req, res) => courseController.unpublish(req, res));
 
+/**
+ * @swagger
+ * /api/courses/instructor/{instructorId}:
+ *   get:
+ *     tags: [Courses]
+ *     summary: Récupérer les cours d'un professeur
+ *     parameters:
+ *       - in: path
+ *         name: instructorId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du professeur
+ *     responses:
+ *       200:
+ *         description: Liste des cours du professeur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Course'
+ *                 count:
+ *                   type: integer
+ */
+router.get('/instructor/:instructorId', (req, res) => courseController.getByInstructor(req, res));
+
 export default router;

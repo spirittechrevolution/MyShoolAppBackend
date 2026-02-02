@@ -12,6 +12,7 @@ export interface Course {
   image: string;
   isPublished: boolean;
   certificateAvailable: boolean;
+  instructorId?: string; // ID du professeur qui enseigne ce cours
   chaptersIds: string[];
   chapters: any[];
   exercises: number;
@@ -34,6 +35,7 @@ export class CourseModel implements Course {
   image: string;
   isPublished: boolean;
   certificateAvailable: boolean;
+  instructorId?: string;
   chaptersIds: string[];
   chapters: any[];
   exercises: number;
@@ -55,6 +57,7 @@ export class CourseModel implements Course {
     this.image = data.image || '';
     this.isPublished = data.isPublished !== undefined ? data.isPublished : false;
     this.certificateAvailable = data.certificateAvailable !== undefined ? data.certificateAvailable : false;
+    this.instructorId = data.instructorId;
     this.chaptersIds = data.chaptersIds || [];
     this.chapters = data.chapters || [];
     this.exercises = data.exercises || 0;
@@ -78,6 +81,7 @@ export class CourseModel implements Course {
       image: this.image,
       isPublished: this.isPublished,
       certificateAvailable: this.certificateAvailable,
+      instructorId: this.instructorId,
       chaptersIds: this.chaptersIds,
       chapters: this.chapters,
       exercises: this.exercises,

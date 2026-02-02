@@ -51,7 +51,7 @@ export class WaveSubscriptionService extends WaveService {
 
       // URLs de redirection
       const baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://myschool-app.com' 
+        ? 'https://myschool-f862b.web.app' 
         : 'http://localhost:4200';
 
       const transaction = {

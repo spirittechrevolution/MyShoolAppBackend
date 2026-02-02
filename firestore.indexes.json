@@ -321,6 +321,24 @@
             "order": "ASCENDING"
           }
         ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "instructorId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
       }
     ],
     "fieldOverrides": []

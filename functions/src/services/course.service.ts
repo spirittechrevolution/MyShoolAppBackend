@@ -107,4 +107,16 @@ export class CourseService {
       await this.update(courseId, { enrolledUsers });
     }
   }
+
+  async getByInstructor(instructorId: string): Promise<CourseModel[]> {
+    const snapshot = await db.collection(this.collectionName)
+      .where('instructorId', '==', instructorId)
+      .where('isPublished', '==', true)
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    return snapshot.docs.map(doc => 
+      new CourseModel({ ...doc.data() as Course, id: doc.id })
+    );
+  }
 }
