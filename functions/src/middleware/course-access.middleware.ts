@@ -1,16 +1,18 @@
 /**
  * Middleware pour vérifier l'accès aux cours
  * Un utilisateur a accès à un cours si :
- * 1. Il a un abonnement actif (accès illimité)
+ * 1. Il a un abonnement actif pour la catégorie du cours
  * 2. Il a acheté le cours individuellement
  */
 
 import { Request, Response, NextFunction } from 'express';
 import { SubscriptionService } from '../services/subscription.service';
 import { EnrollmentService } from '../services/enrollment.service';
+import { CourseService } from '../services/course.service';
 
 const subscriptionService = new SubscriptionService();
 const enrollmentService = new EnrollmentService();
+const courseService = new CourseService();
 
 export interface CourseAccessRequest extends Request {
   userId?: string;
@@ -45,12 +47,22 @@ export async function checkCourseAccess(
       return;
     }
 
-    // Vérifier si l'utilisateur a un abonnement actif
-    const hasUnlimitedAccess = await subscriptionService.hasUnlimitedAccess(userId);
+    // Récupérer le cours pour obtenir sa catégorie
+    const course = await courseService.getById(courseId);
+    if (!course) {
+      res.status(404).json({
+        success: false,
+        message: 'Cours non trouvé'
+      });
+      return;
+    }
 
-    if (hasUnlimitedAccess) {
-      // L'utilisateur a un abonnement actif → accès illimité
-      console.log(`✅ Accès autorisé via abonnement - User: ${userId}, Course: ${courseId}`);
+    // Vérifier si l'utilisateur a un abonnement actif pour cette catégorie
+    const hasCategoryAccess = await subscriptionService.hasCategoryAccess(userId, course.category);
+
+    if (hasCategoryAccess) {
+      // L'utilisateur a un abonnement actif pour cette catégorie
+      console.log(`✅ Accès autorisé via abonnement catégorie ${course.category} - User: ${userId}, Course: ${courseId}`);
       next();
       return;
     }
@@ -68,13 +80,14 @@ export async function checkCourseAccess(
     // Aucun accès
     res.status(403).json({
       success: false,
-      message: 'Accès refusé. Vous devez acheter ce cours ou souscrire à un abonnement.',
+      message: `Accès refusé. Vous devez acheter ce cours ou souscrire à la catégorie "${course.category}".`,
       data: {
+        courseCategory: course.category,
         hasSubscription: false,
         hasCourseAccess: false,
         options: {
           buyCourse: `/api/wave/create-payment`,
-          subscribe: `/api/subscriptions/plans`
+          subscribeToCategory: `/api/subscriptions/plans?category=${encodeURIComponent(course.category)}`
         }
       }
     });
@@ -132,11 +145,23 @@ export async function checkExerciseAccess(
 
     const courseId = exercise.courseId;
 
-    // Vérifier l'accès au cours
-    const hasUnlimitedAccess = await subscriptionService.hasUnlimitedAccess(userId);
-    const enrollment = !hasUnlimitedAccess ? await enrollmentService.getUserEnrollment(userId, courseId) : null;
+    // Récupérer le cours pour obtenir sa catégorie
+    const course = await courseService.getById(courseId);
+    if (!course) {
+      res.status(404).json({
+        success: false,
+        message: 'Cours associé non trouvé'
+      });
+      return;
+    }
 
-    if (hasUnlimitedAccess || enrollment) {
+    // Vérifier l'accès via abonnement catégorie
+    const hasCategoryAccess = await subscriptionService.hasCategoryAccess(userId, course.category);
+    
+    // Vérifier l'accès via achat individuel
+    const enrollment = !hasCategoryAccess ? await enrollmentService.getUserEnrollment(userId, courseId) : null;
+
+    if (hasCategoryAccess || enrollment) {
       console.log(`✅ Accès exercice autorisé - User: ${userId}, Exercise: ${exerciseId}`);
       next();
       return;
@@ -144,7 +169,7 @@ export async function checkExerciseAccess(
 
     res.status(403).json({
       success: false,
-      message: 'Accès refusé. Vous devez avoir accès au cours pour accéder à cet exercice.'
+      message: `Accès refusé. Vous devez avoir accès au cours (catégorie "${course.category}") pour accéder à cet exercice.`
     });
 
   } catch (error: any) {
@@ -168,17 +193,15 @@ export async function enrichWithAccessInfo(
     const userId = req.userId || req.params.userId;
 
     if (userId) {
-      const hasUnlimitedAccess = await subscriptionService.hasUnlimitedAccess(userId);
+      const activeSubscriptions = await subscriptionService.getUserActiveSubscriptions(userId);
       
       // Ajouter les informations d'accès dans les headers de réponse
-      res.setHeader('X-Has-Subscription', hasUnlimitedAccess.toString());
+      res.setHeader('X-Has-Subscription', (activeSubscriptions.length > 0).toString());
+      res.setHeader('X-Active-Subscriptions-Count', activeSubscriptions.length.toString());
       
-      if (hasUnlimitedAccess) {
-        const activeSubscription = await subscriptionService.getActiveSubscription(userId);
-        if (activeSubscription) {
-          res.setHeader('X-Subscription-Plan', activeSubscription.plan);
-          res.setHeader('X-Subscription-End-Date', activeSubscription.endDate.toISOString());
-        }
+      if (activeSubscriptions.length > 0) {
+        const categories = activeSubscriptions.map(sub => sub.category).join(',');
+        res.setHeader('X-Subscribed-Categories', categories);
       }
     }
 

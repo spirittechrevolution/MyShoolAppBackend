@@ -11,14 +11,14 @@ const router = Router();
  * @swagger
  * tags:
  *   name: Subscriptions
- *   description: Gestion des abonnements profil (accès illimité à tous les cours)
+ *   description: Gestion des abonnements par catégorie de cours
  */
 
 /**
  * @swagger
  * /api/subscriptions/create-payment:
  *   post:
- *     summary: Créer un paiement Wave pour un abonnement
+ *     summary: Créer un paiement Wave pour un abonnement à une catégorie
  *     tags: [Subscriptions]
  *     requestBody:
  *       required: true
@@ -29,6 +29,7 @@ const router = Router();
  *             required:
  *               - plan
  *               - userId
+ *               - category
  *             properties:
  *               plan:
  *                 type: string
@@ -39,6 +40,10 @@ const router = Router();
  *                 type: string
  *                 description: ID de l'utilisateur
  *                 example: "VLzZCBlJstQOWhJy9Xg4MEO7ESK2"
+ *               category:
+ *                 type: string
+ *                 description: Catégorie de cours à débloquer
+ *                 example: "Mathématiques"
  *     responses:
  *       200:
  *         description: Paiement créé avec succès
@@ -65,18 +70,21 @@ const router = Router();
  *                       example: "sub_abc123"
  *                     amount:
  *                       type: number
- *                       example: 5000
+ *                       example: 3000
  *                     plan:
  *                       type: string
  *                       example: "MONTHLY"
+ *                     category:
+ *                       type: string
+ *                       example: "Mathématiques"
  *                     currency:
  *                       type: string
  *                       example: "XOF"
  *                 message:
  *                   type: string
- *                   example: "Paiement d'abonnement créé avec succès"
+ *                   example: "Paiement d'abonnement créé pour la catégorie \"Mathématiques\""
  *       400:
- *         description: Données invalides ou abonnement actif existant
+ *         description: Données invalides ou abonnement actif existant pour cette catégorie
  *       404:
  *         description: Utilisateur non trouvé
  */
@@ -86,11 +94,58 @@ router.post('/create-payment', subscriptionController.createSubscriptionPayment.
  * @swagger
  * /api/subscriptions/plans:
  *   get:
- *     summary: Obtenir les plans d'abonnement disponibles
+ *     summary: Obtenir les plans d'abonnement disponibles pour une catégorie
  *     tags: [Subscriptions]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Catégorie de cours (optionnel)
+ *         example: "Mathématiques"
  *     responses:
  *       200:
  *         description: Liste des plans disponibles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     category:
+ *                       type: string
+ *                       example: "Mathématiques"
+ *                     plans:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           plan:
+ *                             type: string
+ *                             example: "MONTHLY"
+ *                           price:
+ *                             type: number
+ *                             example: 3000
+ *                           duration:
+ *                             type: string
+ *                             example: "1 mois"
+ */
+router.get('/plans', subscriptionController.getAvailablePlans.bind(subscriptionController));
+
+/**
+ * @swagger
+ * /api/subscriptions/categories:
+ *   get:
+ *     summary: Obtenir toutes les catégories disponibles avec leurs tarifs
+ *     tags: [Subscriptions]
+ *     responses:
+ *       200:
+ *         description: Liste des catégories avec tarifs
  *         content:
  *           application/json:
  *             schema:
@@ -104,17 +159,23 @@ router.post('/create-payment', subscriptionController.createSubscriptionPayment.
  *                   items:
  *                     type: object
  *                     properties:
- *                       plan:
+ *                       category:
  *                         type: string
- *                         example: "MONTHLY"
- *                       price:
- *                         type: number
- *                         example: 5000
- *                       duration:
- *                         type: string
- *                         example: "1 mois"
+ *                         example: "Mathématiques"
+ *                       pricing:
+ *                         type: object
+ *                         properties:
+ *                           MONTHLY:
+ *                             type: number
+ *                             example: 3000
+ *                           QUARTERLY:
+ *                             type: number
+ *                             example: 8000
+ *                           ANNUAL:
+ *                             type: number
+ *                             example: 25000
  */
-router.get('/plans', subscriptionController.getAvailablePlans.bind(subscriptionController));
+router.get('/categories', subscriptionController.getAvailableCategories.bind(subscriptionController));
 
 /**
  * @swagger
@@ -179,7 +240,7 @@ router.post('/:subscriptionId/cancel', subscriptionController.cancelSubscription
  * @swagger
  * /api/subscriptions/check-access/{userId}:
  *   get:
- *     summary: Vérifier si un utilisateur a un accès illimité
+ *     summary: Vérifier les abonnements actifs d'un utilisateur
  *     tags: [Subscriptions]
  *     parameters:
  *       - in: path
@@ -190,7 +251,7 @@ router.post('/:subscriptionId/cancel', subscriptionController.cancelSubscription
  *         description: ID de l'utilisateur
  *     responses:
  *       200:
- *         description: Statut d'accès
+ *         description: Statut d'accès avec liste des abonnements
  *         content:
  *           application/json:
  *             schema:
@@ -205,7 +266,66 @@ router.post('/:subscriptionId/cancel', subscriptionController.cancelSubscription
  *                     hasUnlimitedAccess:
  *                       type: boolean
  *                       example: true
+ *                     activeSubscriptions:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           category:
+ *                             type: string
+ *                             example: "Mathématiques"
+ *                           plan:
+ *                             type: string
+ *                             example: "MONTHLY"
+ *                           endDate:
+ *                             type: string
+ *                             format: date-time
  */
 router.get('/check-access/:userId', subscriptionController.checkUnlimitedAccess.bind(subscriptionController));
+
+/**
+ * @swagger
+ * /api/subscriptions/check-access/{userId}/{category}:
+ *   get:
+ *     summary: Vérifier si un utilisateur a accès à une catégorie spécifique
+ *     tags: [Subscriptions]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'utilisateur
+ *       - in: path
+ *         name: category
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Catégorie de cours
+ *         example: "Mathématiques"
+ *     responses:
+ *       200:
+ *         description: Statut d'accès à la catégorie
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: string
+ *                     category:
+ *                       type: string
+ *                       example: "Mathématiques"
+ *                     hasCategoryAccess:
+ *                       type: boolean
+ *                       example: true
+ */
+router.get('/check-access/:userId/:category', subscriptionController.checkCategoryAccess.bind(subscriptionController));
 
 export default router;

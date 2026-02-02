@@ -6,8 +6,9 @@ import { db } from '../config/firebase.config';
 import { 
   Subscription, 
   SubscriptionModel, 
-  SubscriptionPlan, 
-  DEFAULT_SUBSCRIPTION_PRICING 
+  SubscriptionPlan,
+  SubscriptionPricing,
+  CATEGORY_PRICING
 } from '../models/subscription.model';
 import { UserService } from './user.service';
 
@@ -24,21 +25,23 @@ export class SubscriptionService {
    */
   async create(subscriptionData: Partial<Subscription>): Promise<SubscriptionModel> {
     try {
-      if (!subscriptionData.userId || !subscriptionData.plan) {
-        throw new Error('userId et plan sont requis');
+      if (!subscriptionData.userId || !subscriptionData.plan || !subscriptionData.category) {
+        throw new Error('userId, plan et category sont requis');
       }
 
-      // Vérifier si l'utilisateur a déjà un abonnement actif
-      const existingSubscription = await this.getActiveSubscription(subscriptionData.userId);
+      // Vérifier si l'utilisateur a déjà un abonnement actif pour cette catégorie
+      const existingSubscription = await this.getActiveCategorySubscription(
+        subscriptionData.userId, 
+        subscriptionData.category
+      );
       if (existingSubscription) {
-        throw new Error('L\'utilisateur a déjà un abonnement actif');
+        throw new Error(`L'utilisateur a déjà un abonnement actif pour la catégorie ${subscriptionData.category}`);
       }
 
       // Créer le modèle d'abonnement
       const subscription = new SubscriptionModel({
         ...subscriptionData,
         status: subscriptionData.status || 'PENDING',
-        amount: subscriptionData.amount || DEFAULT_SUBSCRIPTION_PRICING[subscriptionData.plan!],
         currency: subscriptionData.currency || 'XOF',
         createdAt: new Date(),
         updatedAt: new Date()
@@ -105,6 +108,69 @@ export class SubscriptionService {
       return subscription;
     } catch (error) {
       console.error('❌ Erreur récupération abonnement actif:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Récupère l'abonnement actif d'un utilisateur pour une catégorie spécifique
+   */
+  async getActiveCategorySubscription(userId: string, category: string): Promise<SubscriptionModel | null> {
+    try {
+      const snapshot = await db.collection(this.collectionName)
+        .where('userId', '==', userId)
+        .where('category', '==', category)
+        .where('status', '==', 'ACTIVE')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (snapshot.empty) {
+        return null;
+      }
+
+      const doc = snapshot.docs[0];
+      const subscription = new SubscriptionModel({ id: doc.id, ...doc.data() });
+
+      // Vérifier si l'abonnement n'est pas expiré
+      if (subscription.isExpired()) {
+        await this.expireSubscription(subscription.id!);
+        return null;
+      }
+
+      return subscription;
+    } catch (error) {
+      console.error('❌ Erreur récupération abonnement actif catégorie:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Récupère tous les abonnements actifs d'un utilisateur (toutes catégories)
+   */
+  async getUserActiveSubscriptions(userId: string): Promise<SubscriptionModel[]> {
+    try {
+      const snapshot = await db.collection(this.collectionName)
+        .where('userId', '==', userId)
+        .where('status', '==', 'ACTIVE')
+        .get();
+
+      const subscriptions: SubscriptionModel[] = [];
+      
+      for (const doc of snapshot.docs) {
+        const subscription = new SubscriptionModel({ id: doc.id, ...doc.data() });
+        
+        // Vérifier si l'abonnement n'est pas expiré
+        if (!subscription.isExpired()) {
+          subscriptions.push(subscription);
+        } else {
+          await this.expireSubscription(subscription.id!);
+        }
+      }
+
+      return subscriptions;
+    } catch (error) {
+      console.error('❌ Erreur récupération abonnements actifs:', error);
       throw error;
     }
   }
@@ -258,12 +324,26 @@ export class SubscriptionService {
   }
 
   /**
-   * Vérifie si un utilisateur a accès à tous les cours
+   * Vérifie si un utilisateur a accès à une catégorie de cours
+   */
+  async hasCategoryAccess(userId: string, category: string): Promise<boolean> {
+    try {
+      const subscription = await this.getActiveCategorySubscription(userId, category);
+      return subscription !== null && subscription.isActive();
+    } catch (error) {
+      console.error('❌ Erreur vérification accès catégorie:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Vérifie si un utilisateur a accès à tous les cours (ancienne méthode pour compatibilité)
+   * @deprecated Utiliser hasCategoryAccess à la place
    */
   async hasUnlimitedAccess(userId: string): Promise<boolean> {
     try {
-      const subscription = await this.getActiveSubscription(userId);
-      return subscription !== null && subscription.isActive();
+      const subscriptions = await this.getUserActiveSubscriptions(userId);
+      return subscriptions.length > 0;
     } catch (error) {
       console.error('❌ Erreur vérification accès illimité:', error);
       return false;
@@ -292,21 +372,40 @@ export class SubscriptionService {
   }
 
   /**
-   * Récupère le prix d'un plan
+   * Récupère le prix d'un plan pour une catégorie
    */
-  getPlanPrice(plan: SubscriptionPlan): number {
-    return DEFAULT_SUBSCRIPTION_PRICING[plan];
+  getPlanPrice(plan: SubscriptionPlan, category?: string): number {
+    const categoryPricing = category && CATEGORY_PRICING[category] 
+      ? CATEGORY_PRICING[category] 
+      : CATEGORY_PRICING['default'];
+    return categoryPricing[plan];
   }
 
   /**
-   * Récupère tous les plans disponibles avec leurs prix
+   * Récupère tous les plans disponibles avec leurs prix pour une catégorie
    */
-  getAvailablePlans(): { plan: SubscriptionPlan; price: number; duration: string }[] {
+  getAvailablePlans(category?: string): { plan: SubscriptionPlan; price: number; duration: string }[] {
+    const pricing = category && CATEGORY_PRICING[category] 
+      ? CATEGORY_PRICING[category] 
+      : CATEGORY_PRICING['default'];
+      
     return [
-      { plan: 'MONTHLY', price: DEFAULT_SUBSCRIPTION_PRICING.MONTHLY, duration: '1 mois' },
-      { plan: 'QUARTERLY', price: DEFAULT_SUBSCRIPTION_PRICING.QUARTERLY, duration: '3 mois' },
-      { plan: 'ANNUAL', price: DEFAULT_SUBSCRIPTION_PRICING.ANNUAL, duration: '12 mois' }
+      { plan: 'MONTHLY', price: pricing.MONTHLY, duration: '1 mois' },
+      { plan: 'QUARTERLY', price: pricing.QUARTERLY, duration: '3 mois' },
+      { plan: 'ANNUAL', price: pricing.ANNUAL, duration: '12 mois' }
     ];
+  }
+
+  /**
+   * Récupère toutes les catégories disponibles avec leurs prix
+   */
+  getAvailableCategories(): { category: string; pricing: SubscriptionPricing }[] {
+    return Object.entries(CATEGORY_PRICING)
+      .filter(([key]) => key !== 'default')
+      .map(([category, pricing]) => ({
+        category,
+        pricing
+      }));
   }
 }
 

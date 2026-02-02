@@ -115,3 +115,23 @@ debug-*.js
 config/production.json
 config/secrets.json
 .secrets
+
+# ==================== SÉCURITÉ CRITIQUE ====================
+# ⚠️ NE JAMAIS COMMITER CES FICHIERS ⚠️
+serviceAccountKey.json
+*serviceAccountKey*.json
+functions/.env
+functions/.env.*
+!functions/.env.example
+.env
+.env.*
+!.env.example
+*_credentials.json
+*_api_key.*
+*.pem
+*.key
+*.p12
+*.pfx
+# Fichiers de test avec données sensibles
+test-*.txt
+test-output.txt

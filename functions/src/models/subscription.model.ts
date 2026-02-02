@@ -1,5 +1,5 @@
 /**
- * Modèle pour les abonnements profil
+ * Modèle pour les abonnements par catégorie de cours
  */
 
 export type SubscriptionPlan = 
@@ -19,18 +19,56 @@ export interface SubscriptionPricing {
   ANNUAL: number;
 }
 
-// Prix par défaut en XOF
-export const DEFAULT_SUBSCRIPTION_PRICING: SubscriptionPricing = {
-  MONTHLY: 5000,      // 5 000 FCFA/mois
-  QUARTERLY: 12000,   // 12 000 FCFA/3 mois (économie 3000)
-  ANNUAL: 40000       // 40 000 FCFA/an (économie 20000)
+// Prix par catégorie en XOF
+export const CATEGORY_PRICING: Record<string, SubscriptionPricing> = {
+  'Mathématiques': {
+    MONTHLY: 3000,
+    QUARTERLY: 8000,
+    ANNUAL: 25000
+  },
+  'Physique': {
+    MONTHLY: 3000,
+    QUARTERLY: 8000,
+    ANNUAL: 25000
+  },
+  'Chimie': {
+    MONTHLY: 3000,
+    QUARTERLY: 8000,
+    ANNUAL: 25000
+  },
+  'Informatique': {
+    MONTHLY: 4000,
+    QUARTERLY: 10000,
+    ANNUAL: 35000
+  },
+  'Langues': {
+    MONTHLY: 2500,
+    QUARTERLY: 6500,
+    ANNUAL: 20000
+  },
+  'Sciences': {
+    MONTHLY: 3500,
+    QUARTERLY: 9000,
+    ANNUAL: 30000
+  },
+  'default': {
+    MONTHLY: 3000,
+    QUARTERLY: 8000,
+    ANNUAL: 25000
+  }
 };
+
+// Prix par défaut en XOF (pour compatibilité)
+export const DEFAULT_SUBSCRIPTION_PRICING: SubscriptionPricing = CATEGORY_PRICING['default'];
 
 export interface Subscription {
   id?: string;
   userId: string;
   plan: SubscriptionPlan;
   status: SubscriptionStatus;
+  
+  // Catégorie de cours débloquée
+  category: string;
   
   // Pricing
   amount: number;
@@ -62,6 +100,7 @@ export class SubscriptionModel implements Subscription {
   userId: string;
   plan: SubscriptionPlan;
   status: SubscriptionStatus;
+  category: string;
   amount: number;
   currency: string;
   startDate: Date | any;
@@ -80,7 +119,16 @@ export class SubscriptionModel implements Subscription {
     this.userId = data.userId || '';
     this.plan = data.plan || 'MONTHLY';
     this.status = data.status || 'PENDING';
-    this.amount = data.amount || DEFAULT_SUBSCRIPTION_PRICING[this.plan];
+    this.category = data.category || '';
+    
+    // Calculer le montant basé sur la catégorie et le plan
+    if (data.amount) {
+      this.amount = data.amount;
+    } else {
+      const categoryPricing = CATEGORY_PRICING[this.category] || CATEGORY_PRICING['default'];
+      this.amount = categoryPricing[this.plan];
+    }
+    
     this.currency = data.currency || 'XOF';
     this.startDate = data.startDate || new Date();
     this.endDate = data.endDate || this.calculateEndDate(this.plan, this.startDate);
@@ -156,6 +204,7 @@ export class SubscriptionModel implements Subscription {
       userId: this.userId,
       plan: this.plan,
       status: this.status,
+      category: this.category,
       amount: this.amount,
       currency: this.currency,
       startDate: this.startDate,

@@ -16,11 +16,16 @@ export class WaveSubscriptionService extends WaveService {
   /**
    * Créer un paiement pour un abonnement
    */
-  async createSubscriptionPayment(plan: string, userId: string, userInfo: {
-    phone?: string;
-    firstName?: string;
-    lastName?: string;
-  }): Promise<{ paymentUrl: string; paymentId: string; amount: number; subscriptionId: string }> {
+  async createSubscriptionPayment(
+    plan: string, 
+    userId: string, 
+    userInfo: {
+      phone?: string;
+      firstName?: string;
+      lastName?: string;
+    },
+    category: string
+  ): Promise<{ paymentUrl: string; paymentId: string; amount: number; subscriptionId: string }> {
     try {
       // Vérifier le plan et obtenir le prix
       const validPlans = ['MONTHLY', 'QUARTERLY', 'ANNUAL'];
@@ -28,12 +33,17 @@ export class WaveSubscriptionService extends WaveService {
         throw new Error('Plan d\'abonnement invalide');
       }
 
-      const amount = this.subscriptionService.getPlanPrice(plan as any);
+      if (!category) {
+        throw new Error('Catégorie de cours requise');
+      }
+
+      const amount = this.subscriptionService.getPlanPrice(plan as any, category);
 
       // Créer l'abonnement en statut PENDING
       const subscription = await this.subscriptionService.create({
         userId: userId,
         plan: plan as any,
+        category: category,
         status: 'PENDING',
         amount: amount,
         currency: 'XOF'
@@ -50,13 +60,14 @@ export class WaveSubscriptionService extends WaveService {
         customer_phone: userInfo.phone,
         customer_firstname: userInfo.firstName,
         customer_lastname: userInfo.lastName,
-        description: `Abonnement ${plan}: Accès illimité à tous les cours`,
-        redirect_url: `${baseUrl}/subscription/success?subscriptionId=${subscription.id}&userId=${userId}`,
+        description: `Abonnement ${plan} - Catégorie: ${category}`,
+        redirect_url: `${baseUrl}/subscription/success?subscriptionId=${subscription.id}&userId=${userId}&category=${encodeURIComponent(category)}`,
         cancel_url: `${baseUrl}/subscription/cancel?subscriptionId=${subscription.id}`,
         webhook_url: `${process.env.API_BASE_URL || 'http://localhost:3000'}/api/wave/webhook`,
         metadata: {
           userId: userId,
           plan: plan,
+          category: category,
           subscriptionId: subscription.id,
           type: 'subscription_payment'
         }

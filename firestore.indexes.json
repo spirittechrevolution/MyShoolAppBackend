@@ -299,6 +299,28 @@
             "order": "DESCENDING"
           }
         ]
+      },
+      {
+        "collectionGroup": "subscriptions",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "category",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "ASCENDING"
+          }
+        ]
       }
     ],
     "fieldOverrides": []

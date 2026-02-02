@@ -84,24 +84,21 @@ export class AiChatService {
         return 'Le service de chat intelligent n\'est pas configuré. Veuillez contacter le support.';
       }
 
-      // Liste des modèles à essayer dans l'ordre (Gemini 2.0 puis 1.5 puis 1.0)
+      // Liste des modèles disponibles et fonctionnels (Gemini 2.5 et 3.0)
       const modelsToTry = [
-        'gemini-2.0-flash-exp',
-        'gemini-exp-1206',
-        'gemini-2.0-flash-thinking-exp-1219',
-        'gemini-1.5-flash-002',
-        'gemini-1.5-pro-002',
-        'gemini-1.5-flash-8b',
-        'gemini-1.5-flash',
-        'gemini-1.5-pro',
-        'gemini-pro'
+        'gemini-3-flash-preview',      // Gemini 3.0 - Le plus intelligent (GRATUIT)
+        'gemini-2.5-flash',             // Gemini 2.5 - Rapide et fiable (GRATUIT)
       ];
 
       let lastError: any = null;
 
+      console.log('🔑 GEMINI_API_KEY présente:', !!process.env.GEMINI_API_KEY);
+      console.log('🔑 Longueur de la clé:', process.env.GEMINI_API_KEY?.length);
+
       // Essayer chaque modèle jusqu'à ce qu'un fonctionne
       for (const modelName of modelsToTry) {
         try {
+          console.log(`🔄 Tentative avec le modèle: ${modelName}`);
           const model = this.genAI.getGenerativeModel({ model: modelName });
 
           // Contexte pour MySchool
@@ -130,7 +127,7 @@ Question de l'utilisateur : ${question}`;
           return response.text();
         } catch (error: any) {
           lastError = error;
-          console.log(`⚠️ Modèle ${modelName} non disponible, essai suivant...`);
+          console.error(`❌ Erreur avec ${modelName}:`, error.message || error);
           continue; // Essayer le modèle suivant
         }
       }
