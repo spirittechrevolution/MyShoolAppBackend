@@ -167,9 +167,7 @@ export class WaveService {
       }
 
       // URLs de redirection
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://myschool-app.com' 
-        : 'http://localhost:4200';
+      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
 
       const transaction: WaveTransaction = {
         amount: course.price,

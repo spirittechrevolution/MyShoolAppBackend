@@ -32,6 +32,7 @@ const allowedOrigins = [
   'http://localhost:4204',
   'http://localhost:4205',
   // Domaines de production
+  'https://beta.myschool.sn',
   'https://myschool-f862b.web.app',
   'https://myschool-f862b.firebaseapp.com',
   // URLs Cloud Functions pour Swagger UI
@@ -150,21 +151,21 @@ app.get('/openapi.json', (req, res) => {
   res.json(swaggerDocument);
 });
 
-// API Routes
-app.use('/api/users', userRoutes);
-app.use('/api/courses', courseRoutes);
-app.use('/api/chapters', chapterRoutes);
-app.use('/api/lessons', lessonRoutes);
-app.use('/api/exercises', exerciseRoutes);
-app.use('/api/enrollments', enrollmentRoutes);
-app.use('/api/instructors', instructorRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/referrals', referralRoutes);
-app.use('/api/push-notifications', pushNotificationRoutes);
-app.use('/api/faqs', faqRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/wave', waveRoutes);
-app.use('/api/subscriptions', subscriptionRoutes);
+// API Routes (sans préfixe /api car la Cloud Function s'appelle déjà 'api')
+app.use('/users', userRoutes);
+app.use('/courses', courseRoutes);
+app.use('/chapters', chapterRoutes);
+app.use('/lessons', lessonRoutes);
+app.use('/exercises', exerciseRoutes);
+app.use('/enrollments', enrollmentRoutes);
+app.use('/instructors', instructorRoutes);
+app.use('/payments', paymentRoutes);
+app.use('/referrals', referralRoutes);
+app.use('/push-notifications', pushNotificationRoutes);
+app.use('/faqs', faqRoutes);
+app.use('/chat', chatRoutes);
+app.use('/wave', waveRoutes);
+app.use('/subscriptions', subscriptionRoutes);
 
 // 404 Handler
 app.use((req, res) => {

@@ -95,7 +95,7 @@ export class ReferralModel {
    * Génère un web link
    */
   static generateWebLink(code: string): string {
-    return `https://myschool-app.com/join?ref=${code}`;
+    return `https://beta.myschool.sn/join?ref=${code}`;
   }
 
   /**

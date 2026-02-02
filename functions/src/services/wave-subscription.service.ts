@@ -50,9 +50,7 @@ export class WaveSubscriptionService extends WaveService {
       });
 
       // URLs de redirection
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://myschool-f862b.web.app' 
-        : 'http://localhost:4200';
+      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
 
       const transaction = {
         amount: amount,
