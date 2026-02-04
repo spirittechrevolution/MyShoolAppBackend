@@ -25,6 +25,15 @@ export interface Course {
   chapters: any[];
   exercises: number;
   enrolledUsers?: string[];
+  
+  // Documents PDF
+  documents?: Array<{
+    name: string;        // Nom du fichier
+    url: string;         // URL de téléchargement
+    size?: number;       // Taille en octets
+    uploadedAt?: Date;   // Date d'upload
+  }>;
+  
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,6 +62,13 @@ export class CourseModel implements Course {
   chapters: any[];
   exercises: number;
   enrolledUsers?: string[];
+  documents?: Array<{
+    name: string;
+    url: string;
+    size?: number;
+    uploadedAt?: Date;
+  }>;
+  
   createdAt: Date;
   updatedAt: Date;
 
@@ -80,6 +96,7 @@ export class CourseModel implements Course {
     this.chapters = data.chapters || [];
     this.exercises = data.exercises || 0;
     this.enrolledUsers = data.enrolledUsers || [];
+    this.documents = data.documents || [];
     this.createdAt = data.createdAt || new Date();
     this.updatedAt = data.updatedAt || new Date();
   }
@@ -109,6 +126,7 @@ export class CourseModel implements Course {
       chapters: this.chapters,
       exercises: this.exercises,
       enrolledUsers: this.enrolledUsers,
+      documents: this.documents,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };

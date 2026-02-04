@@ -18,6 +18,7 @@ import chatRoutes from './routes/chat.routes';
 import waveRoutes from './routes/wave.routes';
 import subscriptionRoutes from './routes/subscription.routes';
 import matiereRoutes from './routes/matiere.routes';
+import uploadRoutes from './routes/upload.routes';
 
 // Load environment variables (for local development)
 dotenv.config();
@@ -170,6 +171,7 @@ app.use('/chat', chatRoutes);
 app.use('/wave', waveRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/matieres', matiereRoutes);
+app.use('/upload', uploadRoutes);
 
 // 404 Handler
 app.use((req, res) => {

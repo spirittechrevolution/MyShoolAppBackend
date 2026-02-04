@@ -22,6 +22,14 @@ export interface Exercise {
   questions?: Question[];
   templateCode?: string;
   testCases?: TestCase[];
+  
+  // Documents PDF
+  documents?: Array<{
+    name: string;
+    url: string;
+    size?: number;
+    uploadedAt?: Date;
+  }>;
 }
 
 export class ExerciseModel implements Exercise {
@@ -36,6 +44,12 @@ export class ExerciseModel implements Exercise {
   questions?: Question[];
   templateCode?: string;
   testCases?: TestCase[];
+  documents?: Array<{
+    name: string;
+    url: string;
+    size?: number;
+    uploadedAt?: Date;
+  }>;
 
   constructor(data: Partial<Exercise>) {
     this.id = data.id || '';
@@ -49,6 +63,7 @@ export class ExerciseModel implements Exercise {
     this.questions = data.questions || [];
     this.templateCode = data.templateCode;
     this.testCases = data.testCases || [];
+    this.documents = data.documents || [];
   }
 
   toJSON(): any {
@@ -63,7 +78,8 @@ export class ExerciseModel implements Exercise {
       instructions: this.instructions,
       questions: this.questions,
       templateCode: this.templateCode,
-      testCases: this.testCases
+      testCases: this.testCases,
+      documents: this.documents
     };
   }
 }
