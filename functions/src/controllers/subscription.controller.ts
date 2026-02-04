@@ -17,15 +17,16 @@ export class SubscriptionController {
   /**
    * Créer un paiement d'abonnement Wave
    * POST /api/subscriptions/create-payment
+   * Body: { plan, userId, classe, typeAbonnement, matieres? }
    */
   async createSubscriptionPayment(req: Request, res: Response): Promise<void> {
     try {
-      const { plan, userId, category } = req.body;
+      const { plan, userId, classe, typeAbonnement, matieres } = req.body;
 
-      if (!plan || !userId || !category) {
+      if (!plan || !userId || !classe || !typeAbonnement) {
         res.status(400).json({
           success: false,
-          message: 'plan, userId et category requis'
+          message: 'plan, userId, classe et typeAbonnement requis'
         });
         return;
       }
@@ -40,16 +41,42 @@ export class SubscriptionController {
         return;
       }
 
-      // Vérifier si l'utilisateur a déjà un abonnement actif pour cette catégorie
-      const existingSubscription = await subscriptionService.getActiveCategorySubscription(userId, category);
+      // Vérifier que la classe correspond
+      if (user.classe !== classe) {
+        res.status(400).json({
+          success: false,
+          message: `La classe sélectionnée "${classe}" ne correspond pas à votre classe "${user.classe}"`
+        });
+        return;
+      }
+
+      // Validation selon le type d'abonnement
+      if (typeAbonnement === 'CLASSE' && user.niveauScolaire !== 'ELEMENTAIRE') {
+        res.status(400).json({
+          success: false,
+          message: 'L\'abonnement CLASSE est réservé au niveau ELEMENTAIRE'
+        });
+        return;
+      }
+
+      if (typeAbonnement === 'MATIERE' && (!matieres || matieres.length !== 3)) {
+        res.status(400).json({
+          success: false,
+          message: 'L\'abonnement MATIERE nécessite exactement 3 matières'
+        });
+        return;
+      }
+
+      // Vérifier si l'utilisateur a déjà un abonnement actif
+      const existingSubscription = await subscriptionService.getActiveSubscription(userId);
       if (existingSubscription) {
         res.status(400).json({
           success: false,
-          message: `Vous avez déjà un abonnement actif pour la catégorie "${category}"`,
+          message: 'Vous avez déjà un abonnement actif',
           data: {
             subscriptionEndDate: existingSubscription.endDate,
             plan: existingSubscription.plan,
-            category: existingSubscription.category
+            classe: existingSubscription.classe
           }
         });
         return;
@@ -60,7 +87,7 @@ export class SubscriptionController {
         phone: user.phone,
         firstName: user.firstName,
         lastName: user.lastName
-      }, category);
+      });
 
       // Enregistrer la transaction de paiement dans Firestore
       await paymentService.create({
@@ -76,7 +103,9 @@ export class SubscriptionController {
           wavePaymentId: paymentData.paymentId,
           checkoutUrl: paymentData.paymentUrl,
           plan: plan,
-          category: category
+          classe: classe,
+          typeAbonnement: typeAbonnement,
+          matieres: matieres || []
         }
       });
 
@@ -88,10 +117,11 @@ export class SubscriptionController {
           subscriptionId: paymentData.subscriptionId,
           amount: paymentData.amount,
           plan: plan,
-          category: category,
+          classe: classe,
+          typeAbonnement: typeAbonnement,
           currency: 'XOF'
         },
-        message: `Paiement d'abonnement créé pour la catégorie "${category}"`
+        message: `Paiement d'abonnement créé pour la classe "${classe}"`
       });
 
     } catch (error: any) {
@@ -190,15 +220,11 @@ export class SubscriptionController {
    */
   async getAvailablePlans(req: Request, res: Response): Promise<void> {
     try {
-      const { category } = req.query;
-      const plans = subscriptionService.getAvailablePlans(category as string);
+      const plans = subscriptionService.getAvailablePlans();
 
       res.status(200).json({
         success: true,
-        data: {
-          category: category || 'default',
-          plans
-        }
+        data: { plans }
       });
 
     } catch (error: any) {
@@ -211,48 +237,60 @@ export class SubscriptionController {
   }
 
   /**
-   * Obtenir toutes les catégories disponibles avec leurs prix
-   * GET /api/subscriptions/categories
+   * Obtenir les matières disponibles pour un niveau (deprecated - utiliser /api/matieres)
+   * GET /api/subscriptions/matieres/:niveau
    */
-  async getAvailableCategories(req: Request, res: Response): Promise<void> {
+  async getAvailableSubjects(req: Request, res: Response): Promise<void> {
     try {
-      const categories = subscriptionService.getAvailableCategories();
+      const { niveau } = req.params;
+      
+      if (!niveau) {
+        res.status(400).json({
+          success: false,
+          message: 'Niveau requis'
+        });
+        return;
+      }
+
+      const matieres = await subscriptionService.getAvailableSubjects(niveau as any);
 
       res.status(200).json({
         success: true,
-        data: categories
+        data: matieres,
+        count: matieres.length,
+        message: 'Utilisez plutôt /api/matieres/niveau/:niveau ou /api/matieres/classe/:classe'
       });
 
     } catch (error: any) {
-      console.error('❌ Erreur récupération catégories:', error);
+      console.error('❌ Erreur récupération matières:', error);
       res.status(500).json({
         success: false,
-        message: error.message || 'Erreur lors de la récupération des catégories'
+        message: error.message || 'Erreur lors de la récupération des matières'
       });
     }
   }
 
   /**
-   * Vérifier si un utilisateur a un accès à une catégorie
-   * GET /api/subscriptions/check-access/:userId/:category
+   * Vérifier si un utilisateur a accès à un cours
+   * GET /api/subscriptions/check-course-access/:userId/:courseId
    */
-  async checkCategoryAccess(req: Request, res: Response): Promise<void> {
+  async checkCourseAccess(req: Request, res: Response): Promise<void> {
     try {
-      const { userId, category } = req.params;
+      const { userId, courseId } = req.params;
 
-      const hasAccess = await subscriptionService.hasCategoryAccess(userId, category);
+      const hasAccess = await subscriptionService.hasAccessToCourse(userId, courseId);
 
       res.status(200).json({
         success: true,
         data: {
           userId,
-          category,
-          hasCategoryAccess: hasAccess
+          courseId,
+          hasAccess
         }
       });
 
     } catch (error: any) {
-      console.error('❌ Erreur vérification accès catégorie:', error);
+      console.error('❌ Erreur vérification accès cours:', error);
       res.status(500).json({
         success: false,
         message: error.message || 'Erreur lors de la vérification de l\'accès'
@@ -261,25 +299,27 @@ export class SubscriptionController {
   }
 
   /**
-   * Vérifier si un utilisateur a un accès illimité (ancien endpoint pour compatibilité)
+   * Vérifier si un utilisateur a un abonnement actif (ancien endpoint pour compatibilité)
    * GET /api/subscriptions/check-access/:userId
    */
   async checkUnlimitedAccess(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
 
-      const activeSubscriptions = await subscriptionService.getUserActiveSubscriptions(userId);
-      const hasAccess = activeSubscriptions.length > 0;
+      const subscription = await subscriptionService.getActiveSubscription(userId);
+      const hasAccess = subscription !== null;
 
       res.status(200).json({
         success: true,
         data: {
-          hasUnlimitedAccess: hasAccess,
-          activeSubscriptions: activeSubscriptions.map(sub => ({
-            category: sub.category,
-            plan: sub.plan,
-            endDate: sub.endDate
-          }))
+          hasActiveSubscription: hasAccess,
+          subscription: subscription ? {
+            classe: subscription.classe,
+            typeAbonnement: subscription.typeAbonnement,
+            plan: subscription.plan,
+            endDate: subscription.endDate,
+            matieres: subscription.matieres || []
+          } : null
         }
       });
 

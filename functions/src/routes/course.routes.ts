@@ -48,6 +48,62 @@ router.get('/published', (req, res) => courseController.getPublished(req, res));
 
 /**
  * @swagger
+ * /api/courses/classe/{classe}:
+ *   get:
+ *     tags: [Courses]
+ *     summary: Récupérer les cours par classe précise
+ *     parameters:
+ *       - in: path
+ *         name: classe
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "Licence 2"
+ *     responses:
+ *       200:
+ *         description: Liste des cours pour cette classe
+ */
+router.get('/classe/:classe', (req, res) => courseController.getByClasse(req, res));
+
+/**
+ * @swagger
+ * /api/courses/matiere/{matiereId}:
+ *   get:
+ *     tags: [Courses]
+ *     summary: Récupérer les cours par matière
+ *     parameters:
+ *       - in: path
+ *         name: matiereId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Liste des cours pour cette matière
+ */
+router.get('/matiere/:matiereId', (req, res) => courseController.getByMatiere(req, res));
+
+/**
+ * @swagger
+ * /api/courses/niveau/{niveau}:
+ *   get:
+ *     tags: [Courses]
+ *     summary: Récupérer les cours par niveau scolaire
+ *     parameters:
+ *       - in: path
+ *         name: niveau
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [ELEMENTAIRE, MOYEN, SECONDAIRE, UNIVERSITAIRE]
+ *     responses:
+ *       200:
+ *         description: Liste des cours pour ce niveau
+ */
+router.get('/niveau/:niveau', (req, res) => courseController.getByNiveauScolaire(req, res));
+
+/**
+ * @swagger
  * /api/courses/{id}:
  *   get:
  *     tags: [Courses]

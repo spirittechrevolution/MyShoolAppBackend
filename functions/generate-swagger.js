@@ -34,7 +34,7 @@ const options = {
       schemas: {
         User: {
           type: 'object',
-          required: ['firstName', 'lastName', 'phone', 'level', 'role', 'status'],
+          required: ['firstName', 'lastName', 'phone', 'level', 'role', 'status', 'classe'],
           properties: {
             uid: { type: 'string', description: 'ID Firebase Auth (auto-généré)' },
             firstName: { type: 'string', example: 'John' },
@@ -43,6 +43,8 @@ const options = {
             login: { type: 'string', example: '+221771234567' },
             password: { type: 'string', example: 'Password123', description: 'Requis à la création uniquement' },
             level: { type: 'string', enum: ['beginner', 'intermediate', 'advanced'], example: 'beginner' },
+            classe: { type: 'string', example: '3ème (BFEM)', description: 'Classe précise de l\'utilisateur (obligatoire)' },
+            niveauScolaire: { type: 'string', enum: ['ELEMENTAIRE', 'MOYEN', 'SECONDAIRE', 'UNIVERSITAIRE'], example: 'MOYEN' },
             role: {
               type: 'object',
               properties: {
@@ -57,12 +59,15 @@ const options = {
         },
         Course: {
           type: 'object',
-          required: ['title', 'description', 'level'],
+          required: ['title', 'description', 'level', 'niveauScolaire', 'classe'],
           properties: {
             title: { type: 'string', example: 'Introduction à JavaScript' },
             description: { type: 'string', example: 'Apprendre les bases de JavaScript' },
             image: { type: 'string', description: 'URL de l\'image du cours' },
             level: { type: 'string', enum: ['DEBUTANT', 'INTERMEDIAIRE', 'AVANCE'], example: 'DEBUTANT' },
+            niveauScolaire: { type: 'string', enum: ['ELEMENTAIRE', 'MOYEN', 'SECONDAIRE', 'UNIVERSITAIRE'], example: 'MOYEN' },
+            classe: { type: 'string', example: '3ème (BFEM)', description: 'Classe cible du cours (obligatoire)' },
+            matiereId: { type: 'string', description: 'ID de la matière associée' },
             duration: { type: 'number', example: 120, description: 'Durée en minutes' },
             price: { type: 'number', example: 0, description: 'Prix (0 = gratuit)' },
             category: { type: 'string', example: 'Programmation' },
@@ -209,6 +214,47 @@ const options = {
             referrals: { type: 'array', items: { $ref: '#/components/schemas/Referral' } }
           }
         },
+        Subscription: {
+          type: 'object',
+          required: ['userId', 'classe', 'type', 'status'],
+          properties: {
+            id: { type: 'string', description: 'ID auto-généré' },
+            userId: { type: 'string', description: 'ID de l\'utilisateur abonné' },
+            classe: { type: 'string', example: '3ème (BFEM)', description: 'Classe de l\'abonnement' },
+            niveauScolaire: { type: 'string', enum: ['ELEMENTAIRE', 'MOYEN', 'SECONDAIRE', 'UNIVERSITAIRE'], example: 'MOYEN' },
+            type: { type: 'string', enum: ['CLASSE', 'MATIERE'], example: 'MATIERE', description: 'CLASSE pour élémentaire, MATIERE pour les autres' },
+            matieres: { 
+              type: 'array', 
+              items: { type: 'string' },
+              description: 'Liste de 3 matières (uniquement si type=MATIERE)',
+              example: ['Mathématiques', 'Physique-Chimie', 'SVT']
+            },
+            status: { type: 'string', enum: ['ACTIVE', 'EXPIRED', 'CANCELLED'], example: 'ACTIVE' },
+            startDate: { type: 'string', format: 'date-time' },
+            endDate: { type: 'string', format: 'date-time' },
+            autoRenew: { type: 'boolean', default: false },
+            paymentId: { type: 'string', description: 'ID du paiement associé' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        Matiere: {
+          type: 'object',
+          required: ['nom', 'classe', 'niveauScolaire'],
+          properties: {
+            id: { type: 'string', description: 'ID auto-généré' },
+            nom: { type: 'string', example: 'Mathématiques' },
+            description: { type: 'string', example: 'Matière scientifique fondamentale' },
+            classe: { type: 'string', example: '3ème (BFEM)' },
+            niveauScolaire: { type: 'string', enum: ['ELEMENTAIRE', 'MOYEN', 'SECONDAIRE', 'UNIVERSITAIRE'], example: 'MOYEN' },
+            icon: { type: 'string', example: '🔢' },
+            color: { type: 'string', example: '#4CAF50' },
+            ordre: { type: 'number', example: 1 },
+            isActive: { type: 'boolean', example: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
         Error: {
           type: 'object',
           properties: {
@@ -235,7 +281,13 @@ const options = {
       { name: 'Enrollments', description: 'Gestion des inscriptions' },
       { name: 'Instructors', description: 'Gestion des instructeurs' },
       { name: 'Payments', description: 'Gestion des paiements Orange Money' },
-      { name: 'Referrals', description: 'Système de parrainage avec deep links' }
+      { name: 'Referrals', description: 'Système de parrainage avec deep links' },
+      { name: 'Matieres', description: 'Gestion des matières par classe (CRUD Admin)' },
+      { name: 'Subscriptions', description: 'Système d\'abonnement par classe ou matières' },
+      { name: 'Wave', description: 'Intégration paiement Wave (Mobile Money)' },
+      { name: 'Chat', description: 'Chat IA avec Gemini pour aide éducative' },
+      { name: 'FAQs', description: 'Foire aux questions' },
+      { name: 'Push Notifications', description: 'Notifications push Firebase' }
     ]
   },
   apis: [path.join(__dirname, 'src', 'routes', '*.ts')]

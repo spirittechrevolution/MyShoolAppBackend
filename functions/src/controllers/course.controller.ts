@@ -6,6 +6,26 @@ const courseService = new CourseService();
 export class CourseController {
   async create(req: Request, res: Response): Promise<void> {
     try {
+      const { niveauScolaire, classe, matiereId } = req.body;
+      
+      // Validation des champs obligatoires
+      if (!niveauScolaire || !classe) {
+        res.status(400).json({
+          success: false,
+          message: 'niveauScolaire et classe sont requis'
+        });
+        return;
+      }
+
+      // Pour les niveaux non-élémentaires, matiereId est requis
+      if (niveauScolaire !== 'ELEMENTAIRE' && !matiereId) {
+        res.status(400).json({
+          success: false,
+          message: 'matiereId est requis pour les niveaux MOYEN, SECONDAIRE et UNIVERSITAIRE'
+        });
+        return;
+      }
+
       const course = await courseService.create(req.body);
       res.status(201).json({
         success: true,
@@ -77,6 +97,97 @@ export class CourseController {
   async getByCategory(req: Request, res: Response): Promise<void> {
     try {
       const courses = await courseService.getByCategory(req.params.category);
+      res.status(200).json({
+        success: true,
+        data: courses,
+        count: courses.length,
+        message: 'Endpoint deprecated - utilisez /courses/classe/:classe ou /courses/matiere/:matiereId'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  /**
+   * Obtenir les cours par classe précise
+   * GET /api/courses/classe/:classe
+   */
+  async getByClasse(req: Request, res: Response): Promise<void> {
+    try {
+      const { classe } = req.params;
+      
+      if (!classe) {
+        res.status(400).json({
+          success: false,
+          message: 'Classe requise'
+        });
+        return;
+      }
+
+      const courses = await courseService.getByClasse(decodeURIComponent(classe));
+      res.status(200).json({
+        success: true,
+        data: courses,
+        count: courses.length
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  /**
+   * Obtenir les cours par matière
+   * GET /api/courses/matiere/:matiereId
+   */
+  async getByMatiere(req: Request, res: Response): Promise<void> {
+    try {
+      const { matiereId } = req.params;
+      
+      if (!matiereId) {
+        res.status(400).json({
+          success: false,
+          message: 'ID de matière requis'
+        });
+        return;
+      }
+
+      const courses = await courseService.getByMatiere(matiereId);
+      res.status(200).json({
+        success: true,
+        data: courses,
+        count: courses.length
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  /**
+   * Obtenir les cours par niveau scolaire
+   * GET /api/courses/niveau/:niveau
+   */
+  async getByNiveauScolaire(req: Request, res: Response): Promise<void> {
+    try {
+      const { niveau } = req.params;
+      
+      if (!niveau) {
+        res.status(400).json({
+          success: false,
+          message: 'Niveau scolaire requis'
+        });
+        return;
+      }
+
+      const courses = await courseService.getByNiveauScolaire(niveau as any);
       res.status(200).json({
         success: true,
         data: courses,

@@ -35,6 +35,37 @@ router.post('/', (req, res) => userController.create(req, res));
 
 /**
  * @swagger
+ * /api/users/classes-disponibles:
+ *   get:
+ *     tags: [Users]
+ *     summary: Obtenir toutes les classes disponibles par niveau
+ *     responses:
+ *       200:
+ *         description: Liste des classes par niveau scolaire
+ */
+router.get('/classes-disponibles', (req, res) => userController.getAvailableClasses(req, res));
+
+/**
+ * @swagger
+ * /api/users/classes-disponibles/{niveau}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Obtenir les classes pour un niveau spécifique
+ *     parameters:
+ *       - in: path
+ *         name: niveau
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [ELEMENTAIRE, MOYEN, SECONDAIRE, UNIVERSITAIRE]
+ *     responses:
+ *       200:
+ *         description: Liste des classes pour ce niveau
+ */
+router.get('/classes-disponibles/:niveau', (req, res) => userController.getClassesByNiveau(req, res));
+
+/**
+ * @swagger
  * /api/users:
  *   get:
  *     tags: [Users]

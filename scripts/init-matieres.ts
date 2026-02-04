@@ -6,12 +6,24 @@
 
 import * as admin from 'firebase-admin';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 dotenv.config();
 
-// Initialiser Firebase Admin
+// Initialiser Firebase Admin avec service account
 if (!admin.apps.length) {
-  admin.initializeApp();
+  const serviceAccountPath = path.join(__dirname, '..', 'serviceAccountKey.json');
+  
+  try {
+    const serviceAccount = require(serviceAccountPath);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+  } catch (error) {
+    console.error('❌ Erreur : serviceAccountKey.json non trouvé');
+    console.log('💡 Assurez-vous que serviceAccountKey.json est à la racine du projet\n');
+    process.exit(1);
+  }
 }
 
 const db = admin.firestore();
