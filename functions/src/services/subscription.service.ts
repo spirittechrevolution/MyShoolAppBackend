@@ -201,7 +201,7 @@ export class SubscriptionService {
       await this.userService.update(subscription.userId, {
         hasActiveSubscription: true,
         subscriptionId: subscriptionId,
-        subscriptionPlan: 'ANNUAL', // Toujours annuel maintenant
+        // subscriptionPlan: 'ANNUAL', // Removed - old model, toujours annuel
         subscriptionStatus: 'ACTIVE',
         subscriptionEndDate: endDate
       });

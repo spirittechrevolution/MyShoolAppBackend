@@ -228,7 +228,7 @@ export async function enrichWithAccessInfo(
         res.setHeader('X-User-Niveau', user.niveauScolaire || 'non-defini');
         
         if (hasActiveSubscription) {
-          res.setHeader('X-Subscription-Type', user.subscriptionPlan || 'unknown');
+          res.setHeader('X-Subscription-Type', user.classe || 'non-definie');
         }
       }
     }

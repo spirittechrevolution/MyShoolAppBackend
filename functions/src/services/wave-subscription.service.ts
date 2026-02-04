@@ -18,7 +18,7 @@ export class WaveSubscriptionService extends WaveService {
    * Créer un paiement pour un abonnement - Nouveau modèle basé sur classe
    */
   async createSubscriptionPayment(
-    plan: string,
+    typeAbonnement: string,
     userId: string, 
     userInfo: {
       phone?: string;

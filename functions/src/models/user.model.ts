@@ -25,7 +25,7 @@ export interface User {
   // Subscription fields
   hasActiveSubscription?: boolean;
   subscriptionId?: string;
-  subscriptionPlan?: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL';
+  // subscriptionPlan?: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL'; // Removed - old model
   subscriptionStatus?: 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'PENDING';
   subscriptionEndDate?: Date | any;
   
@@ -54,7 +54,7 @@ export class UserModel implements User {
   // Subscription fields
   hasActiveSubscription?: boolean;
   subscriptionId?: string;
-  subscriptionPlan?: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL';
+  // subscriptionPlan?: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL'; // Removed - old model
   subscriptionStatus?: 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'PENDING';
   subscriptionEndDate?: Date | any;
   
@@ -82,7 +82,7 @@ export class UserModel implements User {
     // Subscription fields
     this.hasActiveSubscription = data.hasActiveSubscription || false;
     this.subscriptionId = data.subscriptionId;
-    this.subscriptionPlan = data.subscriptionPlan;
+    // this.subscriptionPlan = data.subscriptionPlan; // Removed - old model
     this.subscriptionStatus = data.subscriptionStatus;
     this.subscriptionEndDate = data.subscriptionEndDate;
     
@@ -110,7 +110,7 @@ export class UserModel implements User {
       specializationId: this.specializationId,
       hasActiveSubscription: this.hasActiveSubscription,
       subscriptionId: this.subscriptionId,
-      subscriptionPlan: this.subscriptionPlan,
+      // subscriptionPlan: this.subscriptionPlan, // Removed - old model
       subscriptionStatus: this.subscriptionStatus,
       subscriptionEndDate: this.subscriptionEndDate,
       createdAt: this.createdAt,

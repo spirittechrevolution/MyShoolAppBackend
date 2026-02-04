@@ -92,7 +92,7 @@ export class SubscriptionController {
       }
 
       // Créer le paiement Wave pour l'abonnement
-      const paymentData = await waveSubscriptionService.createSubscriptionPayment(plan, userId, {
+      const paymentData = await waveSubscriptionService.createSubscriptionPayment(typeAbonnement, userId, {
         phone: user.phone,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -115,7 +115,6 @@ export class SubscriptionController {
         metadata: {
           wavePaymentId: paymentData.paymentId,
           checkoutUrl: paymentData.paymentUrl,
-          plan: plan,
           classe: classe,
           typeAbonnement: typeAbonnement,
           matieres: matieres || []
@@ -129,7 +128,6 @@ export class SubscriptionController {
           paymentId: paymentData.paymentId,
           subscriptionId: paymentData.subscriptionId,
           amount: paymentData.amount,
-          plan: plan,
           classe: classe,
           typeAbonnement: typeAbonnement,
           currency: 'XOF'
