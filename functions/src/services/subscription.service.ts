@@ -31,14 +31,15 @@ export class SubscriptionService {
    */
   async create(subscriptionData: Partial<Subscription>): Promise<SubscriptionModel> {
     try {
-      if (!subscriptionData.userId || !subscriptionData.niveauScolaire || !subscriptionData.typeAbonnement) {
-        throw new Error('userId, niveauScolaire et typeAbonnement sont requis');
+      if (!subscriptionData.userId || !subscriptionData.niveauScolaire || !subscriptionData.typeAbonnement || !subscriptionData.classe) {
+        throw new Error('userId, niveauScolaire, typeAbonnement et classe sont requis');
       }
 
       // Validation spécifique selon le type d'abonnement
       if (subscriptionData.typeAbonnement === 'CLASSE') {
-        if (!subscriptionData.classe) {
-          throw new Error('Le champ classe est requis pour un abonnement de type CLASSE');
+        // Pour ELEMENTAIRE: pas de sélection de matières, accès à TOUTES les matières de la classe
+        if (subscriptionData.niveauScolaire !== 'ELEMENTAIRE') {
+          throw new Error('Le type d\'abonnement CLASSE est réservé au niveau ELEMENTAIRE');
         }
       } else if (subscriptionData.typeAbonnement === 'MATIERE') {
         if (!subscriptionData.matieres || subscriptionData.matieres.length !== 3) {

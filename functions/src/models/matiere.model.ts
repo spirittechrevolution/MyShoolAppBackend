@@ -13,6 +13,7 @@ export interface Matiere {
   id?: string;
   nom: string;                      // Ex: "Mathématiques", "Physique-Chimie", "SVT"
   niveauScolaire: NiveauScolaire;   // Niveau auquel cette matière appartient
+  classe?: string;                   // Classe précise (CM2, Licence2, Terminale S, etc.)
   description?: string;
   icone?: string;                   // Émoji ou URL d'icône
   ordre?: number;                   // Pour l'affichage
@@ -26,6 +27,7 @@ export class MatiereModel implements Matiere {
   id?: string;
   nom: string;
   niveauScolaire: NiveauScolaire;
+  classe?: string;
   description?: string;
   icone?: string;
   ordre?: number;
@@ -37,6 +39,7 @@ export class MatiereModel implements Matiere {
     this.id = data.id;
     this.nom = data.nom || '';
     this.niveauScolaire = data.niveauScolaire || 'MOYEN';
+    this.classe = data.classe;
     this.description = data.description;
     this.icone = data.icone;
     this.ordre = data.ordre || 0;
@@ -50,6 +53,7 @@ export class MatiereModel implements Matiere {
       id: this.id,
       nom: this.nom,
       niveauScolaire: this.niveauScolaire,
+      classe: this.classe,
       description: this.description,
       icone: this.icone,
       ordre: this.ordre,
@@ -61,54 +65,18 @@ export class MatiereModel implements Matiere {
 }
 
 /**
- * Liste des matières par défaut par niveau
+ * Classes disponibles par niveau scolaire
  */
-export const DEFAULT_MATIERES: Record<NiveauScolaire, string[]> = {
-  ELEMENTAIRE: [
-    'Mathématiques',
-    'Français',
-    'Anglais',
-    'Sciences',
-    'Histoire-Géographie',
-    'Éducation Civique',
-    'Arts',
-    'Sport'
-  ],
-  MOYEN: [
-    'Mathématiques',
-    'Physique-Chimie',
-    'SVT',
-    'Français',
-    'Anglais',
-    'Espagnol',
-    'Arabe',
-    'Histoire-Géographie',
-    'Éducation Civique',
-    'Informatique'
-  ],
+export const CLASSES_PAR_NIVEAU: Record<NiveauScolaire, string[]> = {
+  ELEMENTAIRE: ['CI', 'CP', 'CE1', 'CE2', 'CM1', 'CM2'],
+  MOYEN: ['6ème', '5ème', '4ème', '3ème (BFEM)'],
   SECONDAIRE: [
-    'Mathématiques',
-    'Physique-Chimie',
-    'SVT',
-    'Français',
-    'Anglais',
-    'Espagnol',
-    'Arabe',
-    'Histoire-Géographie',
-    'Philosophie',
-    'Informatique',
-    'Économie'
+    // Seconde (toutes séries)
+    'Seconde L', 'Seconde S', 'Seconde G', 'Seconde T',
+    // Première (toutes séries)
+    'Première L', 'Première L\'', 'Première S', 'Première G', 'Première T',
+    // Terminale (toutes séries)
+    'Terminale L', 'Terminale L\'', 'Terminale S', 'Terminale G', 'Terminale T'
   ],
-  UNIVERSITAIRE: [
-    'Mathématiques',
-    'Physique',
-    'Chimie',
-    'Biologie',
-    'Informatique',
-    'Droit',
-    'Économie',
-    'Gestion',
-    'Littérature',
-    'Langues'
-  ]
+  UNIVERSITAIRE: ['Licence 1', 'Licence 2', 'Licence 3', 'Master 1', 'Master 2']
 };

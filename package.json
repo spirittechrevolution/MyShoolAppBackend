@@ -11,7 +11,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:clean": "npm test && npx ts-node src/scripts/cleanup-test-data.ts"
+    "test:clean": "npm test && npx ts-node src/scripts/cleanup-test-data.ts",
+    "init-matieres": "ts-node scripts/init-matieres.ts"
   },
   "author": "",
   "license": "ISC",

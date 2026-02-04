@@ -25,11 +25,9 @@ export interface Subscription {
   // Hiérarchie
   niveauScolaire: NiveauScolaire;    // Hérité du profil utilisateur
   typeAbonnement: TypeAbonnement;    // CLASSE ou MATIERE
+  classe: string;                    // OBLIGATOIRE: CM2, Licence2, Terminale S, etc.
   
-  // Pour ELEMENTAIRE
-  classe?: string;                   // Ex: "CM1", "CM2", "CE1", etc.
-  
-  // Pour MOYEN/SECONDAIRE/UNIVERSITAIRE
+  // Pour MOYEN/SECONDAIRE/UNIVERSITAIRE uniquement
   matieres?: string[];               // Array de 3 IDs de matières obligatoires
   
   // Pricing
@@ -59,7 +57,7 @@ export class SubscriptionModel implements Subscription {
   status: SubscriptionStatus;
   niveauScolaire: NiveauScolaire;
   typeAbonnement: TypeAbonnement;
-  classe?: string;
+  classe: string;
   matieres?: string[];
   amount: number;
   currency: string;
@@ -78,7 +76,7 @@ export class SubscriptionModel implements Subscription {
     this.status = data.status || 'PENDING';
     this.niveauScolaire = data.niveauScolaire || 'MOYEN';
     this.typeAbonnement = data.typeAbonnement || 'MATIERE';
-    this.classe = data.classe;
+    this.classe = data.classe || '';  // Obligatoire
     this.matieres = data.matieres;
     this.amount = data.amount || SUBSCRIPTION_PRICE;
     this.currency = data.currency || 'XOF';

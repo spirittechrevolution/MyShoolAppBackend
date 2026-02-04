@@ -17,6 +17,7 @@ export interface User {
   profileImageUpdated?: any;
   level: 'beginner' | 'intermediate' | 'advanced';
   niveauScolaire?: NiveauScolaire;  // Choisi à l'inscription
+  classe?: string;  // Classe précise (CM2, Licence2, Terminale S, etc.)
   role: Role;
   status: 'active' | 'inactive' | 'suspended';
   specializationId?: string;
@@ -37,6 +38,7 @@ export class UserModel implements User {
   profileImageUpdated?: any;
   level: 'beginner' | 'intermediate' | 'advanced';
   niveauScolaire?: NiveauScolaire;
+  classe?: string;
   role: Role;
   status: 'active' | 'inactive' | 'suspended';
   specializationId?: string;
@@ -56,6 +58,7 @@ export class UserModel implements User {
     this.profileImageUpdated = data.profileImageUpdated;
     this.level = data.level || 'beginner';
     this.niveauScolaire = data.niveauScolaire;
+    this.classe = data.classe;
     this.role = data.role || { libelle: 'student' };
     this.status = data.status || 'active';
     this.specializationId = data.specializationId;
@@ -77,6 +80,7 @@ export class UserModel implements User {
       profileImageUpdated: this.profileImageUpdated,
       level: this.level,
       niveauScolaire: this.niveauScolaire,
+      classe: this.classe,
       role: this.role,
       status: this.status,
       specializationId: this.specializationId,

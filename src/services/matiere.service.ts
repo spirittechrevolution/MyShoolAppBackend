@@ -56,6 +56,21 @@ export class MatiereService {
   }
 
   /**
+   * Récupérer les matières par classe précise
+   */
+  async getByClasse(classe: string): Promise<MatiereModel[]> {
+    const snapshot = await db.collection(this.collectionName)
+      .where('classe', '==', classe)
+      .where('isActive', '==', true)
+      .orderBy('ordre', 'asc')
+      .get();
+    
+    return snapshot.docs.map(doc => 
+      new MatiereModel({ ...doc.data() as Matiere, id: doc.id })
+    );
+  }
+
+  /**
    * Mettre à jour une matière
    */
   async update(id: string, matiereData: Partial<Matiere>): Promise<void> {
@@ -68,37 +83,6 @@ export class MatiereService {
    */
   async delete(id: string): Promise<void> {
     await this.update(id, { isActive: false });
-  }
-
-  /**
-   * Initialiser les matières par défaut pour un niveau
-   */
-  async initializeDefaultMatieres(niveauScolaire: NiveauScolaire): Promise<MatiereModel[]> {
-    const matieres = DEFAULT_MATIERES[niveauScolaire];
-    const created: MatiereModel[] = [];
-
-    for (let i = 0; i < matieres.length; i++) {
-      const nom = matieres[i];
-      
-      // Vérifier si la matière existe déjà
-      const existing = await db.collection(this.collectionName)
-        .where('nom', '==', nom)
-        .where('niveauScolaire', '==', niveauScolaire)
-        .limit(1)
-        .get();
-
-      if (existing.empty) {
-        const matiere = await this.create({
-          nom,
-          niveauScolaire,
-          ordre: i,
-          isActive: true
-        });
-        created.push(matiere);
-      }
-    }
-
-    return created;
   }
 
   /**
