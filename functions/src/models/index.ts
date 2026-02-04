@@ -1,5 +1,5 @@
 export * from './user.model';
-export * from './course.model';
+export { CourseModel, Course } from './course.model';
 export * from './chapter.model';
 export * from './lesson.model';
 export * from './exercise.model';

@@ -1,5 +1,5 @@
 import { db } from '../config/firebase.config';
-import { MatiereModel, Matiere, NiveauScolaire, DEFAULT_MATIERES } from '../models';
+import { MatiereModel, Matiere, NiveauScolaire } from '../models';
 
 export class MatiereService {
   private collectionName = 'matieres';

@@ -75,9 +75,18 @@ export class SubscriptionController {
           message: 'Vous avez déjà un abonnement actif',
           data: {
             subscriptionEndDate: existingSubscription.endDate,
-            plan: existingSubscription.plan,
+            typeAbonnement: existingSubscription.typeAbonnement,
             classe: existingSubscription.classe
           }
+        });
+        return;
+      }
+
+      // Vérifier que l'utilisateur a un niveauScolaire défini
+      if (!user.niveauScolaire) {
+        res.status(400).json({
+          success: false,
+          message: 'Le niveau scolaire de l\'utilisateur n\'est pas défini'
         });
         return;
       }
@@ -86,7 +95,11 @@ export class SubscriptionController {
       const paymentData = await waveSubscriptionService.createSubscriptionPayment(plan, userId, {
         phone: user.phone,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        classe: classe,
+        niveauScolaire: user.niveauScolaire,
+        typeAbonnement: typeAbonnement,
+        matieres: matieres
       });
 
       // Enregistrer la transaction de paiement dans Firestore
@@ -94,7 +107,7 @@ export class SubscriptionController {
         userId: userId,
         paymentType: 'subscription',
         subscriptionId: paymentData.subscriptionId,
-        subscriptionPlan: plan,
+        typeAbonnement: typeAbonnement,
         amount: paymentData.amount,
         currency: 'XOF',
         paymentMethod: 'wave',
@@ -215,28 +228,6 @@ export class SubscriptionController {
   }
 
   /**
-   * Obtenir les plans d'abonnement disponibles
-   * GET /api/subscriptions/plans
-   */
-  async getAvailablePlans(req: Request, res: Response): Promise<void> {
-    try {
-      const plans = subscriptionService.getAvailablePlans();
-
-      res.status(200).json({
-        success: true,
-        data: { plans }
-      });
-
-    } catch (error: any) {
-      console.error('❌ Erreur récupération plans:', error);
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Erreur lors de la récupération des plans'
-      });
-    }
-  }
-
-  /**
    * Obtenir les matières disponibles pour un niveau (deprecated - utiliser /api/matieres)
    * GET /api/subscriptions/matieres/:niveau
    */
@@ -316,7 +307,7 @@ export class SubscriptionController {
           subscription: subscription ? {
             classe: subscription.classe,
             typeAbonnement: subscription.typeAbonnement,
-            plan: subscription.plan,
+            niveauScolaire: subscription.niveauScolaire,
             endDate: subscription.endDate,
             matieres: subscription.matieres || []
           } : null

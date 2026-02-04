@@ -2,7 +2,7 @@
  * Modèle pour les transactions de paiement Orange Money
  */
 
-import { SubscriptionPlan } from './subscription.model';
+// import { SubscriptionPlan } from './subscription.model'; // Removed - old model
 
 export type PaymentStatus = 
   | 'PENDING' 
@@ -34,7 +34,8 @@ export interface Payment {
   
   // Subscription payment fields (si paymentType = 'subscription')
   subscriptionId?: string;
-  subscriptionPlan?: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL';
+  // subscriptionPlan?: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL'; // Removed - old model
+  typeAbonnement?: 'CLASSE' | 'MATIERE';
   
   amount: number;
   currency: string;
@@ -82,7 +83,8 @@ export class PaymentModel implements Payment {
   
   // Pour les paiements d'abonnement
   subscriptionId?: string;
-  subscriptionPlan?: SubscriptionPlan;
+  // subscriptionPlan?: SubscriptionPlan; // Removed - old model, use typeAbonnement
+  typeAbonnement?: 'CLASSE' | 'MATIERE';
   
   orderReferenceNumber?: string;
   payToken?: string;
@@ -119,7 +121,8 @@ export class PaymentModel implements Payment {
     
     // Champs d'abonnement
     this.subscriptionId = data.subscriptionId;
-    this.subscriptionPlan = data.subscriptionPlan;
+    // this.subscriptionPlan = data.subscriptionPlan; // Removed - old model
+    this.typeAbonnement = data.typeAbonnement;
     
     this.orderReferenceNumber = data.orderReferenceNumber;
     this.payToken = data.payToken;

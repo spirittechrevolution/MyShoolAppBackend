@@ -3,11 +3,7 @@
  * Une matière est liée à un niveau scolaire spécifique
  */
 
-export type NiveauScolaire = 
-  | 'ELEMENTAIRE'
-  | 'MOYEN'
-  | 'SECONDAIRE'
-  | 'UNIVERSITAIRE';
+import { NiveauScolaire } from './user.model';
 
 export interface Matiere {
   id?: string;

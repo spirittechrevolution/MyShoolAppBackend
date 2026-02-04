@@ -7,7 +7,7 @@ import {
   Subscription, 
   SubscriptionModel,
   NiveauScolaire,
-  TypeAbonnement,
+  // TypeAbonnement, // Unused import
   SUBSCRIPTION_PRICE
 } from '../models/subscription.model';
 import { UserService } from './user.service';
@@ -166,10 +166,19 @@ export class SubscriptionService {
    */
   async activateSubscription(subscriptionId: string, paymentId: string, paymentMethod: string): Promise<SubscriptionModel> {
     try {
+      console.log('🔄 Activation abonnement:', { subscriptionId, paymentId, paymentMethod });
+
       const subscription = await this.getById(subscriptionId);
       if (!subscription) {
         throw new Error('Abonnement non trouvé');
       }
+
+      console.log('📋 Abonnement trouvé:', {
+        userId: subscription.userId,
+        classe: subscription.classe,
+        typeAbonnement: subscription.typeAbonnement,
+        status: subscription.status
+      });
 
       const now = new Date();
       const startDate = now;
@@ -186,6 +195,8 @@ export class SubscriptionService {
         updatedAt: new Date()
       });
 
+      console.log('✅ Document subscription mis à jour');
+
       // Mettre à jour l'utilisateur
       await this.userService.update(subscription.userId, {
         hasActiveSubscription: true,
@@ -195,7 +206,13 @@ export class SubscriptionService {
         subscriptionEndDate: endDate
       });
 
-      console.log(`✅ Abonnement activé: ${subscriptionId} pour user: ${subscription.userId}`);
+      console.log('✅ Profil utilisateur mis à jour:', {
+        userId: subscription.userId,
+        hasActiveSubscription: true,
+        subscriptionEndDate: endDate
+      });
+
+      console.log(`🎉 Abonnement activé avec succès: ${subscriptionId} pour user: ${subscription.userId}`);
       
       // Récupérer l'abonnement mis à jour
       return (await this.getById(subscriptionId))!;

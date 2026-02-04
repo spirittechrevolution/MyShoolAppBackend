@@ -1,9 +1,10 @@
 /**
- * Extension du Wave Service pour les paiements d'abonnement
+ * Extension du Wave Service pour les paiements d'abonnement - Nouveau modèle classe-based
  */
 
 import { WaveService } from './wave.service';
 import { SubscriptionService } from './subscription.service';
+import { SUBSCRIPTION_PRICE } from '../models/subscription.model';
 
 export class WaveSubscriptionService extends WaveService {
   private subscriptionService: SubscriptionService;
@@ -14,36 +15,47 @@ export class WaveSubscriptionService extends WaveService {
   }
 
   /**
-   * Créer un paiement pour un abonnement
+   * Créer un paiement pour un abonnement - Nouveau modèle basé sur classe
    */
   async createSubscriptionPayment(
-    plan: string, 
+    plan: string,
     userId: string, 
     userInfo: {
       phone?: string;
       firstName?: string;
       lastName?: string;
-    },
-    category: string
+      classe: string;
+      niveauScolaire: string;
+      typeAbonnement: string;
+      matieres?: string[];
+    }
   ): Promise<{ paymentUrl: string; paymentId: string; amount: number; subscriptionId: string }> {
     try {
-      // Vérifier le plan et obtenir le prix
-      const validPlans = ['MONTHLY', 'QUARTERLY', 'ANNUAL'];
-      if (!validPlans.includes(plan)) {
-        throw new Error('Plan d\'abonnement invalide');
+      const { classe, niveauScolaire, typeAbonnement, matieres } = userInfo;
+
+      if (!classe || !niveauScolaire || !typeAbonnement) {
+        throw new Error('classe, niveauScolaire et typeAbonnement sont requis');
       }
 
-      if (!category) {
-        throw new Error('Catégorie de cours requise');
+      // Validation du type d'abonnement
+      if (typeAbonnement === 'CLASSE' && niveauScolaire !== 'ELEMENTAIRE') {
+        throw new Error('Le type d\'abonnement CLASSE est réservé au niveau ELEMENTAIRE');
       }
 
-      const amount = this.subscriptionService.getPlanPrice(plan as any, category);
+      if (typeAbonnement === 'MATIERE' && (!matieres || matieres.length !== 3)) {
+        throw new Error('L\'abonnement MATIERE nécessite exactement 3 matières');
+      }
+
+      // Prix unique pour tous les abonnements : 5000 FCFA/an
+      const amount = SUBSCRIPTION_PRICE;
 
       // Créer l'abonnement en statut PENDING
       const subscription = await this.subscriptionService.create({
         userId: userId,
-        plan: plan as any,
-        category: category,
+        niveauScolaire: niveauScolaire as any,
+        typeAbonnement: typeAbonnement as any,
+        classe: classe,
+        matieres: matieres,
         status: 'PENDING',
         amount: amount,
         currency: 'XOF'
@@ -58,25 +70,29 @@ export class WaveSubscriptionService extends WaveService {
         customer_phone: userInfo.phone,
         customer_firstname: userInfo.firstName,
         customer_lastname: userInfo.lastName,
-        description: `Abonnement ${plan} - Catégorie: ${category}`,
-        redirect_url: `${baseUrl}/subscription/success?subscriptionId=${subscription.id}&userId=${userId}&category=${encodeURIComponent(category)}`,
+        description: `Abonnement annuel - Classe: ${classe}${typeAbonnement === 'MATIERE' ? ' (3 matières)' : ''}`,
+        redirect_url: `${baseUrl}/subscription/success?subscriptionId=${subscription.id}&userId=${userId}&classe=${encodeURIComponent(classe)}`,
         cancel_url: `${baseUrl}/subscription/cancel?subscriptionId=${subscription.id}`,
         webhook_url: `${process.env.API_BASE_URL || 'http://localhost:3000'}/api/wave/webhook`,
         metadata: {
           userId: userId,
-          plan: plan,
-          category: category,
           subscriptionId: subscription.id,
-          type: 'subscription_payment'
+          classe: classe,
+          niveauScolaire: niveauScolaire,
+          typeAbonnement: typeAbonnement,
+          matieres: matieres || [],
+          type: 'subscription_payment'  // Important pour le webhook
         }
       };
 
       const payment = await this.createPayment(transaction);
 
-      console.log('💰 Paiement Wave reçu:', {
+      console.log('💰 Paiement Wave créé:', {
         id: payment.id,
         wave_launch_url: payment.wave_launch_url,
-        has_wave_launch_url: !!payment.wave_launch_url
+        subscriptionId: subscription.id,
+        classe: classe,
+        typeAbonnement: typeAbonnement
       });
 
       return {

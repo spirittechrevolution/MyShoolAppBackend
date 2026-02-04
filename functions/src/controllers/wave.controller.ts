@@ -246,24 +246,44 @@ export class WaveController {
     const subscriptionId = metadata.subscriptionId;
     const userId = metadata.userId;
 
+    console.log('📋 Traitement paiement abonnement:', {
+      subscriptionId,
+      userId,
+      wavePaymentId,
+      metadata
+    });
+
     if (!subscriptionId || !userId) {
-      console.error('❌ Métadonnées manquantes pour le paiement d\'abonnement');
+      console.error('❌ Métadonnées manquantes pour le paiement d\'abonnement:', metadata);
       return;
     }
 
-    // Trouver le paiement par wavePaymentId et mettre à jour le statut
-    const payment = await paymentService.getByWavePaymentId(wavePaymentId);
-    if (!payment || !payment.id) {
-      console.error('❌ Paiement non trouvé pour wavePaymentId:', wavePaymentId);
-      return;
+    try {
+      // Trouver le paiement par wavePaymentId et mettre à jour le statut
+      const payment = await paymentService.getByWavePaymentId(wavePaymentId);
+      if (!payment || !payment.id) {
+        console.error('❌ Paiement non trouvé pour wavePaymentId:', wavePaymentId);
+        return;
+      }
+
+      console.log('💳 Paiement trouvé:', {
+        paymentId: payment.id,
+        status: payment.status,
+        subscriptionId: payment.subscriptionId
+      });
+
+      await paymentService.updateStatus(payment.id, 'SUCCESS' as PaymentStatus);
+      console.log('✅ Statut paiement mis à jour: SUCCESS');
+
+      // Activer l'abonnement
+      await subscriptionService.activateSubscription(subscriptionId, wavePaymentId, 'wave');
+      console.log('✅ Abonnement activé avec succès');
+
+      console.log(`🎉 Paiement abonnement complété - User: ${userId}, Subscription: ${subscriptionId}`);
+    } catch (error) {
+      console.error('❌ Erreur lors du traitement du paiement d\'abonnement:', error);
+      throw error;
     }
-
-    await paymentService.updateStatus(payment.id, 'SUCCESS' as PaymentStatus);
-
-    // Activer l'abonnement (sans les paramètres supplémentaires)
-    await subscriptionService.activateSubscription(subscriptionId, wavePaymentId, 'wave');
-
-    console.log(`✅ Abonnement activé - User: ${userId}, Subscription: ${subscriptionId}`);
   }
 
   /**

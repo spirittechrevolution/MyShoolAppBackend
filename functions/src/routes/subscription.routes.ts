@@ -133,50 +133,6 @@ router.post('/create-payment', subscriptionController.createSubscriptionPayment.
  *                             example: 3000
  *                           duration:
  *                             type: string
- *                             example: "1 mois"
- */
-router.get('/plans', subscriptionController.getAvailablePlans.bind(subscriptionController));
-
-/**
- * @swagger
- * /api/subscriptions/categories:
- *   get:
- *     summary: Obtenir toutes les catégories disponibles avec leurs tarifs
- *     tags: [Subscriptions]
- *     responses:
- *       200:
- *         description: Liste des catégories avec tarifs
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       category:
- *                         type: string
- *                         example: "Mathématiques"
- *                       pricing:
- *                         type: object
- *                         properties:
- *                           MONTHLY:
- *                             type: number
- *                             example: 3000
- *                           QUARTERLY:
- *                             type: number
- *                             example: 8000
- *                           ANNUAL:
- *                             type: number
- *                             example: 25000
- */
-router.get('/categories', subscriptionController.getAvailableCategories.bind(subscriptionController));
-
 /**
  * @swagger
  * /api/subscriptions/active/{userId}:
@@ -282,50 +238,5 @@ router.post('/:subscriptionId/cancel', subscriptionController.cancelSubscription
  *                             format: date-time
  */
 router.get('/check-access/:userId', subscriptionController.checkUnlimitedAccess.bind(subscriptionController));
-
-/**
- * @swagger
- * /api/subscriptions/check-access/{userId}/{category}:
- *   get:
- *     summary: Vérifier si un utilisateur a accès à une catégorie spécifique
- *     tags: [Subscriptions]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de l'utilisateur
- *       - in: path
- *         name: category
- *         required: true
- *         schema:
- *           type: string
- *         description: Catégorie de cours
- *         example: "Mathématiques"
- *     responses:
- *       200:
- *         description: Statut d'accès à la catégorie
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     userId:
- *                       type: string
- *                     category:
- *                       type: string
- *                       example: "Mathématiques"
- *                     hasCategoryAccess:
- *                       type: boolean
- *                       example: true
- */
-router.get('/check-access/:userId/:category', subscriptionController.checkCategoryAccess.bind(subscriptionController));
 
 export default router;
