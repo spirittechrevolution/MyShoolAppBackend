@@ -23,7 +23,7 @@ export interface Subscription {
   status: SubscriptionStatus;
   
   // Hiérarchie
-  niveauScolaire: NiveauScolaire;    // Hérité du profil utilisateur
+  niveauScolaire: NiveauScolaire;    // Héri du profil utilisateur
   typeAbonnement: TypeAbonnement;    // CLASSE ou MATIERE
   
   // Pour ELEMENTAIRE
@@ -99,38 +99,6 @@ export class SubscriptionModel implements Subscription {
     return endDate;
   }
 
-  isActive(): boolean {
-    if (this.status !== 'ACTIVE') return false;
-    
-    const now = new Date();
-    const end = new Date(this.endDate);
-    return now <= end;
-  }
-
-  isExpired(): boolean {
-    if (this.status === 'CANCELLED') return true;
-    
-    const now = new Date();
-    const end = new Date(this.endDate);
-    return now >= end;
-  }
-
-  getDaysRemaining(): number {
-    const now = new Date();
-    const end = new Date(this.endDate);
-    const diff = end.getTime() - now.getTime();
-    
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  }
-
-  // Validation: Pour MOYEN/SECONDAIRE/UNIVERSITAIRE, doit avoir exactement 3 matières
-  validateSubjectSelection(): boolean {
-    if (this.typeAbonnement === 'MATIERE') {
-      return this.matieres !== undefined && this.matieres.length === 3;
-    }
-    return true; // CLASSE n'a pas cette contrainte
-  }
-
   toJSON(): any {
     return {
       id: this.id,
@@ -151,5 +119,22 @@ export class SubscriptionModel implements Subscription {
       updatedAt: this.updatedAt,
       cancelledAt: this.cancelledAt
     };
+  }
+
+  // Validation: Pour MOYEN/SECONDAIRE/UNIVERSITAIRE, doit avoir exactement 3 matières
+  validateSubjectSelection(): boolean {
+    if (this.typeAbonnement === 'MATIERE') {
+      return this.matieres !== undefined && this.matieres.length === 3;
+    }
+    return true; // CLASSE n'a pas cette contrainte
+  }
+
+  // Vérifier si l'abonnement est actif
+  isActive(): boolean {
+    if (this.status !== 'ACTIVE') return false;
+    
+    const now = new Date();
+    const end = new Date(this.endDate);
+    return now <= end;
   }
 }
