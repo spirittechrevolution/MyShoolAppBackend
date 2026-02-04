@@ -26,6 +26,7 @@ const PORT = process.env.PORT || 3000;
 
 // CORS Configuration - Autoriser les ports frontend 4200-4205
 const allowedOrigins = [
+  'http://localhost:3000',
   'http://localhost:4200',
   'http://localhost:4201',
   'http://localhost:4202',

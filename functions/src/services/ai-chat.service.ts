@@ -1,6 +1,7 @@
 /**
- * Service AI Chat pour MySchool
+ * Service AI Chat pour MySchool - Marème
  * Utilise Gemini AI pour répondre aux questions des utilisateurs
+ * Marème est l'assistante virtuelle personnalisée de MySchool
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -44,11 +45,14 @@ export class AiChatService {
         // Réponse trouvée dans la FAQ
         const bestMatch = faqs[0]; // Premier résultat = meilleur match
 
+        // Personnaliser la réponse avec Marème
+        const personalizedAnswer = `Bonjour ! Je suis Marème 😊\n\n${bestMatch.answer}\n\nN'hésitez pas si vous avez d'autres questions ! 📚`;
+
         // Sauvegarder dans l'historique
-        await this.saveMessage(userId, question, bestMatch.answer, bestMatch.id);
+        await this.saveMessage(userId, question, personalizedAnswer, bestMatch.id);
 
         return {
-          answer: bestMatch.answer,
+          answer: personalizedAnswer,
           source: 'faq',
           faqId: bestMatch.id,
         };
@@ -102,22 +106,24 @@ export class AiChatService {
           const model = this.genAI.getGenerativeModel({ model: modelName });
 
           // Contexte pour MySchool
-          const context = `Tu es un assistant virtuel pour MySchool, une plateforme d'e-learning.
+          const context = `Tu es Marème, l'assistante virtuelle de MySchool, une plateforme d'e-learning sénégalaise.
       
 Informations sur MySchool :
-- Plateforme de cours en ligne
+- Plateforme de cours en ligne pour tous les niveaux (ELEMENTAIRE, MOYEN, SECONDAIRE, UNIVERSITAIRE)
+- Abonnements annuels à 5000 FCFA (CLASSE pour élémentaire, MATIERE pour les autres niveaux)
 - Paiements via Orange Money, Wave, Free Money
 - Système de parrainage avec deep links
 - Certificats de complétion
 - Notifications SMS et Push
-- Cours de différents niveaux (débutant, intermédiaire, avancé)
+- Organisation par classes (CM2, 3ème, Terminale S, Licence2, etc.) et matières
 
-Règles de réponse :
-1. Sois courtois, professionnel et utile
-2. Réponds en français
-3. Sois concis (max 3-4 phrases)
-4. Si tu ne sais pas, propose de contacter le support
-5. Utilise des émojis appropriés (📚 💡 ✅)
+Ton rôle en tant que Marème :
+1. Sois chaleureuse, professionnelle et serviable
+2. Réponds toujours en français
+3. Sois concise (max 3-4 phrases)
+4. Si tu ne connais pas la réponse, propose de contacter le support
+5. Utilise des émojis appropriés (📚 💡 ✅ 🎓)
+6. Personnalise tes réponses avec ton prénom "Marème" quand c'est approprié
 
 Question de l'utilisateur : ${question}`;
 

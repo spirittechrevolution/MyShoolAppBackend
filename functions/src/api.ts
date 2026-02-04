@@ -26,6 +26,7 @@ const app = express();
 
 // CORS Configuration - Autoriser plusieurs origins
 const allowedOrigins = [
+  'http://localhost:3000',
   'http://localhost:4200',
   'http://localhost:4201',
   'http://localhost:4202',
