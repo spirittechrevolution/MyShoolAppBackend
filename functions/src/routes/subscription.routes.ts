@@ -16,7 +16,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/subscriptions/create-payment:
+ * /subscriptions/create-payment:
  *   post:
  *     summary: Créer un paiement Wave pour un abonnement à une catégorie
  *     tags: [Subscriptions]
@@ -92,7 +92,7 @@ router.post('/create-payment', subscriptionController.createSubscriptionPayment.
 
 /**
  * @swagger
- * /api/subscriptions/plans:
+ * /subscriptions/plans:
  *   get:
  *     summary: Obtenir les plans d'abonnement disponibles pour une catégorie
  *     tags: [Subscriptions]
@@ -135,7 +135,7 @@ router.post('/create-payment', subscriptionController.createSubscriptionPayment.
  *                             type: string
 /**
  * @swagger
- * /api/subscriptions/active/{userId}:
+ * /subscriptions/active/{userId}:
  *   get:
  *     summary: Obtenir l'abonnement actif d'un utilisateur
  *     tags: [Subscriptions]
@@ -156,7 +156,7 @@ router.get('/active/:userId', subscriptionController.getActiveSubscription.bind(
 
 /**
  * @swagger
- * /api/subscriptions/user/{userId}:
+ * /subscriptions/user/{userId}:
  *   get:
  *     summary: Obtenir tous les abonnements d'un utilisateur
  *     tags: [Subscriptions]
@@ -175,7 +175,7 @@ router.get('/user/:userId', subscriptionController.getUserSubscriptions.bind(sub
 
 /**
  * @swagger
- * /api/subscriptions/{subscriptionId}/cancel:
+ * /subscriptions/{subscriptionId}/cancel:
  *   post:
  *     summary: Annuler un abonnement
  *     tags: [Subscriptions]
@@ -194,7 +194,7 @@ router.post('/:subscriptionId/cancel', subscriptionController.cancelSubscription
 
 /**
  * @swagger
- * /api/subscriptions/check-access/{userId}:
+ * /subscriptions/check-access/{userId}:
  *   get:
  *     summary: Vérifier les abonnements actifs d'un utilisateur
  *     tags: [Subscriptions]

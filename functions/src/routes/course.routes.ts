@@ -6,7 +6,7 @@ const courseController = new CourseController();
 
 /**
  * @swagger
- * /api/courses:
+ * /courses:
  *   post:
  *     tags: [Courses]
  *     summary: Créer un nouveau cours
@@ -24,7 +24,7 @@ router.post('/', (req, res) => courseController.create(req, res));
 
 /**
  * @swagger
- * /api/courses:
+ * /courses:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer tous les cours
@@ -36,7 +36,7 @@ router.get('/', (req, res) => courseController.getAll(req, res));
 
 /**
  * @swagger
- * /api/courses/published:
+ * /courses/published:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours publiés
@@ -48,7 +48,7 @@ router.get('/published', (req, res) => courseController.getPublished(req, res));
 
 /**
  * @swagger
- * /api/courses/classe/{classe}:
+ * /courses/classe/{classe}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours par classe précise
@@ -67,7 +67,7 @@ router.get('/classe/:classe', (req, res) => courseController.getByClasse(req, re
 
 /**
  * @swagger
- * /api/courses/matiere/{matiereId}:
+ * /courses/matiere/{matiereId}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours par matière
@@ -85,7 +85,7 @@ router.get('/matiere/:matiereId', (req, res) => courseController.getByMatiere(re
 
 /**
  * @swagger
- * /api/courses/niveau/{niveau}:
+ * /courses/niveau/{niveau}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours par niveau scolaire
@@ -104,7 +104,7 @@ router.get('/niveau/:niveau', (req, res) => courseController.getByNiveauScolaire
 
 /**
  * @swagger
- * /api/courses/{id}:
+ * /courses/{id}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer un cours par ID
@@ -124,7 +124,7 @@ router.get('/:id', (req, res) => courseController.getById(req, res));
 
 /**
  * @swagger
- * /api/courses/category/{category}:
+ * /courses/category/{category}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours par catégorie
@@ -142,7 +142,7 @@ router.get('/category/:category', (req, res) => courseController.getByCategory(r
 
 /**
  * @swagger
- * /api/courses/level/{level}:
+ * /courses/level/{level}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours par niveau
@@ -161,7 +161,7 @@ router.get('/level/:level', (req, res) => courseController.getByLevel(req, res))
 
 /**
  * @swagger
- * /api/courses/type/{type}:
+ * /courses/type/{type}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours par type
@@ -179,7 +179,7 @@ router.get('/type/:type', (req, res) => courseController.getByType(req, res));
 
 /**
  * @swagger
- * /api/courses/{id}:
+ * /courses/{id}:
  *   put:
  *     tags: [Courses]
  *     summary: Mettre à jour un cours
@@ -203,7 +203,7 @@ router.put('/:id', (req, res) => courseController.update(req, res));
 
 /**
  * @swagger
- * /api/courses/{id}:
+ * /courses/{id}:
  *   delete:
  *     tags: [Courses]
  *     summary: Supprimer un cours
@@ -221,7 +221,7 @@ router.delete('/:id', (req, res) => courseController.delete(req, res));
 
 /**
  * @swagger
- * /api/courses/{id}/publish:
+ * /courses/{id}/publish:
  *   patch:
  *     tags: [Courses]
  *     summary: Publier un cours
@@ -239,7 +239,7 @@ router.patch('/:id/publish', (req, res) => courseController.publish(req, res));
 
 /**
  * @swagger
- * /api/courses/{id}/unpublish:
+ * /courses/{id}/unpublish:
  *   patch:
  *     tags: [Courses]
  *     summary: Dépublier un cours
@@ -257,7 +257,7 @@ router.patch('/:id/unpublish', (req, res) => courseController.unpublish(req, res
 
 /**
  * @swagger
- * /api/courses/instructor/{instructorId}:
+ * /courses/instructor/{instructorId}:
  *   get:
  *     tags: [Courses]
  *     summary: Récupérer les cours d'un professeur

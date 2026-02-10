@@ -16,7 +16,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/wave/create-payment:
+ * /wave/create-payment:
  *   post:
  *     summary: Créer un paiement Wave pour un cours
  *     tags: [Wave Payments]
@@ -79,7 +79,7 @@ router.post('/create-payment', (req, res) => waveController.createCoursePayment(
 
 /**
  * @swagger
- * /api/wave/payment-status/{paymentId}:
+ * /wave/payment-status/{paymentId}:
  *   get:
  *     summary: Vérifier le statut d'un paiement Wave
  *     tags: [Wave Payments]
@@ -124,7 +124,7 @@ router.get('/payment-status/:paymentId', (req, res) => waveController.getPayment
 
 /**
  * @swagger
- * /api/wave/confirm-payment:
+ * /wave/confirm-payment:
  *   post:
  *     summary: Confirmer un paiement après retour depuis Wave
  *     tags: [Wave Payments]
@@ -183,7 +183,7 @@ router.post('/confirm-payment', (req, res) => waveController.confirmPayment(req,
 
 /**
  * @swagger
- * /api/wave/webhook:
+ * /wave/webhook:
  *   post:
  *     summary: Webhook Wave pour les notifications de paiement
  *     tags: [Wave Payments]

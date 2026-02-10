@@ -73,6 +73,19 @@ const options = {
             category: { type: 'string', example: 'Programmation' },
             type: { type: 'string', enum: ['VIDEO', 'En ligne', 'Hybride'], example: 'En ligne' },
             rating: { type: 'number', example: 4.5 },
+            documents: {
+              type: 'array',
+              description: 'Documents PDF associés au cours',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string', example: 'Cours_Chapitre1.pdf' },
+                  url: { type: 'string', example: 'https://storage.googleapis.com/.../document.pdf' },
+                  size: { type: 'number', example: 2048576, description: 'Taille en octets' },
+                  uploadedAt: { type: 'string', format: 'date-time' }
+                }
+              }
+            },
             createdAt: { type: 'string', format: 'date-time' }
           }
         },
@@ -114,6 +127,19 @@ const options = {
             type: { type: 'string', enum: ['quiz', 'coding', 'essay'], example: 'quiz' },
             questions: { type: 'array', items: { type: 'object' } },
             points: { type: 'number', example: 10 },
+            documents: {
+              type: 'array',
+              description: 'Documents PDF associés à l\'exercice',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string', example: 'Exercice_Solutions.pdf' },
+                  url: { type: 'string', example: 'https://storage.googleapis.com/.../document.pdf' },
+                  size: { type: 'number', example: 1048576, description: 'Taille en octets' },
+                  uploadedAt: { type: 'string', format: 'date-time' }
+                }
+              }
+            },
             createdAt: { type: 'string', format: 'date-time' }
           }
         },

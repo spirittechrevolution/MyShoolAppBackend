@@ -21,12 +21,13 @@ export class SubscriptionController {
    */
   async createSubscriptionPayment(req: Request, res: Response): Promise<void> {
     try {
-      const { plan, userId, classe, typeAbonnement, matieres } = req.body;
+      const { userId, classe, niveauScolaire, typeAbonnement, matieres } = req.body;
 
-      if (!plan || !userId || !classe || !typeAbonnement) {
+      // Validation des champs requis
+      if (!userId || !classe || !niveauScolaire || !typeAbonnement) {
         res.status(400).json({
           success: false,
-          message: 'plan, userId, classe et typeAbonnement requis'
+          message: 'userId, classe, niveauScolaire et typeAbonnement requis'
         });
         return;
       }
@@ -50,11 +51,36 @@ export class SubscriptionController {
         return;
       }
 
-      // Validation selon le type d'abonnement
-      if (typeAbonnement === 'CLASSE' && user.niveauScolaire !== 'ELEMENTAIRE') {
+      // Vérifier que le niveau scolaire correspond
+      if (user.niveauScolaire !== niveauScolaire) {
         res.status(400).json({
           success: false,
-          message: 'L\'abonnement CLASSE est réservé au niveau ELEMENTAIRE'
+          message: `Le niveau scolaire sélectionné "${niveauScolaire}" ne correspond pas à votre niveau "${user.niveauScolaire}"`
+        });
+        return;
+      }
+
+      // Validation selon le type d'abonnement
+      if (typeAbonnement === 'CLASSE' && niveauScolaire !== 'ELEMENTAIRE') {
+        res.status(400).json({
+          success: false,
+          message: 'Le typeAbonnement doit être CLASSE pour ELEMENTAIRE'
+        });
+        return;
+      }
+
+      if (typeAbonnement === 'MATIERE' && niveauScolaire === 'ELEMENTAIRE') {
+        res.status(400).json({
+          success: false,
+          message: 'Le typeAbonnement doit être MATIERE pour MOYEN/SECONDAIRE/UNIVERSITAIRE'
+        });
+        return;
+      }
+
+      if (typeAbonnement === 'CLASSE' && matieres && matieres.length > 0) {
+        res.status(400).json({
+          success: false,
+          message: 'Les matières ne sont pas autorisées pour l\'abonnement CLASSE (élémentaire)'
         });
         return;
       }
@@ -62,7 +88,7 @@ export class SubscriptionController {
       if (typeAbonnement === 'MATIERE' && (!matieres || matieres.length !== 3)) {
         res.status(400).json({
           success: false,
-          message: 'L\'abonnement MATIERE nécessite exactement 3 matières'
+          message: 'Pour MOYEN/SECONDAIRE/UNIVERSITAIRE, vous devez choisir EXACTEMENT 3 matières'
         });
         return;
       }
@@ -130,9 +156,12 @@ export class SubscriptionController {
           amount: paymentData.amount,
           classe: classe,
           typeAbonnement: typeAbonnement,
+          matieres: matieres || [],
           currency: 'XOF'
         },
-        message: `Paiement d'abonnement créé pour la classe "${classe}"`
+        message: typeAbonnement === 'CLASSE' 
+          ? `Paiement d'abonnement créé pour la classe "${classe}" (5 000 FCFA/an)`
+          : `Paiement d'abonnement créé pour 3 matières (5 000 FCFA/an)`
       });
 
     } catch (error: any) {

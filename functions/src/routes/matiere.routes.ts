@@ -6,7 +6,7 @@ const matiereController = new MatiereController();
 
 /**
  * @swagger
- * /api/matieres:
+ * /matieres:
  *   get:
  *     tags: [Matieres]
  *     summary: Récupérer toutes les matières actives
@@ -29,7 +29,7 @@ router.get('/', matiereController.getAll.bind(matiereController));
 
 /**
  * @swagger
- * /api/matieres/niveau/{niveau}:
+ * /matieres/niveau/{niveau}:
  *   get:
  *     tags: [Matieres]
  *     summary: Récupérer les matières par niveau scolaire
@@ -48,7 +48,7 @@ router.get('/niveau/:niveau', matiereController.getByNiveau.bind(matiereControll
 
 /**
  * @swagger
- * /api/matieres/classe/{classe}:
+ * /matieres/classe/{classe}:
  *   get:
  *     tags: [Matieres]
  *     summary: Récupérer les matières par classe précise
@@ -67,7 +67,7 @@ router.get('/classe/:classe', matiereController.getByClasse.bind(matiereControll
 
 /**
  * @swagger
- * /api/matieres/{id}:
+ * /matieres/{id}:
  *   get:
  *     tags: [Matieres]
  *     summary: Récupérer une matière par ID
@@ -96,7 +96,7 @@ router.get('/:id', matiereController.getById.bind(matiereController));
 
 /**
  * @swagger
- * /api/matieres:
+ * /matieres:
  *   post:
  *     tags: [Matieres]
  *     summary: Créer une nouvelle matière (Admin uniquement)
@@ -139,7 +139,7 @@ router.post('/', matiereController.create.bind(matiereController));
 
 /**
  * @swagger
- * /api/matieres/{id}:
+ * /matieres/{id}:
  *   put:
  *     tags: [Matieres]
  *     summary: Mettre à jour une matière (Admin uniquement)
@@ -178,7 +178,7 @@ router.put('/:id', matiereController.update.bind(matiereController));
 
 /**
  * @swagger
- * /api/matieres/{id}:
+ * /matieres/{id}:
  *   delete:
  *     tags: [Matieres]
  *     summary: Supprimer une matière (soft delete, Admin uniquement)

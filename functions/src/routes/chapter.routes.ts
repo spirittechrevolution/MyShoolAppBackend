@@ -6,7 +6,7 @@ const chapterController = new ChapterController();
 
 /**
  * @swagger
- * /api/chapters:
+ * /chapters:
  *   post:
  *     tags: [Chapters]
  *     summary: Créer un nouveau chapitre
@@ -24,7 +24,7 @@ router.post('/', (req, res) => chapterController.create(req, res));
 
 /**
  * @swagger
- * /api/chapters:
+ * /chapters:
  *   get:
  *     tags: [Chapters]
  *     summary: Récupérer tous les chapitres
@@ -36,7 +36,7 @@ router.get('/', (req, res) => chapterController.getAll(req, res));
 
 /**
  * @swagger
- * /api/chapters/{id}:
+ * /chapters/{id}:
  *   get:
  *     tags: [Chapters]
  *     summary: Récupérer un chapitre par ID
@@ -54,7 +54,7 @@ router.get('/:id', (req, res) => chapterController.getById(req, res));
 
 /**
  * @swagger
- * /api/chapters/course/{courseId}:
+ * /chapters/course/{courseId}:
  *   get:
  *     tags: [Chapters]
  *     summary: Récupérer les chapitres d'un cours
@@ -72,7 +72,7 @@ router.get('/course/:courseId', (req, res) => chapterController.getByCourseId(re
 
 /**
  * @swagger
- * /api/chapters/{id}:
+ * /chapters/{id}:
  *   put:
  *     tags: [Chapters]
  *     summary: Mettre à jour un chapitre
@@ -96,7 +96,7 @@ router.put('/:id', (req, res) => chapterController.update(req, res));
 
 /**
  * @swagger
- * /api/chapters/{id}:
+ * /chapters/{id}:
  *   delete:
  *     tags: [Chapters]
  *     summary: Supprimer un chapitre

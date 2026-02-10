@@ -200,6 +200,32 @@
             "type": "number",
             "example": 4.5
           },
+          "documents": {
+            "type": "array",
+            "description": "Documents PDF associés au cours",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Cours_Chapitre1.pdf"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "https://storage.googleapis.com/.../document.pdf"
+                },
+                "size": {
+                  "type": "number",
+                  "example": 2048576,
+                  "description": "Taille en octets"
+                },
+                "uploadedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -322,6 +348,32 @@
           "points": {
             "type": "number",
             "example": 10
+          },
+          "documents": {
+            "type": "array",
+            "description": "Documents PDF associés à l'exercice",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Exercice_Solutions.pdf"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "https://storage.googleapis.com/.../document.pdf"
+                },
+                "size": {
+                  "type": "number",
+                  "example": 1048576,
+                  "description": "Taille en octets"
+                },
+                "uploadedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
           },
           "createdAt": {
             "type": "string",
@@ -922,7 +974,7 @@
     }
   ],
   "paths": {
-    "/api/chapters": {
+    "/chapters": {
       "post": {
         "tags": [
           "Chapters"
@@ -956,7 +1008,7 @@
         }
       }
     },
-    "/api/chapters/{id}": {
+    "/chapters/{id}": {
       "get": {
         "tags": [
           "Chapters"
@@ -1031,7 +1083,7 @@
         }
       }
     },
-    "/api/chapters/course/{courseId}": {
+    "/chapters/course/{courseId}": {
       "get": {
         "tags": [
           "Chapters"
@@ -1308,7 +1360,7 @@
         }
       }
     },
-    "/api/courses": {
+    "/courses": {
       "post": {
         "tags": [
           "Courses"
@@ -1342,7 +1394,7 @@
         }
       }
     },
-    "/api/courses/published": {
+    "/courses/published": {
       "get": {
         "tags": [
           "Courses"
@@ -1355,7 +1407,7 @@
         }
       }
     },
-    "/api/courses/classe/{classe}": {
+    "/courses/classe/{classe}": {
       "get": {
         "tags": [
           "Courses"
@@ -1379,7 +1431,7 @@
         }
       }
     },
-    "/api/courses/matiere/{matiereId}": {
+    "/courses/matiere/{matiereId}": {
       "get": {
         "tags": [
           "Courses"
@@ -1402,7 +1454,7 @@
         }
       }
     },
-    "/api/courses/niveau/{niveau}": {
+    "/courses/niveau/{niveau}": {
       "get": {
         "tags": [
           "Courses"
@@ -1431,7 +1483,7 @@
         }
       }
     },
-    "/api/courses/{id}": {
+    "/courses/{id}": {
       "get": {
         "tags": [
           "Courses"
@@ -1509,7 +1561,7 @@
         }
       }
     },
-    "/api/courses/category/{category}": {
+    "/courses/category/{category}": {
       "get": {
         "tags": [
           "Courses"
@@ -1532,7 +1584,7 @@
         }
       }
     },
-    "/api/courses/level/{level}": {
+    "/courses/level/{level}": {
       "get": {
         "tags": [
           "Courses"
@@ -1560,7 +1612,7 @@
         }
       }
     },
-    "/api/courses/type/{type}": {
+    "/courses/type/{type}": {
       "get": {
         "tags": [
           "Courses"
@@ -1583,7 +1635,7 @@
         }
       }
     },
-    "/api/courses/{id}/publish": {
+    "/courses/{id}/publish": {
       "patch": {
         "tags": [
           "Courses"
@@ -1606,7 +1658,7 @@
         }
       }
     },
-    "/api/courses/{id}/unpublish": {
+    "/courses/{id}/unpublish": {
       "patch": {
         "tags": [
           "Courses"
@@ -1629,7 +1681,7 @@
         }
       }
     },
-    "/api/courses/instructor/{instructorId}": {
+    "/courses/instructor/{instructorId}": {
       "get": {
         "tags": [
           "Courses"
@@ -1674,7 +1726,7 @@
         }
       }
     },
-    "/api/enrollments": {
+    "/enrollments": {
       "post": {
         "tags": [
           "Enrollments"
@@ -1708,7 +1760,7 @@
         }
       }
     },
-    "/api/enrollments/user/{userId}": {
+    "/enrollments/user/{userId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1731,7 +1783,7 @@
         }
       }
     },
-    "/api/enrollments/{id}": {
+    "/enrollments/{id}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1806,7 +1858,7 @@
         }
       }
     },
-    "/api/enrollments/course/{courseId}": {
+    "/enrollments/course/{courseId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1829,7 +1881,7 @@
         }
       }
     },
-    "/api/enrollments/status/{status}": {
+    "/enrollments/status/{status}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1857,7 +1909,7 @@
         }
       }
     },
-    "/api/enrollments/user/{userId}/course/{courseId}": {
+    "/enrollments/user/{userId}/course/{courseId}": {
       "get": {
         "tags": [
           "Enrollments"
@@ -1888,7 +1940,7 @@
         }
       }
     },
-    "/api/enrollments/{id}/progress": {
+    "/enrollments/{id}/progress": {
       "patch": {
         "tags": [
           "Enrollments"
@@ -1928,7 +1980,7 @@
         }
       }
     },
-    "/api/enrollments/{id}/status": {
+    "/enrollments/{id}/status": {
       "patch": {
         "tags": [
           "Enrollments"
@@ -1971,7 +2023,7 @@
         }
       }
     },
-    "/api/exercises": {
+    "/exercises": {
       "post": {
         "tags": [
           "Exercises"
@@ -2005,7 +2057,7 @@
         }
       }
     },
-    "/api/exercises/{id}": {
+    "/exercises/{id}": {
       "get": {
         "tags": [
           "Exercises"
@@ -2080,7 +2132,7 @@
         }
       }
     },
-    "/api/exercises/course/{courseId}": {
+    "/exercises/course/{courseId}": {
       "get": {
         "tags": [
           "Exercises"
@@ -2103,7 +2155,7 @@
         }
       }
     },
-    "/api/exercises/chapter/{chapterId}": {
+    "/exercises/chapter/{chapterId}": {
       "get": {
         "tags": [
           "Exercises"
@@ -2126,7 +2178,7 @@
         }
       }
     },
-    "/api/exercises/type/{type}": {
+    "/exercises/type/{type}": {
       "get": {
         "tags": [
           "Exercises"
@@ -2154,7 +2206,7 @@
         }
       }
     },
-    "/api/exercises/difficulty/{difficulty}": {
+    "/exercises/difficulty/{difficulty}": {
       "get": {
         "tags": [
           "Exercises"
@@ -2488,7 +2540,7 @@
         }
       }
     },
-    "/api/instructors": {
+    "/instructors": {
       "post": {
         "tags": [
           "Instructors"
@@ -2522,7 +2574,7 @@
         }
       }
     },
-    "/api/instructors/{id}": {
+    "/instructors/{id}": {
       "get": {
         "tags": [
           "Instructors"
@@ -2597,7 +2649,7 @@
         }
       }
     },
-    "/api/instructors/course/{courseId}": {
+    "/instructors/course/{courseId}": {
       "get": {
         "tags": [
           "Instructors"
@@ -2620,7 +2672,7 @@
         }
       }
     },
-    "/api/instructors/expertise/{expertiseId}": {
+    "/instructors/expertise/{expertiseId}": {
       "get": {
         "tags": [
           "Instructors"
@@ -2643,7 +2695,7 @@
         }
       }
     },
-    "/api/lessons": {
+    "/lessons": {
       "post": {
         "tags": [
           "Lessons"
@@ -2677,7 +2729,7 @@
         }
       }
     },
-    "/api/lessons/{id}": {
+    "/lessons/{id}": {
       "get": {
         "tags": [
           "Lessons"
@@ -2752,7 +2804,7 @@
         }
       }
     },
-    "/api/lessons/course/{courseId}": {
+    "/lessons/course/{courseId}": {
       "get": {
         "tags": [
           "Lessons"
@@ -2775,7 +2827,7 @@
         }
       }
     },
-    "/api/lessons/chapter/{chapterId}": {
+    "/lessons/chapter/{chapterId}": {
       "get": {
         "tags": [
           "Lessons"
@@ -2798,7 +2850,7 @@
         }
       }
     },
-    "/api/matieres": {
+    "/matieres": {
       "get": {
         "tags": [
           "Matieres"
@@ -2893,7 +2945,7 @@
         }
       }
     },
-    "/api/matieres/niveau/{niveau}": {
+    "/matieres/niveau/{niveau}": {
       "get": {
         "tags": [
           "Matieres"
@@ -2922,7 +2974,7 @@
         }
       }
     },
-    "/api/matieres/classe/{classe}": {
+    "/matieres/classe/{classe}": {
       "get": {
         "tags": [
           "Matieres"
@@ -2946,7 +2998,7 @@
         }
       }
     },
-    "/api/matieres/{id}": {
+    "/matieres/{id}": {
       "get": {
         "tags": [
           "Matieres"
@@ -3065,7 +3117,7 @@
         }
       }
     },
-    "/api/payments": {
+    "/payments": {
       "post": {
         "summary": "Crée un nouveau paiement",
         "tags": [
@@ -3146,7 +3198,7 @@
         }
       }
     },
-    "/api/payments/{id}": {
+    "/payments/{id}": {
       "get": {
         "summary": "Récupère un paiement par ID",
         "tags": [
@@ -3190,7 +3242,7 @@
         }
       }
     },
-    "/api/payments/user/{userId}": {
+    "/payments/user/{userId}": {
       "get": {
         "summary": "Récupère tous les paiements d'un utilisateur",
         "tags": [
@@ -3213,7 +3265,7 @@
         }
       }
     },
-    "/api/payments/enrollment/{enrollmentId}": {
+    "/payments/enrollment/{enrollmentId}": {
       "get": {
         "summary": "Récupère tous les paiements d'une inscription",
         "tags": [
@@ -3236,7 +3288,7 @@
         }
       }
     },
-    "/api/payments/status/{status}": {
+    "/payments/status/{status}": {
       "get": {
         "summary": "Récupère tous les paiements par statut",
         "tags": [
@@ -3266,7 +3318,7 @@
         }
       }
     },
-    "/api/payments/{id}/check": {
+    "/payments/{id}/check": {
       "get": {
         "summary": "Vérifie le statut d'un paiement Orange Money",
         "tags": [
@@ -3289,7 +3341,7 @@
         }
       }
     },
-    "/api/payments/{id}/cancel": {
+    "/payments/{id}/cancel": {
       "post": {
         "summary": "Annule un paiement en attente",
         "tags": [
@@ -3312,7 +3364,7 @@
         }
       }
     },
-    "/api/payments/webhook/orange-money": {
+    "/payments/webhook/orange-money": {
       "post": {
         "summary": "Webhook pour les notifications Orange Money",
         "tags": [
@@ -3536,7 +3588,7 @@
         }
       }
     },
-    "/api/referrals/generate": {
+    "/referrals/generate": {
       "post": {
         "summary": "Génère un nouveau lien de parrainage",
         "tags": [
@@ -3622,7 +3674,7 @@
         }
       }
     },
-    "/api/referrals/user/{userId}": {
+    "/referrals/user/{userId}": {
       "get": {
         "summary": "Récupère tous les parrainages d'un utilisateur",
         "tags": [
@@ -3670,7 +3722,7 @@
         }
       }
     },
-    "/api/referrals/user/{userId}/stats": {
+    "/referrals/user/{userId}/stats": {
       "get": {
         "summary": "Récupère les statistiques de parrainage d'un utilisateur",
         "tags": [
@@ -3712,7 +3764,7 @@
         }
       }
     },
-    "/api/referrals/track-click": {
+    "/referrals/track-click": {
       "post": {
         "summary": "Enregistre un clic sur un lien de parrainage",
         "tags": [
@@ -3783,7 +3835,7 @@
         }
       }
     },
-    "/api/referrals/validate": {
+    "/referrals/validate": {
       "post": {
         "summary": "Valide un code de parrainage lors de l'inscription",
         "tags": [
@@ -3858,7 +3910,7 @@
         }
       }
     },
-    "/api/referrals/code/{code}": {
+    "/referrals/code/{code}": {
       "get": {
         "summary": "Récupère un parrainage par son code",
         "tags": [
@@ -3903,7 +3955,7 @@
         }
       }
     },
-    "/api/referrals/{id}": {
+    "/referrals/{id}": {
       "get": {
         "summary": "Récupère un parrainage par ID",
         "tags": [
@@ -3988,7 +4040,7 @@
         }
       }
     },
-    "/api/referrals": {
+    "/referrals": {
       "get": {
         "summary": "Récupère tous les parrainages (Admin)",
         "tags": [
@@ -4025,7 +4077,7 @@
         }
       }
     },
-    "/api/referrals/{id}/cancel": {
+    "/referrals/{id}/cancel": {
       "post": {
         "summary": "Annule un parrainage",
         "tags": [
@@ -4067,9 +4119,10 @@
         }
       }
     },
-    "/api/subscriptions/create-payment": {
+    "/subscriptions/create-payment": {
       "post": {
-        "summary": "Créer un paiement Wave pour un abonnement à une catégorie",
+        "summary": "Créer un paiement d'abonnement (5 000 FCFA/an)",
+        "description": "**ELEMENTAIRE**: Abonnement CLASSE (tous les cours de la classe). **MOYEN/SECONDAIRE/UNIVERSITAIRE**: Abonnement MATIERE (exactement 3 matières obligatoires).",
         "tags": [
           "Subscriptions"
         ],
@@ -4080,30 +4133,108 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "plan",
                   "userId",
-                  "category"
+                  "classe",
+                  "niveauScolaire",
+                  "typeAbonnement"
                 ],
                 "properties": {
-                  "plan": {
-                    "type": "string",
-                    "enum": [
-                      "MONTHLY",
-                      "QUARTERLY",
-                      "ANNUAL"
-                    ],
-                    "description": "Plan d'abonnement",
-                    "example": "MONTHLY"
-                  },
                   "userId": {
                     "type": "string",
-                    "description": "ID de l'utilisateur",
+                    "description": "ID Firebase Auth de l'utilisateur",
                     "example": "VLzZCBlJstQOWhJy9Xg4MEO7ESK2"
                   },
-                  "category": {
+                  "classe": {
                     "type": "string",
-                    "description": "Catégorie de cours à débloquer",
-                    "example": "Mathématiques"
+                    "description": "Classe précise de l'utilisateur",
+                    "example": "3ème (BFEM)"
+                  },
+                  "niveauScolaire": {
+                    "type": "string",
+                    "enum": [
+                      "ELEMENTAIRE",
+                      "MOYEN",
+                      "SECONDAIRE",
+                      "UNIVERSITAIRE"
+                    ],
+                    "description": "Niveau scolaire de l'utilisateur",
+                    "example": "MOYEN"
+                  },
+                  "typeAbonnement": {
+                    "type": "string",
+                    "enum": [
+                      "CLASSE",
+                      "MATIERE"
+                    ],
+                    "description": "CLASSE pour élémentaire (tous les cours), MATIERE pour les autres (3 matières exactement)",
+                    "example": "MATIERE"
+                  },
+                  "matieres": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "description": "**OBLIGATOIRE pour MOYEN/SECONDAIRE/UNIVERSITAIRE**: Tableau de EXACTEMENT 3 matières. **NON REQUIS pour ELEMENTAIRE**",
+                    "example": [
+                      "Mathématiques",
+                      "Physique-Chimie",
+                      "SVT"
+                    ]
+                  }
+                }
+              },
+              "examples": {
+                "elementaire": {
+                  "summary": "ELEMENTAIRE - Toute la classe (CM2)",
+                  "value": {
+                    "userId": "VLzZCBlJstQOWhJy9Xg4MEO7ESK2",
+                    "classe": "CM2",
+                    "niveauScolaire": "ELEMENTAIRE",
+                    "typeAbonnement": "CLASSE"
+                  }
+                },
+                "moyen": {
+                  "summary": "MOYEN - 3 matières (3ème BFEM)",
+                  "value": {
+                    "userId": "VLzZCBlJstQOWhJy9Xg4MEO7ESK2",
+                    "classe": "3ème (BFEM)",
+                    "niveauScolaire": "MOYEN",
+                    "typeAbonnement": "MATIERE",
+                    "matieres": [
+                      "Mathématiques",
+                      "Physique-Chimie",
+                      "SVT"
+                    ]
+                  }
+                },
+                "secondaire": {
+                  "summary": "SECONDAIRE - 3 matières (Terminale S)",
+                  "value": {
+                    "userId": "user_terminale_001",
+                    "classe": "Terminale S",
+                    "niveauScolaire": "SECONDAIRE",
+                    "typeAbonnement": "MATIERE",
+                    "matieres": [
+                      "Mathématiques",
+                      "Physique",
+                      "Philosophie"
+                    ]
+                  }
+                },
+                "universitaire": {
+                  "summary": "UNIVERSITAIRE - 3 matières (Licence Info)",
+                  "value": {
+                    "userId": "etudiant_l1_info",
+                    "classe": "Licence 1 Informatique",
+                    "niveauScolaire": "UNIVERSITAIRE",
+                    "typeAbonnement": "MATIERE",
+                    "matieres": [
+                      "Algorithmique",
+                      "Base de données",
+                      "Réseaux"
+                    ]
                   }
                 }
               }
@@ -4112,7 +4243,7 @@
         },
         "responses": {
           "200": {
-            "description": "Paiement créé avec succès",
+            "description": "Paiement d'abonnement créé avec succès - Rediriger l'utilisateur vers paymentUrl",
             "content": {
               "application/json": {
                 "schema": {
@@ -4127,38 +4258,58 @@
                       "properties": {
                         "paymentUrl": {
                           "type": "string",
-                          "description": "URL de redirection vers Wave",
-                          "example": "https://checkout.wave.com/pay/abc123"
+                          "description": "URL de paiement Wave - Rediriger l'utilisateur ici",
+                          "example": "https://checkout.wave.com/pay/ckpt_abc123xyz"
                         },
                         "paymentId": {
                           "type": "string",
-                          "example": "wave_12345"
+                          "description": "ID du paiement Wave",
+                          "example": "wave_payment_789"
                         },
                         "subscriptionId": {
                           "type": "string",
-                          "example": "sub_abc123"
+                          "description": "ID de l'abonnement créé",
+                          "example": "sub_20260210_user001"
                         },
                         "amount": {
                           "type": "number",
-                          "example": 3000
-                        },
-                        "plan": {
-                          "type": "string",
-                          "example": "MONTHLY"
-                        },
-                        "category": {
-                          "type": "string",
-                          "example": "Mathématiques"
+                          "description": "Montant en FCFA (toujours 5000)",
+                          "example": 5000
                         },
                         "currency": {
                           "type": "string",
+                          "description": "Devise (toujours XOF)",
                           "example": "XOF"
+                        },
+                        "typeAbonnement": {
+                          "type": "string",
+                          "enum": [
+                            "CLASSE",
+                            "MATIERE"
+                          ],
+                          "example": "MATIERE"
+                        },
+                        "classe": {
+                          "type": "string",
+                          "example": "3ème (BFEM)"
+                        },
+                        "matieres": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Liste des 3 matières (vide si typeAbonnement=CLASSE)",
+                          "example": [
+                            "Mathématiques",
+                            "Physique-Chimie",
+                            "SVT"
+                          ]
                         }
                       }
                     },
                     "message": {
                       "type": "string",
-                      "example": "Paiement d'abonnement créé pour la catégorie \"Mathématiques\""
+                      "example": "Paiement d'abonnement créé pour 3 matières (5 000 FCFA/an)"
                     }
                   }
                 }
@@ -4166,15 +4317,18 @@
             }
           },
           "400": {
-            "description": "Données invalides ou abonnement actif existant pour cette catégorie"
+            "description": "Erreur de validation du payload"
           },
           "404": {
-            "description": "Utilisateur non trouvé"
+            "description": "Utilisateur ou classe non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur lors de la création du paiement Wave"
           }
         }
       }
     },
-    "/api/subscriptions/active/{userId}": {
+    "/subscriptions/active/{userId}": {
       "get": {
         "summary": "Obtenir l'abonnement actif d'un utilisateur",
         "tags": [
@@ -4201,7 +4355,7 @@
         }
       }
     },
-    "/api/subscriptions/user/{userId}": {
+    "/subscriptions/user/{userId}": {
       "get": {
         "summary": "Obtenir tous les abonnements d'un utilisateur",
         "tags": [
@@ -4225,7 +4379,7 @@
         }
       }
     },
-    "/api/subscriptions/{subscriptionId}/cancel": {
+    "/subscriptions/{subscriptionId}/cancel": {
       "post": {
         "summary": "Annuler un abonnement",
         "tags": [
@@ -4249,9 +4403,10 @@
         }
       }
     },
-    "/api/subscriptions/check-access/{userId}": {
+    "/subscriptions/check-access/{userId}": {
       "get": {
-        "summary": "Vérifier les abonnements actifs d'un utilisateur",
+        "summary": "Vérifier l'accès aux cours d'un utilisateur",
+        "description": "Retourne l'abonnement actif et les matières/cours accessibles. **ELEMENTAIRE**: Accès à tous les cours de SA classe. **MOYEN/SECONDAIRE/UNIVERSITAIRE**: Accès uniquement aux cours de ses 3 matières",
         "tags": [
           "Subscriptions"
         ],
@@ -4263,54 +4418,138 @@
             "schema": {
               "type": "string"
             },
-            "description": "ID de l'utilisateur"
+            "description": "ID Firebase Auth de l'utilisateur",
+            "example": "VLzZCBlJstQOWhJy9Xg4MEO7ESK2"
           }
         ],
         "responses": {
           "200": {
-            "description": "Statut d'accès avec liste des abonnements",
+            "description": "Statut d'accès de l'utilisateur",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "success": {
-                      "type": "boolean",
-                      "example": true
+                      "type": "boolean"
                     },
                     "data": {
                       "type": "object",
                       "properties": {
-                        "hasUnlimitedAccess": {
+                        "hasActiveSubscription": {
                           "type": "boolean",
-                          "example": true
+                          "description": "True si au moins un abonnement actif"
+                        },
+                        "niveauScolaire": {
+                          "type": "string",
+                          "enum": [
+                            "ELEMENTAIRE",
+                            "MOYEN",
+                            "SECONDAIRE",
+                            "UNIVERSITAIRE"
+                          ]
+                        },
+                        "classe": {
+                          "type": "string"
+                        },
+                        "typeAbonnement": {
+                          "type": "string",
+                          "enum": [
+                            "CLASSE",
+                            "MATIERE"
+                          ],
+                          "description": "CLASSE = tous les cours | MATIERE = 3 matières uniquement"
+                        },
+                        "matieresAccessibles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Liste des matières accessibles (vide si CLASSE car accès total)"
                         },
                         "activeSubscriptions": {
                           "type": "array",
                           "items": {
-                            "type": "object",
-                            "properties": {
-                              "category": {
-                                "type": "string",
-                                "example": "Mathématiques"
-                              },
-                              "plan": {
-                                "type": "string",
-                                "example": "MONTHLY"
-                              },
-                              "endDate": {
-                                "type": "string",
-                                "format": "date-time"
-                              }
-                            }
+                            "type": "object"
                           }
                         }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "elementaire_actif": {
+                    "summary": "ELEMENTAIRE avec abonnement",
+                    "value": {
+                      "success": true,
+                      "data": {
+                        "hasActiveSubscription": true,
+                        "niveauScolaire": "ELEMENTAIRE",
+                        "classe": "CM2",
+                        "typeAbonnement": "CLASSE",
+                        "matieresAccessibles": [],
+                        "activeSubscriptions": [
+                          {
+                            "id": "sub_123",
+                            "type": "CLASSE",
+                            "endDate": "2027-02-10"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "moyen_actif": {
+                    "summary": "MOYEN avec 3 matières",
+                    "value": {
+                      "success": true,
+                      "data": {
+                        "hasActiveSubscription": true,
+                        "niveauScolaire": "MOYEN",
+                        "classe": "3ème (BFEM)",
+                        "typeAbonnement": "MATIERE",
+                        "matieresAccessibles": [
+                          "Mathématiques",
+                          "Physique-Chimie",
+                          "SVT"
+                        ],
+                        "activeSubscriptions": [
+                          {
+                            "id": "sub_456",
+                            "type": "MATIERE",
+                            "matieres": [
+                              "Mathématiques",
+                              "Physique-Chimie",
+                              "SVT"
+                            ],
+                            "endDate": "2027-02-10"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "sans_abonnement": {
+                    "summary": "Utilisateur sans abonnement",
+                    "value": {
+                      "success": true,
+                      "data": {
+                        "hasActiveSubscription": false,
+                        "niveauScolaire": "SECONDAIRE",
+                        "classe": "Terminale S",
+                        "typeAbonnement": null,
+                        "matieresAccessibles": [],
+                        "activeSubscriptions": []
                       }
                     }
                   }
                 }
               }
             }
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
           }
         }
       }
@@ -4650,7 +4889,7 @@
         }
       }
     },
-    "/api/users": {
+    "/users": {
       "post": {
         "tags": [
           "Users"
@@ -4723,7 +4962,7 @@
         }
       }
     },
-    "/api/users/classes-disponibles": {
+    "/users/classes-disponibles": {
       "get": {
         "tags": [
           "Users"
@@ -4736,7 +4975,7 @@
         }
       }
     },
-    "/api/users/classes-disponibles/{niveau}": {
+    "/users/classes-disponibles/{niveau}": {
       "get": {
         "tags": [
           "Users"
@@ -4765,7 +5004,7 @@
         }
       }
     },
-    "/api/users/{id}": {
+    "/users/{id}": {
       "get": {
         "tags": [
           "Users"
@@ -4850,7 +5089,7 @@
         }
       }
     },
-    "/api/users/email/{email}": {
+    "/users/email/{email}": {
       "get": {
         "tags": [
           "Users"
@@ -4876,7 +5115,7 @@
         }
       }
     },
-    "/api/users/phone/{phone}": {
+    "/users/phone/{phone}": {
       "get": {
         "tags": [
           "Users"
@@ -4903,7 +5142,7 @@
         }
       }
     },
-    "/api/users/role/{role}": {
+    "/users/role/{role}": {
       "get": {
         "tags": [
           "Users"
@@ -4931,7 +5170,7 @@
         }
       }
     },
-    "/api/users/status/{status}": {
+    "/users/status/{status}": {
       "get": {
         "tags": [
           "Users"
@@ -4959,7 +5198,7 @@
         }
       }
     },
-    "/api/users/{id}/profile-image": {
+    "/users/{id}/profile-image": {
       "patch": {
         "tags": [
           "Users"
@@ -4998,7 +5237,7 @@
         }
       }
     },
-    "/api/users/{id}/status": {
+    "/users/{id}/status": {
       "patch": {
         "tags": [
           "Users"
@@ -5041,7 +5280,7 @@
         }
       }
     },
-    "/api/wave/create-payment": {
+    "/wave/create-payment": {
       "post": {
         "summary": "Créer un paiement Wave pour un cours",
         "tags": [
@@ -5128,7 +5367,7 @@
         }
       }
     },
-    "/api/wave/payment-status/{paymentId}": {
+    "/wave/payment-status/{paymentId}": {
       "get": {
         "summary": "Vérifier le statut d'un paiement Wave",
         "tags": [
@@ -5195,7 +5434,7 @@
         }
       }
     },
-    "/api/wave/confirm-payment": {
+    "/wave/confirm-payment": {
       "post": {
         "summary": "Confirmer un paiement après retour depuis Wave",
         "tags": [
@@ -5276,7 +5515,7 @@
         }
       }
     },
-    "/api/wave/webhook": {
+    "/wave/webhook": {
       "post": {
         "summary": "Webhook Wave pour les notifications de paiement",
         "tags": [

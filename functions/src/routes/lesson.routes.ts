@@ -6,7 +6,7 @@ const lessonController = new LessonController();
 
 /**
  * @swagger
- * /api/lessons:
+ * /lessons:
  *   post:
  *     tags: [Lessons]
  *     summary: Créer une nouvelle leçon
@@ -24,7 +24,7 @@ router.post('/', (req, res) => lessonController.create(req, res));
 
 /**
  * @swagger
- * /api/lessons:
+ * /lessons:
  *   get:
  *     tags: [Lessons]
  *     summary: Récupérer toutes les leçons
@@ -36,7 +36,7 @@ router.get('/', (req, res) => lessonController.getAll(req, res));
 
 /**
  * @swagger
- * /api/lessons/{id}:
+ * /lessons/{id}:
  *   get:
  *     tags: [Lessons]
  *     summary: Récupérer une leçon par ID
@@ -54,7 +54,7 @@ router.get('/:id', (req, res) => lessonController.getById(req, res));
 
 /**
  * @swagger
- * /api/lessons/course/{courseId}:
+ * /lessons/course/{courseId}:
  *   get:
  *     tags: [Lessons]
  *     summary: Récupérer les leçons d'un cours
@@ -72,7 +72,7 @@ router.get('/course/:courseId', (req, res) => lessonController.getByCourseId(req
 
 /**
  * @swagger
- * /api/lessons/chapter/{chapterId}:
+ * /lessons/chapter/{chapterId}:
  *   get:
  *     tags: [Lessons]
  *     summary: Récupérer les leçons d'un chapitre
@@ -90,7 +90,7 @@ router.get('/chapter/:chapterId', (req, res) => lessonController.getByChapterId(
 
 /**
  * @swagger
- * /api/lessons/{id}:
+ * /lessons/{id}:
  *   put:
  *     tags: [Lessons]
  *     summary: Mettre à jour une leçon
@@ -114,7 +114,7 @@ router.put('/:id', (req, res) => lessonController.update(req, res));
 
 /**
  * @swagger
- * /api/lessons/{id}:
+ * /lessons/{id}:
  *   delete:
  *     tags: [Lessons]
  *     summary: Supprimer une leçon
