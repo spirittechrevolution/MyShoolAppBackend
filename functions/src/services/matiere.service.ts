@@ -86,7 +86,7 @@ export class MatiereService {
   }
 
   /**
-   * Vérifier si une matière appartient à un niveau scolaire
+   * Vérifier si une matière appartient à un niveau scolaire (par ID)
    */
   async belongsToNiveau(matiereId: string, niveauScolaire: NiveauScolaire): Promise<boolean> {
     const matiere = await this.getById(matiereId);
@@ -94,15 +94,40 @@ export class MatiereService {
   }
 
   /**
-   * Valider que des matières appartiennent toutes au même niveau
+   * Vérifier si une matière appartient à un niveau scolaire (par NOM)
    */
-  async validateMatieresForNiveau(matiereIds: string[], niveauScolaire: NiveauScolaire): Promise<boolean> {
-    for (const matiereId of matiereIds) {
-      const belongs = await this.belongsToNiveau(matiereId, niveauScolaire);
+  async belongsToNiveauByName(matiereNom: string, niveauScolaire: NiveauScolaire): Promise<boolean> {
+    try {
+      const snapshot = await db.collection(this.collectionName)
+        .where('nom', '==', matiereNom)
+        .where('niveauScolaire', '==', niveauScolaire)
+        .where('isActive', '==', true)
+        .limit(1)
+        .get();
+
+      return !snapshot.empty;
+    } catch (error) {
+      console.error(`❌ Erreur vérification matière "${matiereNom}" pour niveau ${niveauScolaire}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Valider que des matières appartiennent toutes au même niveau (par NOMS)
+   */
+  async validateMatieresForNiveau(matiereNoms: string[], niveauScolaire: NiveauScolaire): Promise<boolean> {
+    console.log(`🔍 Validation de ${matiereNoms.length} matières pour niveau ${niveauScolaire}:`, matiereNoms);
+    
+    for (const matiereNom of matiereNoms) {
+      const belongs = await this.belongsToNiveauByName(matiereNom, niveauScolaire);
       if (!belongs) {
+        console.error(`❌ Matière "${matiereNom}" non trouvée pour niveau ${niveauScolaire}`);
         return false;
       }
+      console.log(`✅ Matière "${matiereNom}" validée pour niveau ${niveauScolaire}`);
     }
+    
+    console.log(`✅ Toutes les matières sont valides pour niveau ${niveauScolaire}`);
     return true;
   }
 }
