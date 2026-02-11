@@ -395,6 +395,114 @@
         ]
       },
       {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "classe",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "matiereId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "category",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "level",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "type",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
         "collectionGroup": "exercises",
         "queryScope": "COLLECTION",
         "fields": [

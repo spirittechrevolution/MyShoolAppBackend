@@ -75,11 +75,24 @@ export class UserService {
   }
 
   async getById(uid: string): Promise<UserModel | null> {
+    // Format recommandé : UID Firebase Auth comme ID de document
     const doc = await db.collection(this.collectionName).doc(uid).get();
     
     if (doc.exists) {
       return new UserModel({ ...doc.data() as User, uid: doc.id });
     }
+    
+    // Format legacy : UID stocké dans un champ 'uid'  
+    const snapshot = await db.collection(this.collectionName)
+      .where('uid', '==', uid)
+      .limit(1)
+      .get();
+    
+    if (!snapshot.empty) {
+      const userDoc = snapshot.docs[0];
+      return new UserModel({ ...userDoc.data() as User, uid: userDoc.data().uid });
+    }
+    
     return null;
   }
 
