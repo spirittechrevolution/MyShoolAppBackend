@@ -17,7 +17,7 @@ const controller = new PushNotificationController();
 
 /**
  * @swagger
- * /api/push-notifications/register-token:
+ * /push-notifications/register-token:
  *   post:
  *     summary: Enregistrer un token FCM
  *     tags: [Push Notifications]
@@ -58,7 +58,7 @@ router.post('/register-token', (req, res) => controller.registerToken(req, res))
 
 /**
  * @swagger
- * /api/push-notifications/remove-token:
+ * /push-notifications/remove-token:
  *   delete:
  *     summary: Supprimer un token FCM
  *     tags: [Push Notifications]
@@ -84,7 +84,7 @@ router.delete('/remove-token', (req, res) => controller.removeToken(req, res));
 
 /**
  * @swagger
- * /api/push-notifications/send-test:
+ * /push-notifications/send-test:
  *   post:
  *     summary: Envoyer une notification test
  *     tags: [Push Notifications]
@@ -107,7 +107,7 @@ router.post('/send-test', (req, res) => controller.sendTestNotification(req, res
 
 /**
  * @swagger
- * /api/push-notifications/user/{userId}:
+ * /push-notifications/user/{userId}:
  *   get:
  *     summary: Récupérer les notifications d'un utilisateur
  *     tags: [Push Notifications]
@@ -130,7 +130,7 @@ router.get('/user/:userId', (req, res) => controller.getUserNotifications(req, r
 
 /**
  * @swagger
- * /api/push-notifications/{id}/read:
+ * /push-notifications/{id}/read:
  *   patch:
  *     summary: Marquer une notification comme lue
  *     tags: [Push Notifications]
@@ -148,7 +148,7 @@ router.patch('/:id/read', (req, res) => controller.markAsRead(req, res));
 
 /**
  * @swagger
- * /api/push-notifications/tokens/{userId}:
+ * /push-notifications/tokens/{userId}:
  *   get:
  *     summary: Récupérer les tokens FCM d'un utilisateur (debug)
  *     tags: [Push Notifications]

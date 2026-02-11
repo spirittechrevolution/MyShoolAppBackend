@@ -17,6 +17,8 @@ import paymentRoutes from './routes/payment.routes';
 import referralRoutes from './routes/referral.routes';
 import faqRoutes from './routes/faq.routes';
 import chatRoutes from './routes/chat.routes';
+import pushNotificationRoutes from './routes/push-notification.routes';
+import waveRoutes from './routes/wave.routes';
 import './config/firebase.config'; // Initialize Firebase
 
 const app: Application = express();
@@ -24,6 +26,7 @@ const PORT = process.env.PORT || 3000;
 
 // CORS Configuration - Autoriser les ports frontend 4200-4205
 const allowedOrigins = [
+  'http://localhost:3000',
   'http://localhost:4200',
   'http://localhost:4201',
   'http://localhost:4202',
@@ -89,6 +92,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/referrals', referralRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/push-notifications', pushNotificationRoutes);
+app.use('/api/wave', waveRoutes);
 
 // 404 Handlerreferrals', referralRoutes);
 

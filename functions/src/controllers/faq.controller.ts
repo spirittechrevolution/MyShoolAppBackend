@@ -64,7 +64,7 @@ export class FaqController {
     try {
       const query: FaqSearchQuery = {
         category: req.query.category as FaqCategory,
-        isActive: req.query.isActive === 'true',
+        isActive: req.query.isActive !== undefined ? req.query.isActive === 'true' : undefined,
         limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
         offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
       };
@@ -345,6 +345,42 @@ export class FaqController {
       });
     } catch (error: any) {
       console.error('Erreur historique conversation:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Récupérer le dernier chat d'un utilisateur
+   * GET /api/chat/last/:userId
+   * @param {Request} req - Requête
+   * @param {Response} res - Réponse
+   * @return {Promise<void>} Résultat
+   */
+  async getLastChat(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const lastMessage = await this.aiChatService.getLastChatMessage(userId);
+
+      if (!lastMessage) {
+        res.status(404).json({
+          success: false,
+          message: 'Aucun message trouvé pour cet utilisateur',
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          lastMessage,
+          userId,
+        },
+      });
+    } catch (error: any) {
+      console.error('Erreur dernier chat:', error);
       res.status(500).json({
         success: false,
         message: error.message,

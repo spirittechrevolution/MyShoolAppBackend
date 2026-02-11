@@ -1,6 +1,7 @@
 /**
- * Service AI Chat pour MySchool
+ * Service AI Chat pour MySchool - Marème
  * Utilise Gemini AI pour répondre aux questions des utilisateurs
+ * Marème est l'assistante virtuelle personnalisée de MySchool
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -44,11 +45,14 @@ export class AiChatService {
         // Réponse trouvée dans la FAQ
         const bestMatch = faqs[0]; // Premier résultat = meilleur match
 
+        // Personnaliser la réponse avec Marème
+        const personalizedAnswer = `Bonjour ! Je suis Marème 😊\n\n${bestMatch.answer}\n\nN'hésitez pas si vous avez d'autres questions ! 📚`;
+
         // Sauvegarder dans l'historique
-        await this.saveMessage(userId, question, bestMatch.answer, bestMatch.id);
+        await this.saveMessage(userId, question, personalizedAnswer, bestMatch.id);
 
         return {
-          answer: bestMatch.answer,
+          answer: personalizedAnswer,
           source: 'faq',
           faqId: bestMatch.id,
         };
@@ -84,43 +88,42 @@ export class AiChatService {
         return 'Le service de chat intelligent n\'est pas configuré. Veuillez contacter le support.';
       }
 
-      // Liste des modèles à essayer dans l'ordre (Gemini 2.0 puis 1.5 puis 1.0)
+      // Liste des modèles disponibles et fonctionnels (Gemini 2.5 et 3.0)
       const modelsToTry = [
-        'gemini-2.0-flash-exp',
-        'gemini-exp-1206',
-        'gemini-2.0-flash-thinking-exp-1219',
-        'gemini-1.5-flash-002',
-        'gemini-1.5-pro-002',
-        'gemini-1.5-flash-8b',
-        'gemini-1.5-flash',
-        'gemini-1.5-pro',
-        'gemini-pro'
+        'gemini-3-flash-preview',      // Gemini 3.0 - Le plus intelligent (GRATUIT)
+        'gemini-2.5-flash',             // Gemini 2.5 - Rapide et fiable (GRATUIT)
       ];
 
       let lastError: any = null;
 
+      console.log('🔑 GEMINI_API_KEY présente:', !!process.env.GEMINI_API_KEY);
+      console.log('🔑 Longueur de la clé:', process.env.GEMINI_API_KEY?.length);
+
       // Essayer chaque modèle jusqu'à ce qu'un fonctionne
       for (const modelName of modelsToTry) {
         try {
+          console.log(`🔄 Tentative avec le modèle: ${modelName}`);
           const model = this.genAI.getGenerativeModel({ model: modelName });
 
           // Contexte pour MySchool
-          const context = `Tu es un assistant virtuel pour MySchool, une plateforme d'e-learning.
+          const context = `Tu es Marème, l'assistante virtuelle de MySchool, une plateforme d'e-learning sénégalaise.
       
 Informations sur MySchool :
-- Plateforme de cours en ligne
+- Plateforme de cours en ligne pour tous les niveaux (ELEMENTAIRE, MOYEN, SECONDAIRE, UNIVERSITAIRE)
+- Abonnements annuels à 5000 FCFA (CLASSE pour élémentaire, MATIERE pour les autres niveaux)
 - Paiements via Orange Money, Wave, Free Money
 - Système de parrainage avec deep links
 - Certificats de complétion
 - Notifications SMS et Push
-- Cours de différents niveaux (débutant, intermédiaire, avancé)
+- Organisation par classes (CM2, 3ème, Terminale S, Licence2, etc.) et matières
 
-Règles de réponse :
-1. Sois courtois, professionnel et utile
-2. Réponds en français
-3. Sois concis (max 3-4 phrases)
-4. Si tu ne sais pas, propose de contacter le support
-5. Utilise des émojis appropriés (📚 💡 ✅)
+Ton rôle en tant que Marème :
+1. Sois chaleureuse, professionnelle et serviable
+2. Réponds toujours en français
+3. Sois concise (max 3-4 phrases)
+4. Si tu ne connais pas la réponse, propose de contacter le support
+5. Utilise des émojis appropriés (📚 💡 ✅ 🎓)
+6. Personnalise tes réponses avec ton prénom "Marème" quand c'est approprié
 
 Question de l'utilisateur : ${question}`;
 
@@ -130,7 +133,7 @@ Question de l'utilisateur : ${question}`;
           return response.text();
         } catch (error: any) {
           lastError = error;
-          console.log(`⚠️ Modèle ${modelName} non disponible, essai suivant...`);
+          console.error(`❌ Erreur avec ${modelName}:`, error.message || error);
           continue; // Essayer le modèle suivant
         }
       }
@@ -217,6 +220,35 @@ Question de l'utilisateur : ${question}`;
       } as ChatConversation;
     } catch (error: any) {
       console.error('Erreur récupération conversation:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Récupérer le dernier message de chat d'un utilisateur
+   * @param userId - ID utilisateur
+   * @returns Dernier message ou null
+   */
+  async getLastChatMessage(userId: string): Promise<ChatMessage | null> {
+    try {
+      const doc = await db.collection(CHAT_COLLECTION).doc(userId).get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      const conversation = doc.data() as ChatConversation;
+      
+      if (!conversation.messages || conversation.messages.length === 0) {
+        return null;
+      }
+
+      // Récupérer le dernier message (le plus récent)
+      const lastMessage = conversation.messages[conversation.messages.length - 1];
+      
+      return lastMessage;
+    } catch (error: any) {
+      console.error('Erreur récupération dernier message:', error);
       return null;
     }
   }

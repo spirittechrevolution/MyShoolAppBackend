@@ -161,6 +161,470 @@
             "order": "DESCENDING"
           }
         ]
+      },
+      {
+        "collectionGroup": "push_notifications",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "payments",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "payments",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "payments",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "enrollmentId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "payments",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "paymentMethod",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "subscriptions",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "subscriptions",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "endDate",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "subscriptions",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "subscriptions",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "subscriptions",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "category",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "instructorId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "classe",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "matiereId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "rating",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "classe",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "matiereId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "category",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "level",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "courses",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "type",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isPublished",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "exercises",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "courseId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "difficulty",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "matieres",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "isActive",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "ordre",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "matieres",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "ordre",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "matieres",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isActive",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "ordre",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "matieres",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "classe",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "isActive",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "ordre",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "matieres",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "niveauScolaire",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "nom",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "chat_conversations",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "createdAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      {
+        "collectionGroup": "chat_messages",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "conversationId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "timestamp",
+            "order": "ASCENDING"
+          }
+        ]
       }
     ],
     "fieldOverrides": []

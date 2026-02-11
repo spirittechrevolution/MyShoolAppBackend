@@ -16,6 +16,7 @@ export class FaqService {
    * @return {Promise<{ success: boolean; id?: string; message: string }>} Résultat
    */
   async createFaq(faqData: FAQ): Promise<{ success: boolean; id?: string; message: string }> {
+    //MySchool AI
     try {
       const faq: FAQ = {
         ...faqData,
@@ -50,34 +51,49 @@ export class FaqService {
    */
   async getAllFaqs(query: FaqSearchQuery = {}): Promise<FAQ[]> {
     try {
-      let faqQuery = db.collection(FAQ_COLLECTION).orderBy('order', 'asc');
+      console.log('Début getAllFaqs avec query:', query);
+      console.log('Collection utilisée:', FAQ_COLLECTION);
+      
+      let faqQuery = db.collection(FAQ_COLLECTION);
 
-      // Filtrer par catégorie
+      // Filtrer par catégorie si spécifié
       if (query.category) {
+        console.log('Filtrage par catégorie:', query.category);
         faqQuery = faqQuery.where('category', '==', query.category) as any;
       }
 
-      // Filtrer par statut actif
+      // Filtrer par statut actif si spécifié
       if (query.isActive !== undefined) {
+        console.log('Filtrage par isActive:', query.isActive);
         faqQuery = faqQuery.where('isActive', '==', query.isActive) as any;
       }
 
-      // Limite et pagination
+      // Limite simple sans offset pour éviter les problèmes
       const limit = query.limit || 50;
       faqQuery = faqQuery.limit(limit) as any;
 
-      if (query.offset) {
-        faqQuery = faqQuery.offset(query.offset) as any;
+      console.log('Exécution de la requête Firestore...');
+      const snapshot = await faqQuery.get();
+      console.log('Nombre de documents récupérés:', snapshot.docs.length);
+
+      if (snapshot.docs.length > 0) {
+        console.log('Premier document ID:', snapshot.docs[0].id);
+        console.log('Premier document data:', snapshot.docs[0].data());
       }
 
-      const snapshot = await faqQuery.get();
-
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      } as FAQ));
+      const faqs = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+        } as FAQ;
+      });
+      
+      console.log('FAQs retournées:', faqs.length);
+      return faqs;
     } catch (error: any) {
       console.error('Erreur récupération FAQs:', error);
+      console.error('Stack:', error.stack);
       return [];
     }
   }

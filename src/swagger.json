@@ -1,0 +1,5372 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MySchool API",
+    "version": "2.2.0",
+    "description": "API REST complète pour MySchool e-learning. \n        Gestion des utilisateurs, cours, chapitres, leçons, exercices, inscriptions et instructeurs.\n        Support complet des requêtes filtrées et index Firestore optimisés.",
+    "contact": {
+      "name": "MySchool Support",
+      "email": "support@myschool.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://us-central1-myschool-f862b.cloudfunctions.net",
+      "description": "Serveur de production (Firebase Functions)"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Serveur de développement local"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": [
+          "firstName",
+          "lastName",
+          "phone",
+          "level",
+          "role",
+          "status",
+          "classe"
+        ],
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": "ID Firebase Auth (auto-généré)"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+221771234567"
+          },
+          "login": {
+            "type": "string",
+            "example": "+221771234567"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123",
+            "description": "Requis à la création uniquement"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "example": "beginner"
+          },
+          "classe": {
+            "type": "string",
+            "example": "3ème (BFEM)",
+            "description": "Classe précise de l'utilisateur (obligatoire)"
+          },
+          "niveauScolaire": {
+            "type": "string",
+            "enum": [
+              "ELEMENTAIRE",
+              "MOYEN",
+              "SECONDAIRE",
+              "UNIVERSITAIRE"
+            ],
+            "example": "MOYEN"
+          },
+          "role": {
+            "type": "object",
+            "properties": {
+              "libelle": {
+                "type": "string",
+                "enum": [
+                  "student",
+                  "instructor",
+                  "admin"
+                ],
+                "example": "student"
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "suspended"
+            ],
+            "example": "active"
+          },
+          "profileImage": {
+            "type": "string",
+            "description": "URL de l'image de profil"
+          },
+          "specializationId": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Course": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "level",
+          "niveauScolaire",
+          "classe"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Introduction à JavaScript"
+          },
+          "description": {
+            "type": "string",
+            "example": "Apprendre les bases de JavaScript"
+          },
+          "image": {
+            "type": "string",
+            "description": "URL de l'image du cours"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "DEBUTANT",
+              "INTERMEDIAIRE",
+              "AVANCE"
+            ],
+            "example": "DEBUTANT"
+          },
+          "niveauScolaire": {
+            "type": "string",
+            "enum": [
+              "ELEMENTAIRE",
+              "MOYEN",
+              "SECONDAIRE",
+              "UNIVERSITAIRE"
+            ],
+            "example": "MOYEN"
+          },
+          "classe": {
+            "type": "string",
+            "example": "3ème (BFEM)",
+            "description": "Classe cible du cours (obligatoire)"
+          },
+          "matiereId": {
+            "type": "string",
+            "description": "ID de la matière associée"
+          },
+          "duration": {
+            "type": "number",
+            "example": 120,
+            "description": "Durée en minutes"
+          },
+          "price": {
+            "type": "number",
+            "example": 0,
+            "description": "Prix (0 = gratuit)"
+          },
+          "category": {
+            "type": "string",
+            "example": "Programmation"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "VIDEO",
+              "En ligne",
+              "Hybride"
+            ],
+            "example": "En ligne"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.5
+          },
+          "documents": {
+            "type": "array",
+            "description": "Documents PDF associés au cours",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Cours_Chapitre1.pdf"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "https://storage.googleapis.com/.../document.pdf"
+                },
+                "size": {
+                  "type": "number",
+                  "example": 2048576,
+                  "description": "Taille en octets"
+                },
+                "uploadedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Chapter": {
+        "type": "object",
+        "required": [
+          "title",
+          "courseId",
+          "order"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Chapitre 1: Variables"
+          },
+          "description": {
+            "type": "string",
+            "example": "Introduction aux variables"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number",
+            "example": 1
+          },
+          "duration": {
+            "type": "number",
+            "example": 30
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Lesson": {
+        "type": "object",
+        "required": [
+          "title",
+          "chapterId",
+          "order"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Les variables en JavaScript"
+          },
+          "content": {
+            "type": "string",
+            "example": "Contenu de la leçon..."
+          },
+          "videoUrl": {
+            "type": "string",
+            "example": "https://youtube.com/watch?v=..."
+          },
+          "chapterId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number",
+            "example": 1
+          },
+          "duration": {
+            "type": "number",
+            "example": 15
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Exercise": {
+        "type": "object",
+        "required": [
+          "title",
+          "lessonId",
+          "type"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Quiz: Les variables"
+          },
+          "description": {
+            "type": "string",
+            "example": "Testez vos connaissances"
+          },
+          "lessonId": {
+            "type": "string"
+          },
+          "chapterId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "quiz",
+              "coding",
+              "essay"
+            ],
+            "example": "quiz"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "points": {
+            "type": "number",
+            "example": 10
+          },
+          "documents": {
+            "type": "array",
+            "description": "Documents PDF associés à l'exercice",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Exercice_Solutions.pdf"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "https://storage.googleapis.com/.../document.pdf"
+                },
+                "size": {
+                  "type": "number",
+                  "example": 1048576,
+                  "description": "Taille en octets"
+                },
+                "uploadedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Enrollment": {
+        "type": "object",
+        "required": [
+          "userId",
+          "courseId"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "courseTitle": {
+            "type": "string"
+          },
+          "courseImage": {
+            "type": "string"
+          },
+          "enrolledAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "cancelled"
+            ],
+            "example": "active"
+          },
+          "progress": {
+            "type": "number",
+            "example": 0,
+            "minimum": 0,
+            "maximum": 100
+          },
+          "amount": {
+            "type": "number",
+            "example": 0
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "free-money",
+              "wave",
+              "orange-money",
+              "card"
+            ],
+            "example": "free-money"
+          },
+          "chaptersCompleted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Instructor": {
+        "type": "object",
+        "required": [
+          "userId",
+          "bio",
+          "specialization"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Développeur web avec 10 ans d'expérience"
+          },
+          "specialization": {
+            "type": "string",
+            "example": "web-development"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.5,
+            "minimum": 0,
+            "maximum": 5
+          },
+          "totalStudents": {
+            "type": "number",
+            "example": 150
+          },
+          "totalCourses": {
+            "type": "number",
+            "example": 5
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "required": [
+          "userId",
+          "enrollmentId",
+          "courseId",
+          "amount",
+          "paymentMethod"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "enrollmentId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "example": 10000
+          },
+          "currency": {
+            "type": "string",
+            "example": "XOF",
+            "default": "XOF"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "orange-money",
+              "wave",
+              "free-money",
+              "card"
+            ],
+            "example": "orange-money"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SUCCESS",
+              "FAILED",
+              "CANCELLED",
+              "EXPIRED"
+            ],
+            "example": "PENDING"
+          },
+          "orderReferenceNumber": {
+            "type": "string",
+            "example": "MS-1701234567-8901"
+          },
+          "payToken": {
+            "type": "string"
+          },
+          "paymentUrl": {
+            "type": "string"
+          },
+          "customerPhoneNumber": {
+            "type": "string",
+            "example": "+221771234567"
+          },
+          "customerFirstName": {
+            "type": "string",
+            "example": "Amadou"
+          },
+          "customerLastName": {
+            "type": "string",
+            "example": "Diallo"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Referral": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID du parrainage"
+          },
+          "referrerId": {
+            "type": "string",
+            "description": "ID de l'utilisateur parrain"
+          },
+          "referredUserId": {
+            "type": "string",
+            "description": "ID de l'utilisateur parrainé"
+          },
+          "referralCode": {
+            "type": "string",
+            "example": "REF_GPL8_A1B2C3",
+            "description": "Code de parrainage (REF_XXXX_XXXXXX)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED"
+            ],
+            "example": "PENDING",
+            "description": "Statut du parrainage"
+          },
+          "bonusAmount": {
+            "type": "number",
+            "example": 500,
+            "description": "Montant du bonus en centimes"
+          },
+          "bonusType": {
+            "type": "string",
+            "enum": [
+              "DISCOUNT",
+              "FREE_COURSE",
+              "POINTS"
+            ],
+            "example": "DISCOUNT",
+            "description": "Type de bonus"
+          },
+          "clicks": {
+            "type": "number",
+            "example": 0,
+            "description": "Nombre de clics sur le lien"
+          },
+          "conversions": {
+            "type": "number",
+            "example": 0,
+            "description": "Nombre de conversions réussies"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "deepLink": {
+                "type": "string",
+                "example": "myschool://referral?code=REF_GPL8_A1B2C3"
+              },
+              "webLink": {
+                "type": "string",
+                "example": "https://myschool-app.com/join?ref=REF_GPL8_A1B2C3"
+              },
+              "shareText": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string",
+                "example": "whatsapp"
+              }
+            }
+          }
+        }
+      },
+      "ReferralStats": {
+        "type": "object",
+        "properties": {
+          "totalReferrals": {
+            "type": "number",
+            "example": 5
+          },
+          "activeReferrals": {
+            "type": "number",
+            "example": 2
+          },
+          "completedReferrals": {
+            "type": "number",
+            "example": 2
+          },
+          "expiredReferrals": {
+            "type": "number",
+            "example": 1
+          },
+          "cancelledReferrals": {
+            "type": "number",
+            "example": 0
+          },
+          "totalClicks": {
+            "type": "number",
+            "example": 25
+          },
+          "totalConversions": {
+            "type": "number",
+            "example": 2
+          },
+          "conversionRate": {
+            "type": "number",
+            "example": 8
+          },
+          "totalEarnings": {
+            "type": "number",
+            "example": 1000,
+            "description": "En centimes"
+          },
+          "pendingBonus": {
+            "type": "number",
+            "example": 1000,
+            "description": "En centimes"
+          },
+          "referrals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Referral"
+            }
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "required": [
+          "userId",
+          "classe",
+          "type",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID auto-généré"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID de l'utilisateur abonné"
+          },
+          "classe": {
+            "type": "string",
+            "example": "3ème (BFEM)",
+            "description": "Classe de l'abonnement"
+          },
+          "niveauScolaire": {
+            "type": "string",
+            "enum": [
+              "ELEMENTAIRE",
+              "MOYEN",
+              "SECONDAIRE",
+              "UNIVERSITAIRE"
+            ],
+            "example": "MOYEN"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "CLASSE",
+              "MATIERE"
+            ],
+            "example": "MATIERE",
+            "description": "CLASSE pour élémentaire, MATIERE pour les autres"
+          },
+          "matieres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Liste de 3 matières (uniquement si type=MATIERE)",
+            "example": [
+              "Mathématiques",
+              "Physique-Chimie",
+              "SVT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "EXPIRED",
+              "CANCELLED"
+            ],
+            "example": "ACTIVE"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "autoRenew": {
+            "type": "boolean",
+            "default": false
+          },
+          "paymentId": {
+            "type": "string",
+            "description": "ID du paiement associé"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Matiere": {
+        "type": "object",
+        "required": [
+          "nom",
+          "classe",
+          "niveauScolaire"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID auto-généré"
+          },
+          "nom": {
+            "type": "string",
+            "example": "Mathématiques"
+          },
+          "description": {
+            "type": "string",
+            "example": "Matière scientifique fondamentale"
+          },
+          "classe": {
+            "type": "string",
+            "example": "3ème (BFEM)"
+          },
+          "niveauScolaire": {
+            "type": "string",
+            "enum": [
+              "ELEMENTAIRE",
+              "MOYEN",
+              "SECONDAIRE",
+              "UNIVERSITAIRE"
+            ],
+            "example": "MOYEN"
+          },
+          "icon": {
+            "type": "string",
+            "example": "🔢"
+          },
+          "color": {
+            "type": "string",
+            "example": "#4CAF50"
+          },
+          "ordre": {
+            "type": "number",
+            "example": 1
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Message d'erreur"
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Gestion des utilisateurs"
+    },
+    {
+      "name": "Courses",
+      "description": "Gestion des cours"
+    },
+    {
+      "name": "Chapters",
+      "description": "Gestion des chapitres"
+    },
+    {
+      "name": "Lessons",
+      "description": "Gestion des leçons"
+    },
+    {
+      "name": "Exercises",
+      "description": "Gestion des exercices"
+    },
+    {
+      "name": "Enrollments",
+      "description": "Gestion des inscriptions"
+    },
+    {
+      "name": "Instructors",
+      "description": "Gestion des instructeurs"
+    },
+    {
+      "name": "Payments",
+      "description": "Gestion des paiements Orange Money"
+    },
+    {
+      "name": "Referrals",
+      "description": "Système de parrainage avec deep links"
+    },
+    {
+      "name": "Matieres",
+      "description": "Gestion des matières par classe (CRUD Admin)"
+    },
+    {
+      "name": "Subscriptions",
+      "description": "Système d'abonnement par classe ou matières"
+    },
+    {
+      "name": "Wave",
+      "description": "Intégration paiement Wave (Mobile Money)"
+    },
+    {
+      "name": "Chat",
+      "description": "Chat IA avec Gemini pour aide éducative"
+    },
+    {
+      "name": "FAQs",
+      "description": "Foire aux questions"
+    },
+    {
+      "name": "Push Notifications",
+      "description": "Notifications push Firebase"
+    },
+    {
+      "name": "AI Chat",
+      "description": "Chatbot intelligent avec Gemini AI"
+    },
+    {
+      "name": "FAQ",
+      "description": "Gestion des questions fréquemment posées"
+    },
+    {
+      "name": "Wave Payments",
+      "description": "Intégration des paiements Wave"
+    }
+  ],
+  "paths": {
+    "/api/chapters": {
+      "post": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Créer un nouveau chapitre",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Chapter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Chapitre créé"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Récupérer tous les chapitres",
+        "responses": {
+          "200": {
+            "description": "Liste des chapitres"
+          }
+        }
+      }
+    },
+    "/api/chapters/{id}": {
+      "get": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Récupérer un chapitre par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chapitre trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Mettre à jour un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Chapter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chapitre mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Supprimer un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chapitre supprimé"
+          }
+        }
+      }
+    },
+    "/api/chapters/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Chapters"
+        ],
+        "summary": "Récupérer les chapitres d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des chapitres"
+          }
+        }
+      }
+    },
+    "/chat/ask": {
+      "post": {
+        "summary": "Poser une question au chatbot",
+        "tags": [
+          "AI Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "question"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "example": "user123"
+                  },
+                  "question": {
+                    "type": "string",
+                    "example": "Comment obtenir mon certificat ?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Réponse du chatbot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "answer": {
+                          "type": "string"
+                        },
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "faq",
+                            "ai"
+                          ]
+                        },
+                        "faqId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      }
+    },
+    "/chat/history/{userId}": {
+      "get": {
+        "summary": "Récupérer l'historique de conversation",
+        "tags": [
+          "AI Chat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historique de conversation"
+          },
+          "404": {
+            "description": "Aucune conversation trouvée"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer l'historique de conversation",
+        "tags": [
+          "AI Chat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historique supprimé"
+          }
+        }
+      }
+    },
+    "/chat/last/{userId}": {
+      "get": {
+        "summary": "Récupérer le dernier message de chat d'un utilisateur",
+        "tags": [
+          "AI Chat"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dernier message de chat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "lastMessage": {
+                          "type": "object",
+                          "properties": {
+                            "role": {
+                              "type": "string",
+                              "enum": [
+                                "user",
+                                "assistant"
+                              ],
+                              "example": "assistant"
+                            },
+                            "content": {
+                              "type": "string",
+                              "example": "Voici la réponse à votre question..."
+                            },
+                            "timestamp": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "faqId": {
+                              "type": "string",
+                              "description": "ID de la FAQ source (si applicable)"
+                            },
+                            "helpful": {
+                              "type": "boolean",
+                              "description": "Feedback utilisateur"
+                            }
+                          }
+                        },
+                        "userId": {
+                          "type": "string",
+                          "example": "uGbrU72VFWfWZcUkvk31QaOi7tG3"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Aucun message trouvé pour cet utilisateur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Aucun message trouvé pour cet utilisateur"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/chat/feedback": {
+      "post": {
+        "summary": "Marquer un message comme utile ou pas",
+        "tags": [
+          "AI Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "messageIndex",
+                  "helpful"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "messageIndex": {
+                    "type": "number"
+                  },
+                  "helpful": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback enregistré"
+          }
+        }
+      }
+    },
+    "/api/courses": {
+      "post": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Créer un nouveau cours",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Course"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cours créé avec succès"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer tous les cours",
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/published": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours publiés",
+        "responses": {
+          "200": {
+            "description": "Liste des cours publiés"
+          }
+        }
+      }
+    },
+    "/api/courses/classe/{classe}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par classe précise",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "classe",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Licence 2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours pour cette classe"
+          }
+        }
+      }
+    },
+    "/api/courses/matiere/{matiereId}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par matière",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matiereId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours pour cette matière"
+          }
+        }
+      }
+    },
+    "/api/courses/niveau/{niveau}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par niveau scolaire",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "niveau",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ELEMENTAIRE",
+                "MOYEN",
+                "SECONDAIRE",
+                "UNIVERSITAIRE"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours pour ce niveau"
+          }
+        }
+      }
+    },
+    "/api/courses/{id}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer un cours par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours trouvé"
+          },
+          "404": {
+            "description": "Cours non trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Mettre à jour un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Course"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cours mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Supprimer un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours supprimé"
+          }
+        }
+      }
+    },
+    "/api/courses/category/{category}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par catégorie",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/level/{level}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par niveau",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "level",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "beginner",
+                "intermediate",
+                "advanced"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/type/{type}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours par type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours"
+          }
+        }
+      }
+    },
+    "/api/courses/{id}/publish": {
+      "patch": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Publier un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours publié"
+          }
+        }
+      }
+    },
+    "/api/courses/{id}/unpublish": {
+      "patch": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Dépublier un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cours dépublié"
+          }
+        }
+      }
+    },
+    "/api/courses/instructor/{instructorId}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "summary": "Récupérer les cours d'un professeur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "instructorId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du professeur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des cours du professeur",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Course"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/enrollments": {
+      "post": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Créer une nouvelle inscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enrollment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Inscription créée avec succès"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer toutes les inscriptions",
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/user/{userId}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer les inscriptions d'un utilisateur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/{id}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer une inscription par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Mettre à jour une inscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enrollment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inscription mise à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Supprimer une inscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription supprimée"
+          }
+        }
+      }
+    },
+    "/api/enrollments/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer les inscriptions d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/status/{status}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer les inscriptions par statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "completed",
+                "cancelled"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions"
+          }
+        }
+      }
+    },
+    "/api/enrollments/user/{userId}/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Récupérer l'inscription d'un utilisateur à un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription trouvée"
+          }
+        }
+      }
+    },
+    "/api/enrollments/{id}/progress": {
+      "patch": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Mettre à jour la progression",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "progress": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Progression mise à jour"
+          }
+        }
+      }
+    },
+    "/api/enrollments/{id}/status": {
+      "patch": {
+        "tags": [
+          "Enrollments"
+        ],
+        "summary": "Mettre à jour le statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "completed",
+                      "cancelled"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Statut mis à jour"
+          }
+        }
+      }
+    },
+    "/api/exercises": {
+      "post": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Créer un nouvel exercice",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exercise"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exercice créé"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer tous les exercices",
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/{id}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer un exercice par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exercice trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Mettre à jour un exercice",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Exercise"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exercice mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Supprimer un exercice",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exercice supprimé"
+          }
+        }
+      }
+    },
+    "/api/exercises/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/chapter/{chapterId}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices d'un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chapterId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/type/{type}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices par type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "quiz",
+                "coding",
+                "essay"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/api/exercises/difficulty/{difficulty}": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Récupérer les exercices par difficulté",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "difficulty",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des exercices"
+          }
+        }
+      }
+    },
+    "/faqs": {
+      "post": {
+        "summary": "Créer une nouvelle FAQ",
+        "tags": [
+          "FAQ"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question",
+                  "answer",
+                  "category",
+                  "order"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "example": "Comment payer un cours ?"
+                  },
+                  "answer": {
+                    "type": "string",
+                    "example": "Vous pouvez payer via Orange Money, Wave ou Free Money"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "general",
+                      "payments",
+                      "courses",
+                      "enrollment",
+                      "certificates",
+                      "technical",
+                      "account",
+                      "referral"
+                    ]
+                  },
+                  "order": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "paiement",
+                      "orange-money"
+                    ]
+                  },
+                  "isActive": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "FAQ créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupérer toutes les FAQs",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrer par catégorie"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filtrer par statut actif"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nombre maximum de résultats"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des FAQs"
+          }
+        }
+      }
+    },
+    "/faqs/search": {
+      "get": {
+        "summary": "Rechercher des FAQs",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Texte à rechercher"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Résultats de la recherche"
+          }
+        }
+      }
+    },
+    "/faqs/stats": {
+      "get": {
+        "summary": "Récupérer les statistiques des FAQs",
+        "tags": [
+          "FAQ"
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistiques"
+          }
+        }
+      }
+    },
+    "/faqs/category/{category}": {
+      "get": {
+        "summary": "Récupérer les FAQs par catégorie",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "general",
+                "payments",
+                "courses",
+                "enrollment",
+                "certificates",
+                "technical",
+                "account",
+                "referral"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQs de la catégorie"
+          }
+        }
+      }
+    },
+    "/faqs/{id}": {
+      "get": {
+        "summary": "Récupérer une FAQ par ID",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ trouvée"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      },
+      "put": {
+        "summary": "Mettre à jour une FAQ",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "FAQ mise à jour"
+          },
+          "404": {
+            "description": "FAQ non trouvée"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer une FAQ",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ supprimée"
+          }
+        }
+      }
+    },
+    "/faqs/{id}/helpful": {
+      "post": {
+        "summary": "Marquer une FAQ comme utile ou pas",
+        "tags": [
+          "FAQ"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "helpful"
+                ],
+                "properties": {
+                  "helpful": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback enregistré"
+          }
+        }
+      }
+    },
+    "/api/instructors": {
+      "post": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Créer un nouvel instructeur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Instructor"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Instructeur créé"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer tous les instructeurs",
+        "responses": {
+          "200": {
+            "description": "Liste des instructeurs"
+          }
+        }
+      }
+    },
+    "/api/instructors/{id}": {
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer un instructeur par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instructeur trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Mettre à jour un instructeur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Instructor"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Instructeur mis à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Supprimer un instructeur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instructeur supprimé"
+          }
+        }
+      }
+    },
+    "/api/instructors/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer les instructeurs d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des instructeurs"
+          }
+        }
+      }
+    },
+    "/api/instructors/expertise/{expertiseId}": {
+      "get": {
+        "tags": [
+          "Instructors"
+        ],
+        "summary": "Récupérer les instructeurs par expertise",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "expertiseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des instructeurs"
+          }
+        }
+      }
+    },
+    "/api/lessons": {
+      "post": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Créer une nouvelle leçon",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Leçon créée"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer toutes les leçons",
+        "responses": {
+          "200": {
+            "description": "Liste des leçons"
+          }
+        }
+      }
+    },
+    "/api/lessons/{id}": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer une leçon par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leçon trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Mettre à jour une leçon",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Leçon mise à jour"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Supprimer une leçon",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leçon supprimée"
+          }
+        }
+      }
+    },
+    "/api/lessons/course/{courseId}": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer les leçons d'un cours",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des leçons"
+          }
+        }
+      }
+    },
+    "/api/lessons/chapter/{chapterId}": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Récupérer les leçons d'un chapitre",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chapterId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des leçons"
+          }
+        }
+      }
+    },
+    "/api/matieres": {
+      "get": {
+        "tags": [
+          "Matieres"
+        ],
+        "summary": "Récupérer toutes les matières actives",
+        "responses": {
+          "200": {
+            "description": "Liste de toutes les matières actives",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Matiere"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Matieres"
+        ],
+        "summary": "Créer une nouvelle matière (Admin uniquement)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "nom",
+                  "classe",
+                  "niveauScolaire"
+                ],
+                "properties": {
+                  "nom": {
+                    "type": "string",
+                    "example": "Mathématiques"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Matière scientifique fondamentale"
+                  },
+                  "classe": {
+                    "type": "string",
+                    "example": "3ème (BFEM)"
+                  },
+                  "niveauScolaire": {
+                    "type": "string",
+                    "enum": [
+                      "ELEMENTAIRE",
+                      "MOYEN",
+                      "SECONDAIRE",
+                      "UNIVERSITAIRE"
+                    ]
+                  },
+                  "icon": {
+                    "type": "string",
+                    "example": "🔢"
+                  },
+                  "color": {
+                    "type": "string",
+                    "example": "#4CAF50"
+                  },
+                  "ordre": {
+                    "type": "number",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Matière créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      }
+    },
+    "/api/matieres/niveau/{niveau}": {
+      "get": {
+        "tags": [
+          "Matieres"
+        ],
+        "summary": "Récupérer les matières par niveau scolaire",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "niveau",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ELEMENTAIRE",
+                "MOYEN",
+                "SECONDAIRE",
+                "UNIVERSITAIRE"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des matières pour ce niveau"
+          }
+        }
+      }
+    },
+    "/api/matieres/classe/{classe}": {
+      "get": {
+        "tags": [
+          "Matieres"
+        ],
+        "summary": "Récupérer les matières par classe précise",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "classe",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "3ème (BFEM)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des matières pour cette classe"
+          }
+        }
+      }
+    },
+    "/api/matieres/{id}": {
+      "get": {
+        "tags": [
+          "Matieres"
+        ],
+        "summary": "Récupérer une matière par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails de la matière",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Matiere"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Matière non trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Matieres"
+        ],
+        "summary": "Mettre à jour une matière (Admin uniquement)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nom": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string"
+                  },
+                  "color": {
+                    "type": "string"
+                  },
+                  "ordre": {
+                    "type": "number"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matière mise à jour"
+          },
+          "404": {
+            "description": "Matière non trouvée"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Matieres"
+        ],
+        "summary": "Supprimer une matière (soft delete, Admin uniquement)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matière désactivée"
+          },
+          "404": {
+            "description": "Matière non trouvée"
+          }
+        }
+      }
+    },
+    "/api/payments": {
+      "post": {
+        "summary": "Crée un nouveau paiement",
+        "tags": [
+          "Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "enrollmentId",
+                  "courseId",
+                  "amount",
+                  "paymentMethod"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "enrollmentId": {
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "default": "XOF"
+                  },
+                  "paymentMethod": {
+                    "type": "string",
+                    "enum": [
+                      "orange-money",
+                      "wave",
+                      "free-money",
+                      "card"
+                    ]
+                  },
+                  "customerPhoneNumber": {
+                    "type": "string",
+                    "description": "Requis pour orange-money"
+                  },
+                  "customerFirstName": {
+                    "type": "string"
+                  },
+                  "customerLastName": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Paiement créé avec succès"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupère tous les paiements",
+        "tags": [
+          "Payments"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/{id}": {
+      "get": {
+        "summary": "Récupère un paiement par ID",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiement trouvé"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprime un paiement",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiement supprimé"
+          }
+        }
+      }
+    },
+    "/api/payments/user/{userId}": {
+      "get": {
+        "summary": "Récupère tous les paiements d'un utilisateur",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/enrollment/{enrollmentId}": {
+      "get": {
+        "summary": "Récupère tous les paiements d'une inscription",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollmentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/status/{status}": {
+      "get": {
+        "summary": "Récupère tous les paiements par statut",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "SUCCESS",
+                "FAILED",
+                "CANCELLED",
+                "EXPIRED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des paiements"
+          }
+        }
+      }
+    },
+    "/api/payments/{id}/check": {
+      "get": {
+        "summary": "Vérifie le statut d'un paiement Orange Money",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statut du paiement"
+          }
+        }
+      }
+    },
+    "/api/payments/{id}/cancel": {
+      "post": {
+        "summary": "Annule un paiement en attente",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiement annulé"
+          }
+        }
+      }
+    },
+    "/api/payments/webhook/orange-money": {
+      "post": {
+        "summary": "Webhook pour les notifications Orange Money",
+        "tags": [
+          "Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook traité"
+          }
+        }
+      }
+    },
+    "/push-notifications/register-token": {
+      "post": {
+        "summary": "Enregistrer un token FCM",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "token",
+                  "platform"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token FCM du device"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "web"
+                    ],
+                    "description": "Plateforme du device"
+                  },
+                  "deviceId": {
+                    "type": "string",
+                    "description": "ID unique du device"
+                  },
+                  "deviceName": {
+                    "type": "string",
+                    "description": "Nom du device"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token enregistré avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          }
+        }
+      }
+    },
+    "/push-notifications/remove-token": {
+      "delete": {
+        "summary": "Supprimer un token FCM",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "token"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token supprimé avec succès"
+          }
+        }
+      }
+    },
+    "/push-notifications/send-test": {
+      "post": {
+        "summary": "Envoyer une notification test",
+        "tags": [
+          "Push Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification envoyée"
+          }
+        }
+      }
+    },
+    "/push-notifications/user/{userId}": {
+      "get": {
+        "summary": "Récupérer les notifications d'un utilisateur",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des notifications"
+          }
+        }
+      }
+    },
+    "/push-notifications/{id}/read": {
+      "patch": {
+        "summary": "Marquer une notification comme lue",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marquée comme lue"
+          }
+        }
+      }
+    },
+    "/push-notifications/tokens/{userId}": {
+      "get": {
+        "summary": "Récupérer les tokens FCM d'un utilisateur (debug)",
+        "tags": [
+          "Push Notifications"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des tokens"
+          }
+        }
+      }
+    },
+    "/api/referrals/generate": {
+      "post": {
+        "summary": "Génère un nouveau lien de parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur parrain"
+                  },
+                  "bonusAmount": {
+                    "type": "number",
+                    "description": "Montant du bonus en centimes (défaut 500)"
+                  },
+                  "bonusType": {
+                    "type": "string",
+                    "enum": [
+                      "DISCOUNT",
+                      "FREE_COURSE",
+                      "POINTS"
+                    ],
+                    "description": "Type de bonus (défaut DISCOUNT)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lien de parrainage créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "deepLink": {
+                          "type": "string"
+                        },
+                        "webLink": {
+                          "type": "string"
+                        },
+                        "shareText": {
+                          "type": "string"
+                        },
+                        "bonusAmount": {
+                          "type": "number"
+                        },
+                        "expiresAt": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/user/{userId}": {
+      "get": {
+        "summary": "Récupère tous les parrainages d'un utilisateur",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des parrainages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Referral"
+                      }
+                    },
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/user/{userId}/stats": {
+      "get": {
+        "summary": "Récupère les statistiques de parrainage d'un utilisateur",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistiques de parrainage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReferralStats"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/track-click": {
+      "post": {
+        "summary": "Enregistre un clic sur un lien de parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Code de parrainage"
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "Source du clic (whatsapp, sms, email, etc.)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Clic enregistré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "clicks": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Code manquant"
+          },
+          "404": {
+            "description": "Code non trouvé ou expiré"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/validate": {
+      "post": {
+        "summary": "Valide un code de parrainage lors de l'inscription",
+        "tags": [
+          "Referrals"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code",
+                  "userId"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Code de parrainage"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID du nouvel utilisateur"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Code validé et bonus appliqué",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "bonusAmount": {
+                          "type": "number"
+                        },
+                        "bonusType": {
+                          "type": "string"
+                        },
+                        "referrerId": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides ou code invalide"
+          },
+          "404": {
+            "description": "Code non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/code/{code}": {
+      "get": {
+        "summary": "Récupère un parrainage par son code",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Code de parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails du parrainage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Referral"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Code non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/{id}": {
+      "get": {
+        "summary": "Récupère un parrainage par ID",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails du parrainage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Referral"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parrainage non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprime un parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parrainage supprimé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals": {
+      "get": {
+        "summary": "Récupère tous les parrainages (Admin)",
+        "tags": [
+          "Referrals"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de tous les parrainages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Referral"
+                      }
+                    },
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/referrals/{id}/cancel": {
+      "post": {
+        "summary": "Annule un parrainage",
+        "tags": [
+          "Referrals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du parrainage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parrainage annulé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/create-payment": {
+      "post": {
+        "summary": "Créer un paiement Wave pour un abonnement à une catégorie",
+        "tags": [
+          "Subscriptions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plan",
+                  "userId",
+                  "category"
+                ],
+                "properties": {
+                  "plan": {
+                    "type": "string",
+                    "enum": [
+                      "MONTHLY",
+                      "QUARTERLY",
+                      "ANNUAL"
+                    ],
+                    "description": "Plan d'abonnement",
+                    "example": "MONTHLY"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur",
+                    "example": "VLzZCBlJstQOWhJy9Xg4MEO7ESK2"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Catégorie de cours à débloquer",
+                    "example": "Mathématiques"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "paymentUrl": {
+                          "type": "string",
+                          "description": "URL de redirection vers Wave",
+                          "example": "https://checkout.wave.com/pay/abc123"
+                        },
+                        "paymentId": {
+                          "type": "string",
+                          "example": "wave_12345"
+                        },
+                        "subscriptionId": {
+                          "type": "string",
+                          "example": "sub_abc123"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 3000
+                        },
+                        "plan": {
+                          "type": "string",
+                          "example": "MONTHLY"
+                        },
+                        "category": {
+                          "type": "string",
+                          "example": "Mathématiques"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "XOF"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Paiement d'abonnement créé pour la catégorie \"Mathématiques\""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides ou abonnement actif existant pour cette catégorie"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/active/{userId}": {
+      "get": {
+        "summary": "Obtenir l'abonnement actif d'un utilisateur",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abonnement actif trouvé"
+          },
+          "404": {
+            "description": "Aucun abonnement actif"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/user/{userId}": {
+      "get": {
+        "summary": "Obtenir tous les abonnements d'un utilisateur",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des abonnements"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/{subscriptionId}/cancel": {
+      "post": {
+        "summary": "Annuler un abonnement",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscriptionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'abonnement"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abonnement annulé avec succès"
+          }
+        }
+      }
+    },
+    "/api/subscriptions/check-access/{userId}": {
+      "get": {
+        "summary": "Vérifier les abonnements actifs d'un utilisateur",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statut d'accès avec liste des abonnements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "hasUnlimitedAccess": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "activeSubscriptions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "category": {
+                                "type": "string",
+                                "example": "Mathématiques"
+                              },
+                              "plan": {
+                                "type": "string",
+                                "example": "MONTHLY"
+                              },
+                              "endDate": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload/course-documents/{courseId}": {
+      "post": {
+        "summary": "Upload de documents PDF pour un cours",
+        "tags": [
+          "Upload"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du cours"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Fichiers PDF à uploader (max 10MB chacun, max 10 fichiers)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Documents uploadés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "uploadedFiles": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "url": {
+                                "type": "string"
+                              },
+                              "size": {
+                                "type": "number"
+                              },
+                              "uploadedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "totalDocuments": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Aucun fichier fourni"
+          },
+          "404": {
+            "description": "Cours non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupérer les documents d'un cours",
+        "tags": [
+          "Upload"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du cours"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des documents",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "documents": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "url": {
+                                "type": "string"
+                              },
+                              "size": {
+                                "type": "number"
+                              },
+                              "uploadedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "count": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cours non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un document d'un cours",
+        "tags": [
+          "Upload"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du cours"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documentUrl": {
+                    "type": "string",
+                    "description": "URL du document à supprimer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document supprimé avec succès"
+          },
+          "400": {
+            "description": "URL du document requise"
+          },
+          "404": {
+            "description": "Cours non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/upload/exercise-documents/{exerciseId}": {
+      "post": {
+        "summary": "Upload de documents PDF pour un exercice",
+        "tags": [
+          "Upload"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "exerciseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'exercice"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Fichiers PDF à uploader (max 10MB chacun, max 10 fichiers)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Documents uploadés avec succès"
+          },
+          "404": {
+            "description": "Exercice non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupérer les documents d'un exercice",
+        "tags": [
+          "Upload"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "exerciseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'exercice"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des documents"
+          },
+          "404": {
+            "description": "Exercice non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un document d'un exercice",
+        "tags": [
+          "Upload"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "exerciseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'exercice"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documentUrl": {
+                    "type": "string",
+                    "description": "URL du document à supprimer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document supprimé avec succès"
+          },
+          "404": {
+            "description": "Exercice non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Créer un nouvel utilisateur",
+        "description": "Crée un utilisateur avec authentification Firebase automatique",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Utilisateur créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur de validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer tous les utilisateurs",
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    },
+                    "count": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/classes-disponibles": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtenir toutes les classes disponibles par niveau",
+        "responses": {
+          "200": {
+            "description": "Liste des classes par niveau scolaire"
+          }
+        }
+      }
+    },
+    "/api/users/classes-disponibles/{niveau}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtenir les classes pour un niveau spécifique",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "niveau",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ELEMENTAIRE",
+                "MOYEN",
+                "SECONDAIRE",
+                "UNIVERSITAIRE"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des classes pour ce niveau"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer un utilisateur par ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du document Firestore"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur trouvé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Mettre à jour un utilisateur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Utilisateur mis à jour"
+          },
+          "400": {
+            "description": "Erreur de validation"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Supprimer un utilisateur",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur supprimé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/users/email/{email}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer un utilisateur par email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur trouvé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      }
+    },
+    "/api/users/phone/{phone}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer un utilisateur par téléphone",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "phone",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "+221771234567"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur trouvé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        }
+      }
+    },
+    "/api/users/role/{role}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer les utilisateurs par rôle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "role",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "student",
+                "instructor",
+                "admin"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs"
+          }
+        }
+      }
+    },
+    "/api/users/status/{status}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Récupérer les utilisateurs par statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "suspended"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/profile-image": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Mettre à jour l'image de profil",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profileImageBase64": {
+                    "type": "string",
+                    "description": "Image en base64"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image mise à jour"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/status": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Mettre à jour le statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "inactive",
+                      "suspended"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Statut mis à jour"
+          }
+        }
+      }
+    },
+    "/api/wave/create-payment": {
+      "post": {
+        "summary": "Créer un paiement Wave pour un cours",
+        "tags": [
+          "Wave Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "courseId",
+                  "userId"
+                ],
+                "properties": {
+                  "courseId": {
+                    "type": "string",
+                    "description": "ID du cours à acheter",
+                    "example": "javascript-intro-001"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur",
+                    "example": "uGbrU72VFWfWZcUkvk31QaOi7tG3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "paymentUrl": {
+                          "type": "string",
+                          "description": "URL de redirection vers Wave",
+                          "example": "https://checkout.wave.com/pay/abc123"
+                        },
+                        "paymentId": {
+                          "type": "string",
+                          "example": "wave_12345"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 15000
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "XOF"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Paiement Wave créé avec succès"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données manquantes ou invalides"
+          },
+          "404": {
+            "description": "Cours ou utilisateur non trouvé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/wave/payment-status/{paymentId}": {
+      "get": {
+        "summary": "Vérifier le statut d'un paiement Wave",
+        "tags": [
+          "Wave Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paymentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du paiement Wave"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statut du paiement récupéré",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "wave_12345"
+                        },
+                        "checkout_status": {
+                          "type": "string",
+                          "enum": [
+                            "pending",
+                            "successful",
+                            "cancelled",
+                            "failed"
+                          ],
+                          "example": "successful"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 15000
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "XOF"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erreur lors de la récupération du statut"
+          }
+        }
+      }
+    },
+    "/api/wave/confirm-payment": {
+      "post": {
+        "summary": "Confirmer un paiement après retour depuis Wave",
+        "tags": [
+          "Wave Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "paymentId",
+                  "userId",
+                  "courseId"
+                ],
+                "properties": {
+                  "paymentId": {
+                    "type": "string",
+                    "description": "ID du paiement Wave",
+                    "example": "wave_12345"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID de l'utilisateur",
+                    "example": "uGbrU72VFWfWZcUkvk31QaOi7tG3"
+                  },
+                  "courseId": {
+                    "type": "string",
+                    "description": "ID du cours",
+                    "example": "javascript-intro-001"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement confirmé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "completed"
+                        },
+                        "enrollmentCreated": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Paiement confirmé et inscription créée"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Paiement non confirmé ou données invalides"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/wave/webhook": {
+      "post": {
+        "summary": "Webhook Wave pour les notifications de paiement",
+        "tags": [
+          "Wave Payments"
+        ],
+        "description": "Endpoint appelé par Wave pour notifier les changements de statut de paiement",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "checkout.completed"
+                  },
+                  "data": {
+                    "type": "object",
+                    "description": "Données du paiement Wave"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook traité avec succès"
+          },
+          "401": {
+            "description": "Signature invalide"
+          },
+          "500": {
+            "description": "Erreur lors du traitement du webhook"
+          }
+        }
+      }
+    }
+  }
+}

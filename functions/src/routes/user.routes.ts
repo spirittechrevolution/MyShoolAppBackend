@@ -6,7 +6,7 @@ const userController = new UserController();
 
 /**
  * @swagger
- * /api/users:
+ * /users:
  *   post:
  *     tags: [Users]
  *     summary: Créer un nouvel utilisateur
@@ -35,7 +35,38 @@ router.post('/', (req, res) => userController.create(req, res));
 
 /**
  * @swagger
- * /api/users:
+ * /users/classes-disponibles:
+ *   get:
+ *     tags: [Users]
+ *     summary: Obtenir toutes les classes disponibles par niveau
+ *     responses:
+ *       200:
+ *         description: Liste des classes par niveau scolaire
+ */
+router.get('/classes-disponibles', (req, res) => userController.getAvailableClasses(req, res));
+
+/**
+ * @swagger
+ * /users/classes-disponibles/{niveau}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Obtenir les classes pour un niveau spécifique
+ *     parameters:
+ *       - in: path
+ *         name: niveau
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [ELEMENTAIRE, MOYEN, SECONDAIRE, UNIVERSITAIRE]
+ *     responses:
+ *       200:
+ *         description: Liste des classes pour ce niveau
+ */
+router.get('/classes-disponibles/:niveau', (req, res) => userController.getClassesByNiveau(req, res));
+
+/**
+ * @swagger
+ * /users:
  *   get:
  *     tags: [Users]
  *     summary: Récupérer tous les utilisateurs
@@ -60,7 +91,7 @@ router.get('/', (req, res) => userController.getAll(req, res));
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   get:
  *     tags: [Users]
  *     summary: Récupérer un utilisateur par ID
@@ -81,7 +112,7 @@ router.get('/:id', (req, res) => userController.getById(req, res));
 
 /**
  * @swagger
- * /api/users/email/{email}:
+ * /users/email/{email}:
  *   get:
  *     tags: [Users]
  *     summary: Récupérer un utilisateur par email
@@ -101,7 +132,7 @@ router.get('/email/:email', (req, res) => userController.getByEmail(req, res));
 
 /**
  * @swagger
- * /api/users/phone/{phone}:
+ * /users/phone/{phone}:
  *   get:
  *     tags: [Users]
  *     summary: Récupérer un utilisateur par téléphone
@@ -122,7 +153,7 @@ router.get('/phone/:phone', (req, res) => userController.getByPhone(req, res));
 
 /**
  * @swagger
- * /api/users/role/{role}:
+ * /users/role/{role}:
  *   get:
  *     tags: [Users]
  *     summary: Récupérer les utilisateurs par rôle
@@ -141,7 +172,7 @@ router.get('/role/:role', (req, res) => userController.getByRole(req, res));
 
 /**
  * @swagger
- * /api/users/status/{status}:
+ * /users/status/{status}:
  *   get:
  *     tags: [Users]
  *     summary: Récupérer les utilisateurs par statut
@@ -160,7 +191,7 @@ router.get('/status/:status', (req, res) => userController.getByStatus(req, res)
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   put:
  *     tags: [Users]
  *     summary: Mettre à jour un utilisateur
@@ -186,7 +217,7 @@ router.put('/:id', (req, res) => userController.update(req, res));
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   delete:
  *     tags: [Users]
  *     summary: Supprimer un utilisateur
@@ -206,7 +237,7 @@ router.delete('/:id', (req, res) => userController.delete(req, res));
 
 /**
  * @swagger
- * /api/users/{id}/profile-image:
+ * /users/{id}/profile-image:
  *   patch:
  *     tags: [Users]
  *     summary: Mettre à jour l'image de profil
@@ -234,7 +265,7 @@ router.patch('/:id/profile-image', (req, res) => userController.updateProfileIma
 
 /**
  * @swagger
- * /api/users/{id}/status:
+ * /users/{id}/status:
  *   patch:
  *     tags: [Users]
  *     summary: Mettre à jour le statut

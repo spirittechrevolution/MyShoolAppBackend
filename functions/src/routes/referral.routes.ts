@@ -95,7 +95,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/referrals/generate:
+ * /referrals/generate:
  *   post:
  *     summary: Génère un nouveau lien de parrainage
  *     tags: [Referrals]
@@ -152,7 +152,7 @@ router.post('/generate', (req, res) => referralController.generateReferralLink(r
 
 /**
  * @swagger
- * /api/referrals/user/{userId}:
+ * /referrals/user/{userId}:
  *   get:
  *     summary: Récupère tous les parrainages d'un utilisateur
  *     tags: [Referrals]
@@ -186,7 +186,7 @@ router.get('/user/:userId', (req, res) => referralController.getUserReferrals(re
 
 /**
  * @swagger
- * /api/referrals/user/{userId}/stats:
+ * /referrals/user/{userId}/stats:
  *   get:
  *     summary: Récupère les statistiques de parrainage d'un utilisateur
  *     tags: [Referrals]
@@ -216,7 +216,7 @@ router.get('/user/:userId/stats', (req, res) => referralController.getUserStats(
 
 /**
  * @swagger
- * /api/referrals/track-click:
+ * /referrals/track-click:
  *   post:
  *     summary: Enregistre un clic sur un lien de parrainage
  *     tags: [Referrals]
@@ -265,7 +265,7 @@ router.post('/track-click', (req, res) => referralController.trackClick(req, res
 
 /**
  * @swagger
- * /api/referrals/validate:
+ * /referrals/validate:
  *   post:
  *     summary: Valide un code de parrainage lors de l'inscription
  *     tags: [Referrals]
@@ -317,7 +317,7 @@ router.post('/validate', (req, res) => referralController.validateReferralCode(r
 
 /**
  * @swagger
- * /api/referrals/code/{code}:
+ * /referrals/code/{code}:
  *   get:
  *     summary: Récupère un parrainage par son code
  *     tags: [Referrals]
@@ -349,7 +349,7 @@ router.get('/code/:code', (req, res) => referralController.getReferralByCode(req
 
 /**
  * @swagger
- * /api/referrals/{id}:
+ * /referrals/{id}:
  *   get:
  *     summary: Récupère un parrainage par ID
  *     tags: [Referrals]
@@ -381,7 +381,7 @@ router.get('/:id', (req, res) => referralController.getById(req, res));
 
 /**
  * @swagger
- * /api/referrals:
+ * /referrals:
  *   get:
  *     summary: Récupère tous les parrainages (Admin)
  *     tags: [Referrals]
@@ -408,7 +408,7 @@ router.get('/', (req, res) => referralController.getAll(req, res));
 
 /**
  * @swagger
- * /api/referrals/{id}/cancel:
+ * /referrals/{id}/cancel:
  *   post:
  *     summary: Annule un parrainage
  *     tags: [Referrals]
@@ -438,7 +438,7 @@ router.post('/:id/cancel', (req, res) => referralController.cancel(req, res));
 
 /**
  * @swagger
- * /api/referrals/{id}:
+ * /referrals/{id}:
  *   delete:
  *     summary: Supprime un parrainage
  *     tags: [Referrals]

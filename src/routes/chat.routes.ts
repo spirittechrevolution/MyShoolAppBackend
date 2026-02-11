@@ -85,6 +85,73 @@ router.get('/history/:userId', (req, res) => faqController.getConversationHistor
 
 /**
  * @swagger
+ * /api/chat/last/{userId}:
+ *   get:
+ *     summary: Récupérer le dernier message de chat d'un utilisateur
+ *     tags: [AI Chat]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Dernier message de chat
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     lastMessage:
+ *                       type: object
+ *                       properties:
+ *                         role:
+ *                           type: string
+ *                           enum: [user, assistant]
+ *                           example: assistant
+ *                         content:
+ *                           type: string
+ *                           example: "Voici la réponse à votre question..."
+ *                         timestamp:
+ *                           type: string
+ *                           format: date-time
+ *                         faqId:
+ *                           type: string
+ *                           description: ID de la FAQ source (si applicable)
+ *                         helpful:
+ *                           type: boolean
+ *                           description: Feedback utilisateur
+ *                     userId:
+ *                       type: string
+ *                       example: uGbrU72VFWfWZcUkvk31QaOi7tG3
+ *       404:
+ *         description: Aucun message trouvé pour cet utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Aucun message trouvé pour cet utilisateur"
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get('/last/:userId', (req, res) => faqController.getLastChat(req, res));
+
+/**
+ * @swagger
  * /api/chat/feedback:
  *   post:
  *     summary: Marquer un message comme utile ou pas

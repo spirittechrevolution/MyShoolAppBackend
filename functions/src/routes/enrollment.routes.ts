@@ -6,7 +6,7 @@ const enrollmentController = new EnrollmentController();
 
 /**
  * @swagger
- * /api/enrollments:
+ * /enrollments:
  *   post:
  *     tags: [Enrollments]
  *     summary: Créer une nouvelle inscription
@@ -24,7 +24,7 @@ router.post('/', (req, res) => enrollmentController.create(req, res));
 
 /**
  * @swagger
- * /api/enrollments:
+ * /enrollments:
  *   get:
  *     tags: [Enrollments]
  *     summary: Récupérer toutes les inscriptions
@@ -36,7 +36,7 @@ router.get('/', (req, res) => enrollmentController.getAll(req, res));
 
 /**
  * @swagger
- * /api/enrollments/user/{userId}:
+ * /enrollments/user/{userId}:
  *   get:
  *     tags: [Enrollments]
  *     summary: Récupérer les inscriptions d'un utilisateur
@@ -54,7 +54,7 @@ router.get('/user/:userId', (req, res) => enrollmentController.getByUserId(req, 
 
 /**
  * @swagger
- * /api/enrollments/{id}:
+ * /enrollments/{id}:
  *   get:
  *     tags: [Enrollments]
  *     summary: Récupérer une inscription par ID
@@ -72,7 +72,7 @@ router.get('/:id', (req, res) => enrollmentController.getById(req, res));
 
 /**
  * @swagger
- * /api/enrollments/course/{courseId}:
+ * /enrollments/course/{courseId}:
  *   get:
  *     tags: [Enrollments]
  *     summary: Récupérer les inscriptions d'un cours
@@ -90,7 +90,7 @@ router.get('/course/:courseId', (req, res) => enrollmentController.getByCourseId
 
 /**
  * @swagger
- * /api/enrollments/status/{status}:
+ * /enrollments/status/{status}:
  *   get:
  *     tags: [Enrollments]
  *     summary: Récupérer les inscriptions par statut
@@ -109,7 +109,7 @@ router.get('/status/:status', (req, res) => enrollmentController.getByStatus(req
 
 /**
  * @swagger
- * /api/enrollments/user/{userId}/course/{courseId}:
+ * /enrollments/user/{userId}/course/{courseId}:
  *   get:
  *     tags: [Enrollments]
  *     summary: Récupérer l'inscription d'un utilisateur à un cours
@@ -132,7 +132,7 @@ router.get('/user/:userId/course/:courseId', (req, res) => enrollmentController.
 
 /**
  * @swagger
- * /api/enrollments/{id}:
+ * /enrollments/{id}:
  *   put:
  *     tags: [Enrollments]
  *     summary: Mettre à jour une inscription
@@ -156,7 +156,7 @@ router.put('/:id', (req, res) => enrollmentController.update(req, res));
 
 /**
  * @swagger
- * /api/enrollments/{id}:
+ * /enrollments/{id}:
  *   delete:
  *     tags: [Enrollments]
  *     summary: Supprimer une inscription
@@ -174,7 +174,7 @@ router.delete('/:id', (req, res) => enrollmentController.delete(req, res));
 
 /**
  * @swagger
- * /api/enrollments/{id}/progress:
+ * /enrollments/{id}/progress:
  *   patch:
  *     tags: [Enrollments]
  *     summary: Mettre à jour la progression
@@ -203,7 +203,7 @@ router.patch('/:id/progress', (req, res) => enrollmentController.updateProgress(
 
 /**
  * @swagger
- * /api/enrollments/{id}/status:
+ * /enrollments/{id}/status:
  *   patch:
  *     tags: [Enrollments]
  *     summary: Mettre à jour le statut

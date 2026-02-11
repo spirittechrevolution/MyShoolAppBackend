@@ -6,7 +6,7 @@ const instructorController = new InstructorController();
 
 /**
  * @swagger
- * /api/instructors:
+ * /instructors:
  *   post:
  *     tags: [Instructors]
  *     summary: Créer un nouvel instructeur
@@ -24,7 +24,7 @@ router.post('/', (req, res) => instructorController.create(req, res));
 
 /**
  * @swagger
- * /api/instructors:
+ * /instructors:
  *   get:
  *     tags: [Instructors]
  *     summary: Récupérer tous les instructeurs
@@ -36,7 +36,7 @@ router.get('/', (req, res) => instructorController.getAll(req, res));
 
 /**
  * @swagger
- * /api/instructors/{id}:
+ * /instructors/{id}:
  *   get:
  *     tags: [Instructors]
  *     summary: Récupérer un instructeur par ID
@@ -54,7 +54,7 @@ router.get('/:id', (req, res) => instructorController.getById(req, res));
 
 /**
  * @swagger
- * /api/instructors/course/{courseId}:
+ * /instructors/course/{courseId}:
  *   get:
  *     tags: [Instructors]
  *     summary: Récupérer les instructeurs d'un cours
@@ -72,7 +72,7 @@ router.get('/course/:courseId', (req, res) => instructorController.getByCourse(r
 
 /**
  * @swagger
- * /api/instructors/expertise/{expertiseId}:
+ * /instructors/expertise/{expertiseId}:
  *   get:
  *     tags: [Instructors]
  *     summary: Récupérer les instructeurs par expertise
@@ -90,7 +90,7 @@ router.get('/expertise/:expertiseId', (req, res) => instructorController.getByEx
 
 /**
  * @swagger
- * /api/instructors/{id}:
+ * /instructors/{id}:
  *   put:
  *     tags: [Instructors]
  *     summary: Mettre à jour un instructeur
@@ -114,7 +114,7 @@ router.put('/:id', (req, res) => instructorController.update(req, res));
 
 /**
  * @swagger
- * /api/instructors/{id}:
+ * /instructors/{id}:
  *   delete:
  *     tags: [Instructors]
  *     summary: Supprimer un instructeur

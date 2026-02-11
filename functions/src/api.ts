@@ -15,6 +15,10 @@ import referralRoutes from './routes/referral.routes';
 import pushNotificationRoutes from './routes/push-notification.routes';
 import faqRoutes from './routes/faq.routes';
 import chatRoutes from './routes/chat.routes';
+import waveRoutes from './routes/wave.routes';
+import subscriptionRoutes from './routes/subscription.routes';
+import matiereRoutes from './routes/matiere.routes';
+import uploadRoutes from './routes/upload.routes';
 
 // Load environment variables (for local development)
 dotenv.config();
@@ -23,6 +27,7 @@ const app = express();
 
 // CORS Configuration - Autoriser plusieurs origins
 const allowedOrigins = [
+  'http://localhost:3000',
   'http://localhost:4200',
   'http://localhost:4201',
   'http://localhost:4202',
@@ -30,6 +35,7 @@ const allowedOrigins = [
   'http://localhost:4204',
   'http://localhost:4205',
   // Domaines de production
+  'https://beta.myschool.sn',
   'https://myschool-f862b.web.app',
   'https://myschool-f862b.firebaseapp.com',
   // URLs Cloud Functions pour Swagger UI
@@ -84,7 +90,10 @@ app.get('/', (req, res) => {
       referrals: '/referrals',
       pushNotifications: '/push-notifications',
       faqs: '/faqs',
-      chat: '/chat'
+      chat: '/chat',
+      wave: '/wave',
+      subscriptions: '/subscriptions',
+      matieres: '/matieres'
     }
   });
 });
@@ -146,7 +155,7 @@ app.get('/openapi.json', (req, res) => {
   res.json(swaggerDocument);
 });
 
-// API Routes (sans préfixe /api pour éviter le double /api dans l'URL)
+// API Routes (sans préfixe /api car la Cloud Function s'appelle déjà 'api')
 app.use('/users', userRoutes);
 app.use('/courses', courseRoutes);
 app.use('/chapters', chapterRoutes);
@@ -159,6 +168,10 @@ app.use('/referrals', referralRoutes);
 app.use('/push-notifications', pushNotificationRoutes);
 app.use('/faqs', faqRoutes);
 app.use('/chat', chatRoutes);
+app.use('/wave', waveRoutes);
+app.use('/subscriptions', subscriptionRoutes);
+app.use('/matieres', matiereRoutes);
+app.use('/upload', uploadRoutes);
 
 // 404 Handler
 app.use((req, res) => {

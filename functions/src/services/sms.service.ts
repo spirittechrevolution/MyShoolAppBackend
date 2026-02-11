@@ -170,7 +170,7 @@ export class SmsService {
     
 Inscris-toi avec le code ${referralCode} et reçois ${bonusAmount} FCFA de bonus! 
 
-📱 Télécharge l'app: https://myschool-app.com/join?ref=${referralCode}
+📱 Télécharge l'app: https://beta.myschool.sn/join?ref=${referralCode}
 
 MySchool - Apprends à ton rythme`;
 

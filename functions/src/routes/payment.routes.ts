@@ -10,7 +10,7 @@ const paymentController = new PaymentController();
 
 /**
  * @swagger
- * /api/payments:
+ * /payments:
  *   post:
  *     summary: Crée un nouveau paiement
  *     tags: [Payments]
@@ -58,7 +58,7 @@ router.post('/', (req, res) => paymentController.create(req, res));
 
 /**
  * @swagger
- * /api/payments:
+ * /payments:
  *   get:
  *     summary: Récupère tous les paiements
  *     tags: [Payments]
@@ -70,7 +70,7 @@ router.get('/', (req, res) => paymentController.getAll(req, res));
 
 /**
  * @swagger
- * /api/payments/{id}:
+ * /payments/{id}:
  *   get:
  *     summary: Récupère un paiement par ID
  *     tags: [Payments]
@@ -88,7 +88,7 @@ router.get('/:id', (req, res) => paymentController.getById(req, res));
 
 /**
  * @swagger
- * /api/payments/user/{userId}:
+ * /payments/user/{userId}:
  *   get:
  *     summary: Récupère tous les paiements d'un utilisateur
  *     tags: [Payments]
@@ -106,7 +106,7 @@ router.get('/user/:userId', (req, res) => paymentController.getByUserId(req, res
 
 /**
  * @swagger
- * /api/payments/enrollment/{enrollmentId}:
+ * /payments/enrollment/{enrollmentId}:
  *   get:
  *     summary: Récupère tous les paiements d'une inscription
  *     tags: [Payments]
@@ -124,7 +124,7 @@ router.get('/enrollment/:enrollmentId', (req, res) => paymentController.getByEnr
 
 /**
  * @swagger
- * /api/payments/status/{status}:
+ * /payments/status/{status}:
  *   get:
  *     summary: Récupère tous les paiements par statut
  *     tags: [Payments]
@@ -143,7 +143,7 @@ router.get('/status/:status', (req, res) => paymentController.getByStatus(req, r
 
 /**
  * @swagger
- * /api/payments/{id}/check:
+ * /payments/{id}/check:
  *   get:
  *     summary: Vérifie le statut d'un paiement Orange Money
  *     tags: [Payments]
@@ -161,7 +161,7 @@ router.get('/:id/check', (req, res) => paymentController.checkStatus(req, res));
 
 /**
  * @swagger
- * /api/payments/{id}/cancel:
+ * /payments/{id}/cancel:
  *   post:
  *     summary: Annule un paiement en attente
  *     tags: [Payments]
@@ -179,7 +179,7 @@ router.post('/:id/cancel', (req, res) => paymentController.cancel(req, res));
 
 /**
  * @swagger
- * /api/payments/webhook/orange-money:
+ * /payments/webhook/orange-money:
  *   post:
  *     summary: Webhook pour les notifications Orange Money
  *     tags: [Payments]
@@ -197,7 +197,7 @@ router.post('/webhook/orange-money', (req, res) => paymentController.handleWebho
 
 /**
  * @swagger
- * /api/payments/{id}:
+ * /payments/{id}:
  *   delete:
  *     summary: Supprime un paiement
  *     tags: [Payments]

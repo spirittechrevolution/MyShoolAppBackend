@@ -7,7 +7,7 @@ export class EnrollmentService {
   async create(enrollmentData: Partial<Enrollment>): Promise<EnrollmentModel> {
     const enrollment = new EnrollmentModel(enrollmentData);
     const docRef = await db.collection(this.collectionName).add(enrollment.toJSON());
-    enrollment.userId = docRef.id;
+    enrollment.id = docRef.id; // Assigner l'ID du document, pas remplacer userId
     return enrollment;
   }
 

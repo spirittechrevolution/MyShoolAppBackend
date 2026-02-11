@@ -1,8 +1,16 @@
+export type NiveauScolaire = 'ELEMENTAIRE' | 'MOYEN' | 'SECONDAIRE' | 'UNIVERSITAIRE';
+
 export interface Course {
   id: string;
   title: string;
   description: string;
-  category: string;
+  
+  // Nouveau système de hiérarchie
+  niveauScolaire: NiveauScolaire;  // ELEMENTAIRE, MOYEN, SECONDAIRE, UNIVERSITAIRE
+  matiereId?: string;              // ID de la matière (pour tous niveaux)
+  classe?: string;                 // Classe (pour ELEMENTAIRE uniquement: CM1, CM2, etc.)
+  
+  category: string;                // Sous-domaine du cours (Algèbre, Géométrie, etc.)
   type: 'En ligne' | 'VIDEO' | 'Hybrid';
   level: 'DEBUTANT' | 'INTERMEDIAIRE' | 'AVANCE';
   duration: number; // en minutes ou sessions
@@ -12,10 +20,20 @@ export interface Course {
   image: string;
   isPublished: boolean;
   certificateAvailable: boolean;
+  instructorId?: string; // ID du professeur qui enseigne ce cours
   chaptersIds: string[];
   chapters: any[];
   exercises: number;
   enrolledUsers?: string[];
+  
+  // Documents PDF
+  documents?: Array<{
+    name: string;        // Nom du fichier
+    url: string;         // URL de téléchargement
+    size?: number;       // Taille en octets
+    uploadedAt?: Date;   // Date d'upload
+  }>;
+  
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +42,11 @@ export class CourseModel implements Course {
   id: string;
   title: string;
   description: string;
+  
+  niveauScolaire: NiveauScolaire;
+  matiereId?: string;
+  classe?: string;
+  
   category: string;
   type: 'En ligne' | 'VIDEO' | 'Hybrid';
   level: 'DEBUTANT' | 'INTERMEDIAIRE' | 'AVANCE';
@@ -34,10 +57,18 @@ export class CourseModel implements Course {
   image: string;
   isPublished: boolean;
   certificateAvailable: boolean;
+  instructorId?: string;
   chaptersIds: string[];
   chapters: any[];
   exercises: number;
   enrolledUsers?: string[];
+  documents?: Array<{
+    name: string;
+    url: string;
+    size?: number;
+    uploadedAt?: Date;
+  }>;
+  
   createdAt: Date;
   updatedAt: Date;
 
@@ -45,6 +76,11 @@ export class CourseModel implements Course {
     this.id = data.id || '';
     this.title = data.title || '';
     this.description = data.description || '';
+    
+    this.niveauScolaire = data.niveauScolaire || 'MOYEN';
+    this.matiereId = data.matiereId;
+    this.classe = data.classe;
+    
     this.category = data.category || '';
     this.type = data.type || 'En ligne';
     this.level = data.level || 'DEBUTANT';
@@ -55,10 +91,12 @@ export class CourseModel implements Course {
     this.image = data.image || '';
     this.isPublished = data.isPublished !== undefined ? data.isPublished : false;
     this.certificateAvailable = data.certificateAvailable !== undefined ? data.certificateAvailable : false;
+    this.instructorId = data.instructorId;
     this.chaptersIds = data.chaptersIds || [];
     this.chapters = data.chapters || [];
     this.exercises = data.exercises || 0;
     this.enrolledUsers = data.enrolledUsers || [];
+    this.documents = data.documents || [];
     this.createdAt = data.createdAt || new Date();
     this.updatedAt = data.updatedAt || new Date();
   }
@@ -68,6 +106,11 @@ export class CourseModel implements Course {
       id: this.id,
       title: this.title,
       description: this.description,
+      
+      niveauScolaire: this.niveauScolaire,
+      matiereId: this.matiereId,
+      classe: this.classe,
+      
       category: this.category,
       type: this.type,
       level: this.level,
@@ -78,10 +121,12 @@ export class CourseModel implements Course {
       image: this.image,
       isPublished: this.isPublished,
       certificateAvailable: this.certificateAvailable,
+      instructorId: this.instructorId,
       chaptersIds: this.chaptersIds,
       chapters: this.chapters,
       exercises: this.exercises,
       enrolledUsers: this.enrolledUsers,
+      documents: this.documents,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };

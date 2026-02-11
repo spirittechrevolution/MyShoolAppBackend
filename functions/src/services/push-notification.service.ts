@@ -434,16 +434,28 @@ export class PushNotificationService {
    */
   async getUserNotifications(userId: string, limit: number = 50): Promise<PushNotification[]> {
     try {
+      // Version temporaire sans orderBy en attendant que l'index soit actif
       const snapshot = await this.notificationsCollection
         .where('userId', '==', userId)
-        .orderBy('createdAt', 'desc')
         .limit(limit)
         .get();
 
-      return snapshot.docs.map(doc => ({
+      const notifications = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       })) as PushNotification[];
+
+      // Tri manuel par createdAt en descendant en attendant l'index
+      notifications.sort((a, b) => {
+        const aTime = a.createdAt as any;
+        const bTime = b.createdAt as any;
+        if (aTime && bTime && aTime._seconds && bTime._seconds) {
+          return bTime._seconds - aTime._seconds;
+        }
+        return 0;
+      });
+
+      return notifications;
     } catch (error) {
       console.error('❌ Erreur lors de la récupération des notifications:', error);
       return [];

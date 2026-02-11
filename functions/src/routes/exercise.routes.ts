@@ -6,7 +6,7 @@ const exerciseController = new ExerciseController();
 
 /**
  * @swagger
- * /api/exercises:
+ * /exercises:
  *   post:
  *     tags: [Exercises]
  *     summary: Créer un nouvel exercice
@@ -24,7 +24,7 @@ router.post('/', (req, res) => exerciseController.create(req, res));
 
 /**
  * @swagger
- * /api/exercises:
+ * /exercises:
  *   get:
  *     tags: [Exercises]
  *     summary: Récupérer tous les exercices
@@ -36,7 +36,7 @@ router.get('/', (req, res) => exerciseController.getAll(req, res));
 
 /**
  * @swagger
- * /api/exercises/{id}:
+ * /exercises/{id}:
  *   get:
  *     tags: [Exercises]
  *     summary: Récupérer un exercice par ID
@@ -54,7 +54,7 @@ router.get('/:id', (req, res) => exerciseController.getById(req, res));
 
 /**
  * @swagger
- * /api/exercises/course/{courseId}:
+ * /exercises/course/{courseId}:
  *   get:
  *     tags: [Exercises]
  *     summary: Récupérer les exercices d'un cours
@@ -72,7 +72,7 @@ router.get('/course/:courseId', (req, res) => exerciseController.getByCourseId(r
 
 /**
  * @swagger
- * /api/exercises/chapter/{chapterId}:
+ * /exercises/chapter/{chapterId}:
  *   get:
  *     tags: [Exercises]
  *     summary: Récupérer les exercices d'un chapitre
@@ -90,7 +90,7 @@ router.get('/chapter/:chapterId', (req, res) => exerciseController.getByChapterI
 
 /**
  * @swagger
- * /api/exercises/type/{type}:
+ * /exercises/type/{type}:
  *   get:
  *     tags: [Exercises]
  *     summary: Récupérer les exercices par type
@@ -109,7 +109,7 @@ router.get('/type/:type', (req, res) => exerciseController.getByType(req, res));
 
 /**
  * @swagger
- * /api/exercises/difficulty/{difficulty}:
+ * /exercises/difficulty/{difficulty}:
  *   get:
  *     tags: [Exercises]
  *     summary: Récupérer les exercices par difficulté
@@ -127,7 +127,7 @@ router.get('/difficulty/:difficulty', (req, res) => exerciseController.getByDiff
 
 /**
  * @swagger
- * /api/exercises/{id}:
+ * /exercises/{id}:
  *   put:
  *     tags: [Exercises]
  *     summary: Mettre à jour un exercice
@@ -151,7 +151,7 @@ router.put('/:id', (req, res) => exerciseController.update(req, res));
 
 /**
  * @swagger
- * /api/exercises/{id}:
+ * /exercises/{id}:
  *   delete:
  *     tags: [Exercises]
  *     summary: Supprimer un exercice

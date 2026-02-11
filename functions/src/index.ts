@@ -1,4 +1,8 @@
 import * as admin from 'firebase-admin';
+import * as dotenv from 'dotenv';
+
+// Charger les variables d'environnement
+dotenv.config();
 
 // Initialiser Firebase Admin
 admin.initializeApp();
@@ -14,22 +18,36 @@ db.settings({
 export { api } from './api';
 
 // ============ CLOUD FUNCTIONS SMS ============
+// Temporairement commenté pour éviter l'erreur Eventarc lors du déploiement
+/*
 export { 
   sendSmsOnCreate, 
   retrySendFailedSms, 
   cleanupOldSms 
 } from './sms-sender.function';
+*/
 
 // ============ CLOUD FUNCTIONS NOTIFICATIONS ============
+// Temporairement commenté pour éviter l'erreur Eventarc lors du déploiement
+/*
 export {
   sendSmsOnPaymentCreated,
   sendSmsOnPaymentUpdated,
   sendSmsOnEnrollment,
   sendSmsOnCertificateEarned
 } from './notification-triggers.function';
+*/
 
 // ============ CLOUD FUNCTIONS TRIGGERS ============
 // NOTE: Les triggers Firestore et scheduled functions sont temporairement désactivés
 // pour résoudre les problèmes de compatibilité avec firebase-functions v2
 // Ils seront réactivés après la mise à jour vers firebase-functions@latest
 // Voir le fichier index.ts.backup pour le code complet des triggers
+
+// ============ CLOUD FUNCTIONS MANUAL CHECKS ============
+// Temporairement commenté pour éviter l'erreur Eventarc lors du déploiement
+/*
+export {
+  manualCheckExpiredSubscriptions
+} from './subscription-cron.function';
+*/

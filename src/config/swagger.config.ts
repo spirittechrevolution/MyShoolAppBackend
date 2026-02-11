@@ -182,7 +182,9 @@ const options: swaggerJsdoc.Options = {
       { name: 'Enrollments', description: 'Gestion des inscriptions' },
       { name: 'Instructors', description: 'Gestion des instructeurs' },
       { name: 'Payments', description: 'Gestion des paiements Orange Money' },
-      { name: 'Referrals', description: 'Gestion des parrainages et codes de parrainage' }
+      { name: 'Referrals', description: 'Gestion des parrainages et codes de parrainage' },
+      { name: 'Push Notifications', description: 'Gestion des notifications push' },
+      { name: 'Wave Payments', description: 'Intégration des paiements Wave' }
     ]
   },
   apis: ['./src/routes/*.ts']

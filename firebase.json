@@ -14,10 +14,13 @@
         ]
       }
     ],
-    "firestore": {
-      "rules": "firestore.rules",
-      "indexes": "firestore.indexes.json"
-    },
+    "firestore": [
+      {
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json",
+        "database": "myschool-1"
+      }
+    ],
     "emulators": {
       "functions": {
         "port": 5001
