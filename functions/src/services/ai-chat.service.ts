@@ -11,6 +11,7 @@ import { FaqService } from './faq.service';
 import { Timestamp } from 'firebase-admin/firestore';
 
 const CHAT_COLLECTION = 'chat_conversations';
+const USER_COLLECTION = 'utilisateur';
 
 export class AiChatService {
   private readonly genAI: GoogleGenerativeAI;
@@ -27,8 +28,43 @@ export class AiChatService {
   }
 
   /**
+   * Résoudre l'userId pour accepter soit Firebase Auth UID soit Firestore doc ID
+   * @param userId - ID fourni (peut être uid ou doc id)
+   * @returns Firebase Auth UID (utilisé comme doc ID dans 'utilisateur')
+   */
+  private async resolveUserId(userId: string): Promise<string> {
+    try {
+      // 1. Vérifier si l'ID correspond directement à un document utilisateur
+      const directDoc = await db.collection(USER_COLLECTION).doc(userId).get();
+      if (directDoc.exists) {
+        console.log(`✅ UserId ${userId} trouvé directement comme document`);
+        return userId; // C'est le Firebase Auth UID / doc ID
+      }
+
+      // 2. Sinon chercher dans le champ 'uid' au cas où l'ID serait différent
+      const queryByUid = await db.collection(USER_COLLECTION)
+        .where('uid', '==', userId)
+        .limit(1)
+        .get();
+
+      if (!queryByUid.empty) {
+        const foundUserId = queryByUid.docs[0].id;
+        console.log(`✅ UserId ${userId} résolu via champ uid → ${foundUserId}`);
+        return foundUserId;
+      }
+
+      // 3. Si toujours pas trouvé, utiliser l'ID fourni (nouvel utilisateur ou ID temporaire)
+      console.log(`⚠️ UserId ${userId} non trouvé dans utilisateur, utilisation telle quelle`);
+      return userId;
+    } catch (error: any) {
+      console.error('Erreur resolveUserId:', error);
+      return userId; // Fallback sur l'ID fourni
+    }
+  }
+
+  /**
    * Répondre à une question utilisateur
-   * @param userId - ID de l'utilisateur
+   * @param userId - ID de l'utilisateur (Firebase Auth UID ou Firestore doc ID)
    * @param question - Question posée
    * @returns Réponse avec la source (FAQ ou IA)
    */
@@ -38,6 +74,9 @@ export class AiChatService {
     faqId?: string;
   }> {
     try {
+      // Résoudre l'userId pour accepter les deux types d'ID
+      const resolvedUserId = await this.resolveUserId(userId);
+
       // 1. Rechercher dans les FAQs existantes
       const faqs = await this.faqService.searchFaqs(question);
 
@@ -49,7 +88,7 @@ export class AiChatService {
         const personalizedAnswer = `Bonjour ! Je suis Marème 😊\n\n${bestMatch.answer}\n\nN'hésitez pas si vous avez d'autres questions ! 📚`;
 
         // Sauvegarder dans l'historique
-        await this.saveMessage(userId, question, personalizedAnswer, bestMatch.id);
+        await this.saveMessage(resolvedUserId, question, personalizedAnswer, bestMatch.id);
 
         return {
           answer: personalizedAnswer,
@@ -62,7 +101,7 @@ export class AiChatService {
       const aiAnswer = await this.generateAiResponse(question);
 
       // Sauvegarder dans l'historique
-      await this.saveMessage(userId, question, aiAnswer);
+      await this.saveMessage(resolvedUserId, question, aiAnswer);
 
       return {
         answer: aiAnswer,
@@ -88,10 +127,9 @@ export class AiChatService {
         return 'Le service de chat intelligent n\'est pas configuré. Veuillez contacter le support.';
       }
 
-      // Liste des modèles disponibles et fonctionnels (Gemini 2.5 et 3.0)
+      // Liste des modèles Gemini disponibles (version stable février 2026)
       const modelsToTry = [
-        'gemini-3-flash-preview',      // Gemini 3.0 - Le plus intelligent (GRATUIT)
-        'gemini-2.5-flash',             // Gemini 2.5 - Rapide et fiable (GRATUIT)
+        'gemini-2.0-flash',             // Gemini 2.0 Flash - Le plus récent et gratuit
       ];
 
       let lastError: any = null;
@@ -203,12 +241,14 @@ Question de l'utilisateur : ${question}`;
 
   /**
    * Récupérer l'historique de conversation d'un utilisateur
-   * @param userId - ID utilisateur
+   * @param userId - ID utilisateur (Firebase Auth UID ou Firestore doc ID)
    * @returns Conversation ou null
    */
   async getConversationHistory(userId: string): Promise<ChatConversation | null> {
     try {
-      const doc = await db.collection(CHAT_COLLECTION).doc(userId).get();
+      // Résoudre l'userId pour accepter les deux types d'ID
+      const resolvedUserId = await this.resolveUserId(userId);
+      const doc = await db.collection(CHAT_COLLECTION).doc(resolvedUserId).get();
 
       if (!doc.exists) {
         return null;
@@ -226,12 +266,14 @@ Question de l'utilisateur : ${question}`;
 
   /**
    * Récupérer le dernier message de chat d'un utilisateur
-   * @param userId - ID utilisateur
+   * @param userId - ID utilisateur (Firebase Auth UID ou Firestore doc ID)
    * @returns Dernier message ou null
    */
   async getLastChatMessage(userId: string): Promise<ChatMessage | null> {
     try {
-      const doc = await db.collection(CHAT_COLLECTION).doc(userId).get();
+      // Résoudre l'userId pour accepter les deux types d'ID
+      const resolvedUserId = await this.resolveUserId(userId);
+      const doc = await db.collection(CHAT_COLLECTION).doc(resolvedUserId).get();
 
       if (!doc.exists) {
         return null;

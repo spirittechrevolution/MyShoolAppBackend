@@ -130,6 +130,64 @@ export class MatiereService {
     console.log(`✅ Toutes les matières sont valides pour niveau ${niveauScolaire}`);
     return true;
   }
+
+  /**
+   * Déterminer la classe commune à partir des noms de matières
+   * Pour MOYEN/SECONDAIRE/UNIVERSITAIRE où la classe n'est pas obligatoire dans le profil user
+   * @param matiereNoms Liste des noms de matières sélectionnées
+   * @param niveauScolaire Niveau scolaire pour filtrer
+   * @returns La classe commune ou null si les matières n'ont pas la même classe
+   */
+  async getClasseFromMatieres(matiereNoms: string[], niveauScolaire: NiveauScolaire): Promise<string | null> {
+    try {
+      console.log(`📚 Détermination de la classe à partir des matières:`, matiereNoms);
+      
+      if (!matiereNoms || matiereNoms.length === 0) {
+        console.error('❌ Aucune matière fournie');
+        return null;
+      }
+
+      const classes: string[] = [];
+      
+      for (const matiereNom of matiereNoms) {
+        const snapshot = await db.collection(this.collectionName)
+          .where('nom', '==', matiereNom)
+          .where('niveauScolaire', '==', niveauScolaire)
+          .where('isActive', '==', true)
+          .limit(1)
+          .get();
+
+        if (snapshot.empty) {
+          console.error(`❌ Matière "${matiereNom}" non trouvée pour niveau ${niveauScolaire}`);
+          return null;
+        }
+
+        const matiereData = snapshot.docs[0].data();
+        if (matiereData.classe) {
+          classes.push(matiereData.classe);
+          console.log(`   ✅ Matière "${matiereNom}" → classe "${matiereData.classe}"`);
+        }
+      }
+
+      if (classes.length === 0) {
+        console.error('❌ Aucune classe trouvée pour les matières');
+        return null;
+      }
+
+      // Vérifier que toutes les matières ont la même classe
+      const uniqueClasses = [...new Set(classes)];
+      if (uniqueClasses.length > 1) {
+        console.error(`❌ Les matières n'ont pas la même classe: ${uniqueClasses.join(', ')}`);
+        return null;
+      }
+
+      console.log(`✅ Classe déterminée: ${uniqueClasses[0]}`);
+      return uniqueClasses[0];
+    } catch (error) {
+      console.error('❌ Erreur lors de la détermination de la classe:', error);
+      return null;
+    }
+  }
 }
 
 export const matiereService = new MatiereService();

@@ -7,27 +7,32 @@ import { SubscriptionService } from '../services/subscription.service';
 import { WaveSubscriptionService } from '../services/wave-subscription.service';
 import { UserService } from '../services/user.service';
 import { PaymentService } from '../services/payment.service';
+import { MatiereService } from '../services/matiere.service';
 
 const subscriptionService = new SubscriptionService();
 const waveSubscriptionService = new WaveSubscriptionService();
 const userService = new UserService();
 const paymentService = new PaymentService();
+const matiereService = new MatiereService();
 
 export class SubscriptionController {
   /**
    * Créer un paiement d'abonnement Wave
    * POST /api/subscriptions/create-payment
    * Body: { plan, userId, classe, typeAbonnement, matieres? }
+   * 
+   * Note: Pour MOYEN/SECONDAIRE/UNIVERSITAIRE, la classe est déterminée à partir des matières
+   * sélectionnées si l'utilisateur n'a pas de classe définie dans son profil.
    */
   async createSubscriptionPayment(req: Request, res: Response): Promise<void> {
     try {
-      const { userId, classe, niveauScolaire, typeAbonnement, matieres } = req.body;
+      let { userId, classe, niveauScolaire, typeAbonnement, matieres } = req.body;
 
-      // Validation des champs requis
-      if (!userId || !classe || !niveauScolaire || !typeAbonnement) {
+      // Validation des champs requis de base
+      if (!userId || !niveauScolaire || !typeAbonnement) {
         res.status(400).json({
           success: false,
-          message: 'userId, classe, niveauScolaire et typeAbonnement requis'
+          message: 'userId, niveauScolaire et typeAbonnement requis'
         });
         return;
       }
@@ -42,15 +47,6 @@ export class SubscriptionController {
         return;
       }
 
-      // Vérifier que la classe correspond
-      if (user.classe !== classe) {
-        res.status(400).json({
-          success: false,
-          message: `La classe sélectionnée "${classe}" ne correspond pas à votre classe "${user.classe}"`
-        });
-        return;
-      }
-
       // Vérifier que le niveau scolaire correspond
       if (user.niveauScolaire !== niveauScolaire) {
         res.status(400).json({
@@ -58,6 +54,52 @@ export class SubscriptionController {
           message: `Le niveau scolaire sélectionné "${niveauScolaire}" ne correspond pas à votre niveau "${user.niveauScolaire}"`
         });
         return;
+      }
+
+      // Gestion de la classe selon le niveau scolaire
+      // Note: La classe dans le profil user n'est PAS obligatoire pour tous les niveaux
+      if (niveauScolaire === 'ELEMENTAIRE') {
+        // Pour ELEMENTAIRE: utiliser la classe de la requête ou celle du profil
+        if (!classe) {
+          if (user.classe) {
+            classe = user.classe;
+            console.log(`📚 ELEMENTAIRE: Classe utilisée depuis le profil: ${classe}`);
+          } else {
+            res.status(400).json({
+              success: false,
+              message: 'La classe est obligatoire pour le niveau ELEMENTAIRE. Veuillez spécifier une classe.'
+            });
+            return;
+          }
+        } else {
+          console.log(`📚 ELEMENTAIRE: Classe fournie dans la requête: ${classe}`);
+        }
+      } else {
+        // Pour MOYEN/SECONDAIRE/UNIVERSITAIRE: déduire la classe des matières
+        if (matieres && matieres.length > 0) {
+          const classeFromMatieres = await matiereService.getClasseFromMatieres(matieres, niveauScolaire);
+          if (!classeFromMatieres) {
+            res.status(400).json({
+              success: false,
+              message: 'Impossible de déterminer la classe à partir des matières sélectionnées'
+            });
+            return;
+          }
+          // Utiliser la classe déterminée à partir des matières
+          classe = classeFromMatieres;
+          console.log(`📚 Classe déterminée à partir des matières: ${classe}`);
+        } else if (!classe) {
+          // Si pas de matières et pas de classe, utiliser celle du profil ou erreur
+          if (user.classe) {
+            classe = user.classe;
+          } else {
+            res.status(400).json({
+              success: false,
+              message: 'Impossible de déterminer la classe. Veuillez sélectionner des matières.'
+            });
+            return;
+          }
+        }
       }
 
       // Validation selon le type d'abonnement
