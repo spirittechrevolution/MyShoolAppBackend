@@ -153,7 +153,12 @@ export class PaymentModel implements Payment {
       amount: this.amount,
       currency: this.currency,
       paymentMethod: this.paymentMethod,
+      paymentType: this.paymentType,
       status: this.status,
+      // Subscription fields
+      subscriptionId: this.subscriptionId,
+      typeAbonnement: this.typeAbonnement,
+      // Payment details
       orderReferenceNumber: this.orderReferenceNumber,
       payToken: this.payToken,
       paymentUrl: this.paymentUrl,
