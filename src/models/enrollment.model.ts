@@ -9,6 +9,7 @@ export interface Enrollment {
   progress: number;
   amount: number;
   paymentMethod: 'orange-money' | 'wave' | 'free-money' | 'card';
+  paymentId?: string;
   chaptersCompleted: string[];
 }
 
@@ -23,6 +24,7 @@ export class EnrollmentModel implements Enrollment {
   progress: number;
   amount: number;
   paymentMethod: 'orange-money' | 'wave' | 'free-money' | 'card';
+  paymentId?: string;
   chaptersCompleted: string[];
 
   constructor(data: Partial<Enrollment>) {
@@ -36,6 +38,7 @@ export class EnrollmentModel implements Enrollment {
     this.progress = data.progress || 0;
     this.amount = data.amount || 0;
     this.paymentMethod = data.paymentMethod || 'free-money';
+    this.paymentId = data.paymentId;
     this.chaptersCompleted = data.chaptersCompleted || [];
   }
 

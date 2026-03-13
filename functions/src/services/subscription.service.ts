@@ -123,6 +123,14 @@ export class SubscriptionService {
         .get();
 
       if (snapshot.empty) {
+        // Pas d'abonnement actif - nettoyer le user document
+        try {
+          await this.userService.update(userId, {
+            hasActiveSubscription: false
+          });
+        } catch (err) {
+          console.warn('⚠️  Impossible de mettre à jour user lors de recherche sans abonnement:', err);
+        }
         return null;
       }
 
@@ -135,9 +143,84 @@ export class SubscriptionService {
         return null;
       }
 
+      // Abonnement actif trouvé - mettre à jour le user document pour être sûr
+      try {
+        await this.userService.update(userId, {
+          hasActiveSubscription: true,
+          subscriptionId: subscription.id,
+          subscriptionStatus: 'ACTIVE',
+          subscriptionEndDate: subscription.endDate
+        });
+      } catch (err) {
+        console.warn('⚠️  Impossible de mettre à jour user lors de recherche avec abonnement:', err);
+      }
+
       return subscription;
     } catch (error) {
       console.error('❌ Erreur récupération abonnement actif:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Récupère un abonnement accessible (ACTIVE ou PENDING avec paiement confirmé)
+   * ✨ NOUVELLE méthode pour gérer le délai webhook (2-5 secondes)
+   * Lors du paiement Wave, la subscription est créée en PENDING.
+   * Le webhook met à jour le statut en ACTIVE. Pendant ce délai,
+   * cette méthode permet l'accès aux cours si le paiement est confirmé.
+   */
+  async getAccessibleSubscription(userId: string): Promise<SubscriptionModel | null> {
+    try {
+      // Étape 1: Chercher d'abord une subscription ACTIVE (normal)
+      let subscription = await this.getActiveSubscription(userId);
+      
+      if (subscription) {
+        return subscription;
+      }
+
+      // Étape 2: Si aucune subscription ACTIVE, chercher une subscription PENDING
+      // avec un paiement confirmé (status SUCCESS)
+      console.log(`🔍 Aucune subscription ACTIVE pour ${userId}, cherche PENDING avec paiement...`);
+
+      const pendingSnapshot = await db.collection(this.collectionName)
+        .where('userId', '==', userId)
+        .where('status', '==', 'PENDING')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (pendingSnapshot.empty) {
+        console.log(`⚠️  Aucune subscription PENDING trouvée pour ${userId}`);
+        return null;
+      }
+
+      const pendingDoc = pendingSnapshot.docs[0];
+      const pendingSubscription = new SubscriptionModel({ id: pendingDoc.id, ...pendingDoc.data() });
+
+      // Étape 3: Vérifier si cette subscription PENDING a un paiement confirmé
+      if (!pendingSubscription.id) {
+        console.warn('⚠️  Subscription PENDING sans ID');
+        return null;
+      }
+
+      // Chercher un paiement confirmé pour cette subscription
+      const paymentSnapshot = await db.collection('payments')
+        .where('subscriptionId', '==', pendingSubscription.id)
+        .where('status', '==', 'SUCCESS')
+        .limit(1)
+        .get();
+
+      if (!paymentSnapshot.empty) {
+        console.log(`✅ Subscription PENDING ${pendingSubscription.id} a un paiement SUCCESS confirmé`);
+        console.log(`⚡ Accès autorisé AVANT la confirmation du webhook (délai normal ~2-5s)`);
+        return pendingSubscription;
+      }
+
+      console.log(`⏳ Subscription PENDING ${pendingSubscription.id} - Paiement pas encore confirmé`);
+      return null;
+
+    } catch (error) {
+      console.error('❌ Erreur récupération subscription accessible:', error);
       throw error;
     }
   }
@@ -309,6 +392,7 @@ export class SubscriptionService {
 
   /**
    * Vérifie si un utilisateur a accès à un cours spécifique
+   * ✨ Utilise getAccessibleSubscription() pour gérer le délai webhook
    */
   async hasAccessToCourse(userId: string, courseId: string): Promise<boolean> {
     try {
@@ -318,8 +402,8 @@ export class SubscriptionService {
         return false;
       }
 
-      // Récupérer l'abonnement actif de l'utilisateur
-      const subscription = await this.getActiveSubscription(userId);
+      // Récupérer l'abonnement accessible (ACTIVE ou PENDING avec paiement SUCCESS)
+      const subscription = await this.getAccessibleSubscription(userId);
       if (!subscription || !subscription.isActive()) {
         return false;
       }
@@ -341,11 +425,12 @@ export class SubscriptionService {
   }
 
   /**
-   * Vérifie si un utilisateur a accès illimité (au moins un abonnement actif)
+   * Vérifie si un utilisateur a accès illimité (au moins un abonnement actif ou accessible)
+   * ✨ Utilise getAccessibleSubscription() pour gérer le délai webhook
    */
   async hasUnlimitedAccess(userId: string): Promise<boolean> {
     try {
-      const subscription = await this.getActiveSubscription(userId);
+      const subscription = await this.getAccessibleSubscription(userId);
       return subscription !== null && subscription.isActive();
     } catch (error) {
       console.error('❌ Erreur vérification accès illimité:', error);

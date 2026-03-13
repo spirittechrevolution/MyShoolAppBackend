@@ -23,6 +23,7 @@ export interface Payment {
   amount: number;
   currency: string;
   paymentMethod: PaymentMethod;
+  paymentId?: string;
   status: PaymentStatus;
   
   // Orange Money specific fields

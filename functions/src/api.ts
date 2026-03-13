@@ -19,6 +19,7 @@ import waveRoutes from './routes/wave.routes';
 import subscriptionRoutes from './routes/subscription.routes';
 import matiereRoutes from './routes/matiere.routes';
 import uploadRoutes from './routes/upload.routes';
+import promoCodeRoutes from './routes/promo-code.routes';
 
 // Load environment variables (for local development)
 dotenv.config();
@@ -172,6 +173,7 @@ app.use('/wave', waveRoutes);
 app.use('/subscriptions', subscriptionRoutes);
 app.use('/matieres', matiereRoutes);
 app.use('/upload', uploadRoutes);
+app.use('/codes-promo', promoCodeRoutes);
 
 // 404 Handler
 app.use((req, res) => {

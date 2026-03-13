@@ -21,6 +21,11 @@ export interface User {
   role: Role;
   status: 'active' | 'inactive' | 'suspended';
   specializationId?: string;
+  // Propriétés d'abonnement
+  hasActiveSubscription?: boolean;
+  subscriptionId?: string;
+  subscriptionStatus?: string;
+  subscriptionEndDate?: Date;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -42,6 +47,10 @@ export class UserModel implements User {
   role: Role;
   status: 'active' | 'inactive' | 'suspended';
   specializationId?: string;
+  hasActiveSubscription?: boolean;
+  subscriptionId?: string;
+  subscriptionStatus?: string;
+  subscriptionEndDate?: Date;
   createdAt: Date;
   updatedAt?: Date;
 
@@ -62,6 +71,10 @@ export class UserModel implements User {
     this.role = data.role || { libelle: 'student' };
     this.status = data.status || 'active';
     this.specializationId = data.specializationId;
+    this.hasActiveSubscription = data.hasActiveSubscription;
+    this.subscriptionId = data.subscriptionId;
+    this.subscriptionStatus = data.subscriptionStatus;
+    this.subscriptionEndDate = data.subscriptionEndDate;
     this.createdAt = data.createdAt || new Date();
     this.updatedAt = data.updatedAt;
   }
@@ -84,6 +97,10 @@ export class UserModel implements User {
       role: this.role,
       status: this.status,
       specializationId: this.specializationId,
+      hasActiveSubscription: this.hasActiveSubscription,
+      subscriptionId: this.subscriptionId,
+      subscriptionStatus: this.subscriptionStatus,
+      subscriptionEndDate: this.subscriptionEndDate,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };

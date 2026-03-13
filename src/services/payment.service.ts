@@ -204,6 +204,7 @@ export class PaymentService {
         await this.updateStatus(
           paymentId,
           omStatus.status,
+          undefined,
           omStatus.transactionId,
           omStatus.operatorTransactionId
         );
@@ -230,6 +231,7 @@ export class PaymentService {
   async updateStatus(
     paymentId: string,
     status: PaymentStatus,
+    metadata?: Record<string, any>,
     transactionId?: string,
     operatorTransactionId?: string
   ): Promise<PaymentModel> {
@@ -238,6 +240,10 @@ export class PaymentService {
         status,
         updatedAt: new Date()
       };
+
+      if (metadata) {
+        Object.assign(updateData, metadata);
+      }
 
       if (transactionId) {
         updateData.transactionId = transactionId;
@@ -288,6 +294,7 @@ export class PaymentService {
       const updatedPayment = await this.updateStatus(
         payment.id!,
         processedData.status,
+        undefined,
         processedData.transactionId
       );
 

@@ -6,3 +6,6 @@ export * from './exercise.model';
 export * from './enrollment.model';
 export * from './instructor.model';
 export * from './matiere.model';
+export * from './subscription.model';
+export * from './payment.model';
+export * from './referral.model';

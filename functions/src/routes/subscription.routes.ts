@@ -239,4 +239,10 @@ router.post('/:subscriptionId/cancel', subscriptionController.cancelSubscription
  */
 router.get('/check-access/:userId', subscriptionController.checkUnlimitedAccess.bind(subscriptionController));
 
+/**
+ * Synchroniser le statut de l'abonnement après reconnexion
+ * GET /api/subscriptions/sync-status/:userId
+ */
+router.get('/sync-status/:userId', subscriptionController.syncSubscriptionStatus.bind(subscriptionController));
+
 export default router;

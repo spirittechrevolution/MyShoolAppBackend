@@ -10,8 +10,6 @@ import userRoutes from './routes/user.routes';
 import courseRoutes from './routes/course.routes';
 import chapterRoutes from './routes/chapter.routes';
 import lessonRoutes from './routes/lesson.routes';
-import exerciseRoutes from './routes/exercise.routes';
-import enrollmentRoutes from './routes/enrollment.routes';
 import instructorRoutes from './routes/instructor.routes';
 import paymentRoutes from './routes/payment.routes';
 import referralRoutes from './routes/referral.routes';
@@ -19,6 +17,7 @@ import faqRoutes from './routes/faq.routes';
 import chatRoutes from './routes/chat.routes';
 import pushNotificationRoutes from './routes/push-notification.routes';
 import waveRoutes from './routes/wave.routes';
+import promoCodeRoutes from './routes/promo-code.routes';
 import './config/firebase.config'; // Initialize Firebase
 
 const app: Application = express();
@@ -94,8 +93,7 @@ app.use('/api/faqs', faqRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/push-notifications', pushNotificationRoutes);
 app.use('/api/wave', waveRoutes);
-
-// 404 Handlerreferrals', referralRoutes);
+app.use('/api/codes-promo', promoCodeRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {

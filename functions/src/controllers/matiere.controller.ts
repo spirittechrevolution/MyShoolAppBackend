@@ -122,11 +122,12 @@ export class MatiereController {
         return;
       }
 
+      // Trim les espaces inutiles (correction backoffice)
       const matiere = await matiereService.create({
-        nom,
-        niveauScolaire,
-        classe,
-        description,
+        nom: nom.trim(),
+        niveauScolaire: niveauScolaire.trim(),
+        classe: classe ? classe.trim() : classe,
+        description: description ? description.trim() : description,
         icone,
         ordre,
         isActive: true
@@ -163,11 +164,12 @@ export class MatiereController {
         return;
       }
 
+      // Trim les espaces inutiles (correction backoffice)
       await matiereService.update(id, {
-        nom,
-        niveauScolaire,
-        classe,
-        description,
+        nom: nom ? nom.trim() : nom,
+        niveauScolaire: niveauScolaire ? niveauScolaire.trim() : niveauScolaire,
+        classe: classe ? classe.trim() : classe,
+        description: description ? description.trim() : description,
         icone,
         ordre,
         isActive

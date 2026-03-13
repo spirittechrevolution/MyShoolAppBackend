@@ -138,9 +138,9 @@ export class MatiereService {
    * @param niveauScolaire Niveau scolaire pour filtrer
    * @returns La classe commune ou null si les matières n'ont pas la même classe
    */
-  async getClasseFromMatieres(matiereNoms: string[], niveauScolaire: NiveauScolaire): Promise<string | null> {
+  async getClasseFromMatieres(matiereNoms: string[], niveauScolaire: NiveauScolaire, expectedClasse?: string): Promise<string | null> {
     try {
-      console.log(`📚 Détermination de la classe à partir des matières:`, matiereNoms);
+      console.log(`📚 Détermination de la classe à partir des matières pour ${niveauScolaire}:`, matiereNoms, expectedClasse ? `(classe attendue: ${expectedClasse})` : '');
       
       if (!matiereNoms || matiereNoms.length === 0) {
         console.error('❌ Aucune matière fournie');
@@ -148,17 +148,46 @@ export class MatiereService {
       }
 
       const classes: string[] = [];
+      let hasInactiveMatieres = false;
       
       for (const matiereNom of matiereNoms) {
-        const snapshot = await db.collection(this.collectionName)
+        // Construire la requête de base
+        let query = db.collection(this.collectionName)
           .where('nom', '==', matiereNom)
           .where('niveauScolaire', '==', niveauScolaire)
-          .where('isActive', '==', true)
-          .limit(1)
-          .get();
+          .where('isActive', '==', true);
+        
+        // Ajouter constraint de classe si fournie
+        if (expectedClasse) {
+          query = query.where('classe', '==', expectedClasse);
+        }
+        
+        let snapshot = await query.limit(1).get();
+
+        // Fallback: chercher SANS constraint isActive si pas trouvée
+        if (snapshot.empty && !expectedClasse) {
+          console.warn(`⚠️  Matière active "${matiereNom}" non trouvée pour ${niveauScolaire}, cherche en fallback...`);
+          snapshot = await db.collection(this.collectionName)
+            .where('nom', '==', matiereNom)
+            .where('niveauScolaire', '==', niveauScolaire)
+            .limit(1)
+            .get();
+          
+          if (!snapshot.empty) {
+            hasInactiveMatieres = true;
+            console.warn(`⚠️  Matière trouvée mais INACTIVE: "${matiereNom}"`);
+          }
+        }
 
         if (snapshot.empty) {
-          console.error(`❌ Matière "${matiereNom}" non trouvée pour niveau ${niveauScolaire}`);
+          // Dernier fallback: chercher TOUTES les matières pour ce niveau pour debug
+          console.error(`❌ Matière "${matiereNom}" non trouvée du tout pour ${niveauScolaire}${expectedClasse ? ` + classe ${expectedClasse}` : ''}`);
+          const allMatieres = await db.collection(this.collectionName)
+            .where('niveauScolaire', '==', niveauScolaire)
+            .limit(10)
+            .get();
+          const availableMatieres = allMatieres.docs.map(doc => ({ nom: doc.data().nom, classe: doc.data().classe, isActive: doc.data().isActive }));
+          console.error(`   Matières disponibles pour ${niveauScolaire}:`, availableMatieres);
           return null;
         }
 
@@ -166,6 +195,9 @@ export class MatiereService {
         if (matiereData.classe) {
           classes.push(matiereData.classe);
           console.log(`   ✅ Matière "${matiereNom}" → classe "${matiereData.classe}"`);
+        } else {
+          console.error(`❌ Matière "${matiereNom}" n'a pas de classe définie`);
+          return null;
         }
       }
 
@@ -181,7 +213,12 @@ export class MatiereService {
         return null;
       }
 
-      console.log(`✅ Classe déterminée: ${uniqueClasses[0]}`);
+      if (hasInactiveMatieres) {
+        console.warn(`⚠️  ATTENTION: Une ou plusieurs matières sont INACTIVES. Classe déterminée: ${uniqueClasses[0]}`);
+      } else {
+        console.log(`✅ Classe déterminée: ${uniqueClasses[0]}`);
+      }
+      
       return uniqueClasses[0];
     } catch (error) {
       console.error('❌ Erreur lors de la détermination de la classe:', error);

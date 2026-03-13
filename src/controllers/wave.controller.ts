@@ -17,7 +17,7 @@ export class WaveController {
    */
   async createCoursePayment(req: Request, res: Response): Promise<void> {
     try {
-      const { courseId, userId } = req.body;
+      const { courseId, userId, promoCode, finalAmount } = req.body;
 
       if (!courseId || !userId) {
         res.status(400).json({
@@ -42,7 +42,7 @@ export class WaveController {
         email: user.login, // utilise le login comme email
         firstName: user.firstName,
         lastName: user.lastName
-      });
+      }, promoCode, finalAmount);
 
       // Enregistrer la transaction en attente dans Firestore
       await paymentService.create({
@@ -52,7 +52,7 @@ export class WaveController {
         currency: 'XOF',
         paymentMethod: 'wave',
         paymentId: paymentData.paymentId,
-        status: 'pending',
+        status: 'PENDING',
         metadata: {
           wavePaymentId: paymentData.paymentId,
           checkoutUrl: paymentData.paymentUrl
@@ -170,7 +170,7 @@ export class WaveController {
       }
 
       // Mettre à jour le statut du paiement
-      await paymentService.updatePaymentStatus(wavePaymentId, 'completed', {
+      await paymentService.updateStatus(wavePaymentId, 'SUCCESS', {
         waveData: data,
         completedAt: new Date()
       });
@@ -202,7 +202,7 @@ export class WaveController {
       const wavePaymentId = data.id;
 
       // Mettre à jour le statut du paiement
-      await paymentService.updatePaymentStatus(wavePaymentId, 'failed', {
+      await paymentService.updateStatus(wavePaymentId, 'FAILED', {
         waveData: data,
         failedAt: new Date()
       });

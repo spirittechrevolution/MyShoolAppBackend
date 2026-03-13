@@ -8,6 +8,8 @@ import { WaveSubscriptionService } from '../services/wave-subscription.service';
 import { UserService } from '../services/user.service';
 import { PaymentService } from '../services/payment.service';
 import { MatiereService } from '../services/matiere.service';
+import { getValidPromoCode, applyDiscount } from '../utils/promoCode.util';
+import { SUBSCRIPTION_PRICE } from '../models/subscription.model';
 
 const subscriptionService = new SubscriptionService();
 const waveSubscriptionService = new WaveSubscriptionService();
@@ -26,7 +28,7 @@ export class SubscriptionController {
    */
   async createSubscriptionPayment(req: Request, res: Response): Promise<void> {
     try {
-      let { userId, classe, niveauScolaire, typeAbonnement, matieres } = req.body;
+      let { userId, classe, niveauScolaire, typeAbonnement, matieres, promoCode } = req.body;
 
       // Validation des champs requis de base
       if (!userId || !niveauScolaire || !typeAbonnement) {
@@ -77,11 +79,14 @@ export class SubscriptionController {
       } else {
         // Pour MOYEN/SECONDAIRE/UNIVERSITAIRE: déduire la classe des matières
         if (matieres && matieres.length > 0) {
-          const classeFromMatieres = await matiereService.getClasseFromMatieres(matieres, niveauScolaire);
+          console.log(`🔍 Tentative de détermination de classe pour ${niveauScolaire} avec matières:`, matieres);
+          // Passer la classe s'il y a, sinon undefined pour auto-détermination
+          const classeFromMatieres = await matiereService.getClasseFromMatieres(matieres, niveauScolaire, classe);
           if (!classeFromMatieres) {
+            console.error(`❌ Impossible de déterminer la classe pour matières:`, matieres, `niveau: ${niveauScolaire}`);
             res.status(400).json({
               success: false,
-              message: 'Impossible de déterminer la classe à partir des matières sélectionnées'
+              message: `Impossible de déterminer la classe à partir des matières sélectionnées pour le niveau ${niveauScolaire}. Les matières ${matieres.join(', ')} ne sont pas disponibles ou n'appartiennent pas au même niveau.`
             });
             return;
           }
@@ -160,6 +165,19 @@ export class SubscriptionController {
       }
 
       // Créer le paiement Wave pour l'abonnement
+      let discount = 0;
+      let promo: any = null;
+      let finalAmount = SUBSCRIPTION_PRICE;
+      if (promoCode) {
+        promo = await getValidPromoCode(promoCode);
+        if (!promo) {
+          res.status(400).json({ success: false, message: 'Code promo invalide ou expiré' });
+          return;
+        }
+        discount = SUBSCRIPTION_PRICE - applyDiscount(SUBSCRIPTION_PRICE, promo);
+        finalAmount = applyDiscount(SUBSCRIPTION_PRICE, promo);
+      }
+
       const paymentData = await waveSubscriptionService.createSubscriptionPayment(typeAbonnement, userId, {
         phone: user.phone,
         firstName: user.firstName,
@@ -168,7 +186,7 @@ export class SubscriptionController {
         niveauScolaire: user.niveauScolaire,
         typeAbonnement: typeAbonnement,
         matieres: matieres
-      });
+      }, finalAmount);
 
       // Enregistrer la transaction de paiement dans Firestore
       await paymentService.create({
@@ -185,7 +203,9 @@ export class SubscriptionController {
           checkoutUrl: paymentData.paymentUrl,
           classe: classe,
           typeAbonnement: typeAbonnement,
-          matieres: matieres || []
+          matieres: matieres || [],
+          promoCode: promoCode || null,
+          discount: discount
         }
       });
 
@@ -199,11 +219,13 @@ export class SubscriptionController {
           classe: classe,
           typeAbonnement: typeAbonnement,
           matieres: matieres || [],
-          currency: 'XOF'
+          currency: 'XOF',
+          promoCode: promoCode || null,
+          discount: discount
         },
         message: typeAbonnement === 'CLASSE' 
-          ? `Paiement d'abonnement créé pour la classe "${classe}" (5 000 FCFA/an)`
-          : `Paiement d'abonnement créé pour 3 matières (5 000 FCFA/an)`
+          ? `Paiement d'abonnement créé pour la classe "${classe}" (${finalAmount} FCFA/an${discount > 0 ? ' avec réduction' : ''})`
+          : `Paiement d'abonnement créé pour 3 matières (${finalAmount} FCFA/an${discount > 0 ? ' avec réduction' : ''})`
       });
 
     } catch (error: any) {
@@ -388,6 +410,99 @@ export class SubscriptionController {
       res.status(500).json({
         success: false,
         message: error.message || 'Erreur lors de la vérification de l\'accès'
+      });
+    }
+  }
+
+  /**
+   * Synchroniser le statut de l'abonnement après reconnexion
+   * GET /api/subscriptions/sync-status/:userId
+   * 
+   * Appeler cet endpoint au login pour:
+   * 1. Récupérer le vrai statut de l'abonnement
+   * 2. Mettre à jour le document utilisateur si nécessaire
+   * 3. Nettoyer les abonnements expirés
+   */
+  async syncSubscriptionStatus(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        res.status(400).json({
+          success: false,
+          message: 'userId requis'
+        });
+        return;
+      }
+
+      // Récupérer l'utilisateur
+      const user = await userService.getById(userId);
+      if (!user) {
+        res.status(404).json({
+          success: false,
+          message: 'Utilisateur non trouvé'
+        });
+        return;
+      }
+
+      // Récupérer l'abonnement actif
+      const activeSubscription = await subscriptionService.getActiveSubscription(userId);
+
+      console.log(`🔄 Synchronisation status pour user ${userId}`);
+
+      if (activeSubscription) {
+        // L'utilisateur a un abonnement ACTIF
+        console.log(`✅ Abonnement ACTIF trouvé, mise à jour du user...`);
+        
+        await userService.update(userId, {
+          hasActiveSubscription: true,
+          subscriptionId: activeSubscription.id,
+          subscriptionStatus: 'ACTIVE',
+          subscriptionEndDate: activeSubscription.endDate
+        });
+
+        res.status(200).json({
+          success: true,
+          data: {
+            synced: true,
+            hasActiveSubscription: true,
+            subscription: {
+              id: activeSubscription.id,
+              classe: activeSubscription.classe,
+              typeAbonnement: activeSubscription.typeAbonnement,
+              niveauScolaire: activeSubscription.niveauScolaire,
+              endDate: activeSubscription.endDate,
+              matieres: activeSubscription.matieres || []
+            }
+          },
+          message: 'Abonnement synchronisé avec succès'
+        });
+      } else {
+        // L'utilisateur n'a pas d'abonnement ACTIF
+        console.log(`ℹ️  Pas d'abonnement ACTIF, réinitialisation du user...`);
+        
+        await userService.update(userId, {
+          hasActiveSubscription: false,
+          subscriptionStatus: undefined,
+          subscriptionEndDate: undefined
+        });
+
+        res.status(200).json({
+          success: true,
+          data: {
+            synced: true,
+            hasActiveSubscription: false,
+            subscription: null
+          },
+          message: 'Statut synchronisé: pas d\'abonnement actif'
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Erreur synchronisation status:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Erreur lors de la synchronisation du statut'
       });
     }
   }

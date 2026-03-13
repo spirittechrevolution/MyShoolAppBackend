@@ -1,4 +1,4 @@
-export type NiveauScolaire = 'ELEMENTAIRE' | 'MOYEN' | 'SECONDAIRE' | 'UNIVERSITAIRE';
+import { NiveauScolaire } from './user.model';
 
 export interface Course {
   id: string;
@@ -20,6 +20,7 @@ export interface Course {
   image: string;
   isPublished: boolean;
   certificateAvailable: boolean;
+  instructorId?: string;           // ID de l'instructeur
   chaptersIds: string[];
   chapters: any[];
   exercises: number;

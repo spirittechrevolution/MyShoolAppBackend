@@ -28,7 +28,8 @@ export class WaveSubscriptionService extends WaveService {
       niveauScolaire: string;
       typeAbonnement: string;
       matieres?: string[];
-    }
+    },
+    customAmount?: number
   ): Promise<{ paymentUrl: string; paymentId: string; amount: number; subscriptionId: string }> {
     try {
       const { classe, niveauScolaire, typeAbonnement, matieres } = userInfo;
@@ -46,8 +47,8 @@ export class WaveSubscriptionService extends WaveService {
         throw new Error('L\'abonnement MATIERE nécessite exactement 3 matières');
       }
 
-      // Prix unique pour tous les abonnements : 5000 FCFA/an
-      const amount = SUBSCRIPTION_PRICE;
+      // Prix unique ou custom (promo)
+      const amount = typeof customAmount === 'number' ? customAmount : SUBSCRIPTION_PRICE;
 
       // Créer l'abonnement en statut PENDING
       const subscription = await this.subscriptionService.create({

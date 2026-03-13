@@ -5,7 +5,7 @@
 import { db } from '../config/firebase.config';
 import { 
   Referral, 
-  ReferralStatus, 
+ 
   ReferralStats, 
   ReferralModel,
   BonusType 

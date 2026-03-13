@@ -151,12 +151,23 @@ export class WaveService {
 
   /**
    * Créer le paiement pour un cours
+   * @param {string} courseId - ID du cours
+   * @param {string} userId - ID de l'utilisateur
+   * @param {object} userInfo - Infos utilisateur (email, firstName, lastName)
+   * @param {string} promoCode - Code promo appliqué (optionnel)
+   * @param {number} finalAmount - Montant final après réductions (optionnel, utilise le prix du cours sinon)
    */
-  async createCoursePayment(courseId: string, userId: string, userInfo: {
-    email?: string;
-    firstName?: string;
-    lastName?: string;
-  }): Promise<{ paymentUrl: string; paymentId: string; amount: number }> {
+  async createCoursePayment(
+    courseId: string, 
+    userId: string, 
+    userInfo: {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+    },
+    promoCode?: string,
+    finalAmount?: number
+  ): Promise<{ paymentUrl: string; paymentId: string; amount: number }> {
     try {
       // Import dynamique pour éviter les dépendances circulaires
       const { CourseService } = await import('./course.service');
@@ -172,13 +183,21 @@ export class WaveService {
         throw new Error('Prix du cours invalide');
       }
 
-      // URLs de redirection
+      // Déterminer le montant effectif avec réduction si applicable
+      let effectiveAmount = finalAmount || course.price;
+
+      // Validation du montant final
+      if (effectiveAmount <= 0) {
+        throw new Error('Montant invalide après déduction');
+      }
+
+      console.log(`💳 Paiement Wave: montant original=${course.price}, montant final=${effectiveAmount}${promoCode ? `, code promo=${promoCode}` : ''}`);
       const baseUrl = process.env.NODE_ENV === 'production' 
         ? 'https://myschool-app.com' 
         : 'http://localhost:4200';
 
       const transaction: WaveTransaction = {
-        amount: course.price,
+        amount: effectiveAmount,
         currency: 'XOF',
         customer_email: userInfo.email,
         customer_firstname: userInfo.firstName,
@@ -190,7 +209,10 @@ export class WaveService {
         metadata: {
           courseId: courseId,
           userId: userId,
-          type: 'course_purchase'
+          type: 'course_purchase',
+          ...(promoCode && { promoCode: promoCode }),
+          originalPrice: course.price,
+          ...(finalAmount && finalAmount < course.price && { discountAmount: course.price - finalAmount })
         }
       };
 
@@ -199,7 +221,7 @@ export class WaveService {
       return {
         paymentUrl: payment.checkout_url,
         paymentId: payment.id,
-        amount: course.price
+        amount: effectiveAmount
       };
 
     } catch (error: any) {

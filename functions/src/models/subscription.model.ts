@@ -2,7 +2,8 @@
  * Nouveau modèle d'abonnement basé sur le niveau scolaire et les matières
  */
 
-export type NiveauScolaire = 'ELEMENTAIRE' | 'MOYEN' | 'SECONDAIRE' | 'UNIVERSITAIRE';
+export { NiveauScolaire } from './user.model';
+import { NiveauScolaire } from './user.model';
 
 export type SubscriptionStatus = 
   | 'ACTIVE'      // Actif

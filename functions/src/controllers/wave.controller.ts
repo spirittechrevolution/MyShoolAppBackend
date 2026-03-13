@@ -20,7 +20,7 @@ export class WaveController {
    */
   async createCoursePayment(req: Request, res: Response): Promise<void> {
     try {
-      const { courseId, userId } = req.body;
+      const { courseId, userId, promoCode, finalAmount } = req.body;
 
       if (!courseId || !userId) {
         res.status(400).json({
@@ -66,7 +66,7 @@ export class WaveController {
         phone: user.phone,
         firstName: user.firstName,
         lastName: user.lastName
-      });
+      }, promoCode, finalAmount);
 
       // Enregistrer la transaction en attente dans Firestore
       await paymentService.create({

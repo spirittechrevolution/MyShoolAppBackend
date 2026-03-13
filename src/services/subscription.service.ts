@@ -7,7 +7,6 @@ import {
   Subscription, 
   SubscriptionModel,
   NiveauScolaire,
-  TypeAbonnement,
   SUBSCRIPTION_PRICE
 } from '../models/subscription.model';
 import { UserService } from './user.service';

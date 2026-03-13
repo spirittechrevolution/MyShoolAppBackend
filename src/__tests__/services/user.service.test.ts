@@ -1,5 +1,4 @@
 import { UserService } from '../../services/user.service';
-import { UserModel } from '../../models';
 
 // Mock Firebase Admin
 const mockCreateUser = jest.fn();
