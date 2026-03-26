@@ -211,4 +211,26 @@ router.post('/confirm-payment', (req, res) => waveController.confirmPayment(req,
  */
 router.post('/webhook', (req, res) => waveController.handleWebhook(req, res));
 
+/**
+ * @swagger
+ * /wave/test-confirm/{wavePaymentId}:
+ *   post:
+ *     summary: TEST ENDPOINT - Simuler un webhook Wave
+ *     tags: [Wave Payments]
+ *     description: Endpoint pour tester le webhook sans passer par Wave
+ *     parameters:
+ *       - in: path
+ *         name: wavePaymentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du paiement Wave à simuler
+ *     responses:
+ *       200:
+ *         description: Webhook simulé avec succès
+ *       500:
+ *         description: Erreur lors de la simulation
+ */
+router.post('/test-confirm/:wavePaymentId', (req, res) => waveController.testConfirmPayment(req, res));
+
 export default router;

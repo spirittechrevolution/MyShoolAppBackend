@@ -18,6 +18,28 @@ export class FaqService {
   async createFaq(faqData: FAQ): Promise<{ success: boolean; id?: string; message: string }> {
     //MySchool AI
     try {
+      // Valider les champs obligatoires
+      if (!faqData.question || !faqData.question.trim()) {
+        return {
+          success: false,
+          message: 'La question est obligatoire',
+        };
+      }
+
+      if (!faqData.answer || !faqData.answer.trim()) {
+        return {
+          success: false,
+          message: 'La réponse est obligatoire',
+        };
+      }
+
+      if (!faqData.category || !faqData.category.trim()) {
+        return {
+          success: false,
+          message: 'La catégorie est obligatoire',
+        };
+      }
+
       const faq: FAQ = {
         ...faqData,
         views: 0,

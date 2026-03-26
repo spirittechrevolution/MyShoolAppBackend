@@ -121,6 +121,37 @@ export class PaymentService {
   }
 
   /**
+   * Récupère un paiement par wavePaymentId depuis metadata
+   */
+  async getByWavePaymentId(wavePaymentId: string): Promise<PaymentModel | null> {
+    try {
+      // ✅ Chercher d'abord par wavePaymentId au niveau TOP du document (structure modifiée)
+      let snapshot = await db.collection(this.collectionName)
+        .where('wavePaymentId', '==', wavePaymentId)
+        .limit(1)
+        .get();
+
+      // Si pas trouvé, essayer l'ancien emplacement dans metadata (compatibilité rétroactive)
+      if (snapshot.empty) {
+        snapshot = await db.collection(this.collectionName)
+          .where('metadata.wavePaymentId', '==', wavePaymentId)
+          .limit(1)
+          .get();
+      }
+
+      if (snapshot.empty) {
+        return null;
+      }
+
+      const doc = snapshot.docs[0];
+      return new PaymentModel({ id: doc.id, ...doc.data() });
+    } catch (error) {
+      console.error('❌ Erreur récupération paiement par wavePaymentId:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Récupère tous les paiements d'un utilisateur
    */
   async getByUserId(userId: string): Promise<PaymentModel[]> {

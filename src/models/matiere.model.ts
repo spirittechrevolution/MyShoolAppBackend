@@ -3,11 +3,7 @@
  * Une matière est liée à un niveau scolaire spécifique
  */
 
-export type NiveauScolaire = 
-  | 'ELEMENTAIRE'
-  | 'MOYEN'
-  | 'SECONDAIRE'
-  | 'UNIVERSITAIRE';
+import { NiveauScolaire } from './user.model';
 
 export interface Matiere {
   id?: string;
@@ -75,8 +71,8 @@ export const CLASSES_PAR_NIVEAU: Record<NiveauScolaire, string[]> = {
     'Seconde L', 'Seconde S', 'Seconde G', 'Seconde T',
     // Première (toutes séries)
     'Première L', 'Première L\'', 'Première S', 'Première G', 'Première T',
-    // Terminale (toutes séries)
-    'Terminale L', 'Terminale L\'', 'Terminale S', 'Terminale G', 'Terminale T'
+    // Terminale (toutes séries avec numérotation)
+    'Terminale L1', 'Terminale L2', 'Terminale S1', 'Terminale S2', 'Terminale S3', 'Terminale S4', 'Terminale G', 'Terminale T'
   ],
   UNIVERSITAIRE: ['Licence 1', 'Licence 2', 'Licence 3', 'Master 1', 'Master 2']
 };

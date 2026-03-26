@@ -30,7 +30,7 @@ export class ReferralService {
     // Vérifier si l'utilisateur a déjà un code actif
     const existingRef = await this.getActiveReferralByUser(referrerId);
     if (existingRef) {
-      return existingRef;
+      throw new Error('Un lien de parrainage actif existe déjà');
     }
 
     // Générer un code unique

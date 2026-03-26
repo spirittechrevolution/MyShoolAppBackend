@@ -1,6 +1,6 @@
 import { UserService } from '../../services/user.service';
 
-// Mock Firebase Admin
+// Définir les mocks en dehors du jest.mock pour les rendre accessibles
 const mockCreateUser = jest.fn();
 const mockGetUser = jest.fn();
 const mockUpdateUser = jest.fn();

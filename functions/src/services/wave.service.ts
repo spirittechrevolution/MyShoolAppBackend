@@ -125,23 +125,57 @@ export class WaveService {
   /**
    * Valider une signature webhook Wave
    */
-  verifyWebhookSignature(payload: string, signature: string): boolean {
-    try {
-      const crypto = require('crypto');
-      const expectedSignature = crypto
-        .createHmac('sha256', this.webhookSecret)
-        .update(payload)
-        .digest('hex');
-
-      return crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(expectedSignature)
-      );
-    } catch (error) {
-      console.error('❌ Erreur validation signature Wave:', error);
+verifyWebhookSignature(payload: string, signature: string | undefined): boolean {
+  try {
+    if (!signature || !this.webhookSecret) {
+      console.warn('⚠️ Signature ou webhookSecret manquant');
       return false;
     }
+
+    const crypto = require('crypto');
+
+    // Format Wave: "t=1234567890,v1=abcdef..."
+    const parts = signature.split(',');
+    const tPart = parts.find(p => p.startsWith('t='));
+    const v1Part = parts.find(p => p.startsWith('v1='));
+
+    if (!tPart || !v1Part) {
+      console.warn('⚠️ Format signature Wave invalide:', signature);
+      return false;
+    }
+
+    const timestamp = tPart.split('=')[1];
+    const receivedHash = v1Part.split('=')[1];
+
+    // Wave signe: "timestamp.payload"
+    const signedPayload = `${timestamp}.${payload}`;
+
+    const expectedHash = crypto
+      .createHmac('sha256', this.webhookSecret)
+      .update(signedPayload)
+      .digest('hex');
+
+    console.log('🔐 Vérification signature Wave:', {
+      timestamp,
+      receivedHash: receivedHash.substring(0, 10) + '...',
+      expectedHash: expectedHash.substring(0, 10) + '...'
+    });
+
+    if (receivedHash.length !== expectedHash.length) {
+      console.warn('⚠️ Longueur hash incorrecte');
+      return false;
+    }
+
+    return crypto.timingSafeEqual(
+      Buffer.from(receivedHash),
+      Buffer.from(expectedHash)
+    );
+
+  } catch (error) {
+    console.error('❌ Erreur validation signature Wave:', error);
+    return false;
   }
+}
 
   /**
    * Créer le paiement pour un cours

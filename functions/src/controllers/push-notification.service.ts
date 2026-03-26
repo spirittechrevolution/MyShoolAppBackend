@@ -61,13 +61,13 @@ export interface UserFcmToken {
  */
 export class PushNotificationService {
   private db: admin.firestore.Firestore;
-  private _messaging: admin.messaging.Messaging;
+  private messaging: admin.messaging.Messaging;
   private notificationsCollection: admin.firestore.CollectionReference;
   private tokensCollection: admin.firestore.CollectionReference;
 
   constructor() {
     this.db = admin.firestore();
-    this._messaging = admin.messaging();
+    this.messaging = admin.messaging();
     this.notificationsCollection = this.db.collection('push_notifications');
     this.tokensCollection = this.db.collection('fcm_tokens');
   }
@@ -203,7 +203,7 @@ export class PushNotificationService {
       }
 
       // Prépare le message
-      const _message: admin.messaging.MulticastMessage = {
+      const message: admin.messaging.MulticastMessage = {
         tokens,
         notification: {
           title,
@@ -233,8 +233,8 @@ export class PushNotificationService {
       };
 
       // Envoie la notification
-      // TODO: Fix sendEachForMulticast compatibility with firebase-admin version
-      // const response = await this._messaging.sendEachForMulticast(_message);
+      // TODO: Fix sendMulticast compatibility with firebase-admin version
+      // const response = await this.messaging.sendMulticast(message);
       const response = { successCount: tokens.length, failureCount: 0, responses: [] };
 
       console.log(`✅ Notification envoyée: ${response.successCount} succès, ${response.failureCount} échecs`);
@@ -242,7 +242,7 @@ export class PushNotificationService {
       // Désactive les tokens invalides
       if (response.failureCount > 0) {
         const tokensToRemove: string[] = [];
-        response.responses.forEach((resp, idx) => {
+        response.responses.forEach((resp: any, idx: number) => {
           if (!resp.success) {
             const errorCode = (resp.error as any)?.code;
             if (
@@ -436,23 +436,16 @@ export class PushNotificationService {
    */
   async getUserNotifications(userId: string, limit: number = 50): Promise<PushNotification[]> {
     try {
-      console.log(`🔍 Recherche notifications pour userId: ${userId}, limit: ${limit}`);
-      
       // Version temporaire sans orderBy en attendant que l'index soit actif
       const snapshot = await this.notificationsCollection
         .where('userId', '==', userId)
         .limit(limit)
         .get();
 
-      console.log(`📊 Snapshot size: ${snapshot.size}`);
-      
-      const notifications = snapshot.docs.map(doc => {
-        console.log(`📄 Doc ID: ${doc.id}, Data:`, doc.data());
-        return {
-          id: doc.id,
-          ...doc.data(),
-        };
-      }) as PushNotification[];
+      const notifications = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as PushNotification[];
 
       // Tri manuel par createdAt en descendant en attendant l'index
       notifications.sort((a, b) => {
@@ -464,7 +457,6 @@ export class PushNotificationService {
         return 0;
       });
 
-      console.log(`✅ Notifications retournées: ${notifications.length}`);
       return notifications;
     } catch (error) {
       console.error('❌ Erreur lors de la récupération des notifications:', error);

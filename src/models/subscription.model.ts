@@ -82,14 +82,42 @@ export class SubscriptionModel implements Subscription {
     this.matieres = data.matieres;
     this.amount = data.amount || SUBSCRIPTION_PRICE;
     this.currency = data.currency || 'XOF';
-    this.startDate = data.startDate || new Date();
-    this.endDate = data.endDate || this.calculateEndDate(data.startDate);
+    
+    // ✅ Convertir les Firestore Timestamps en Date
+    this.startDate = this.convertTimestamp(data.startDate) || new Date();
+    this.endDate = this.convertTimestamp(data.endDate) || this.calculateEndDate(data.startDate);
+    
     this.paymentId = data.paymentId;
     this.paymentMethod = data.paymentMethod;
     this.metadata = data.metadata;
-    this.createdAt = data.createdAt || new Date();
-    this.updatedAt = data.updatedAt;
-    this.cancelledAt = data.cancelledAt;
+    
+    this.createdAt = this.convertTimestamp(data.createdAt) || new Date();
+    this.updatedAt = this.convertTimestamp(data.updatedAt);
+    this.cancelledAt = this.convertTimestamp(data.cancelledAt);
+  }
+
+  /**
+   * ✅ Convertir les Firestore Timestamps en Date
+   * Firestore retourne: { _seconds: 1234567890, _nanoseconds: 123456789 }
+   */
+  private convertTimestamp(timestamp: any): Date | null {
+    if (!timestamp) return null;
+    
+    // Si c'est déjà une Date, retourner
+    if (timestamp instanceof Date) return timestamp;
+    
+    // Si c'est un Firestore Timestamp avec _seconds
+    if (timestamp._seconds !== undefined) {
+      return new Date(timestamp._seconds * 1000); // Firestore _seconds est en secondes, Date en millisecondes
+    }
+    
+    // Sinon, essayer de convertir en Date
+    try {
+      const date = new Date(timestamp);
+      return date instanceof Date && !isNaN(date.getTime()) ? date : null;
+    } catch (e) {
+      return null;
+    }
   }
 
   private calculateEndDate(startDate?: Date | any): Date {

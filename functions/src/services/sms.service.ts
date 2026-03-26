@@ -741,36 +741,32 @@ MySchool`;
   async getSmsStats(): Promise<SmsStats> {
     try {
       // Total
-      const totalSnapshot = await this.smsCollection.count().get();
-      const total = totalSnapshot.data().count;
+      const totalSnapshot = await this.smsCollection.get();
+      const total = totalSnapshot.size;
 
       // Sent
       const sentSnapshot = await this.smsCollection
         .where('status', '==', 'sent')
-        .count()
         .get();
-      const sent = sentSnapshot.data().count;
+      const sent = sentSnapshot.size;
 
       // Pending
       const pendingSnapshot = await this.smsCollection
         .where('status', '==', 'pending')
-        .count()
         .get();
-      const pending = pendingSnapshot.data().count;
+      const pending = pendingSnapshot.size;
 
       // Failed
       const failedSnapshot = await this.smsCollection
         .where('status', '==', 'failed')
-        .count()
         .get();
-      const failed = failedSnapshot.data().count;
+      const failed = failedSnapshot.size;
 
       // Delivered
       const deliveredSnapshot = await this.smsCollection
         .where('status', '==', 'delivered')
-        .count()
         .get();
-      const delivered = deliveredSnapshot.data().count;
+      const delivered = deliveredSnapshot.size;
 
       return {
         total,

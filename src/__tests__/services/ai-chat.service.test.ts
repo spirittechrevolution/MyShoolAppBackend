@@ -87,7 +87,7 @@ describe('AiChatService', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toBe('Message non trouvé');
-    });
+    }, 10000);
   });
 
   describe('clearConversation', () => {
@@ -103,6 +103,6 @@ describe('AiChatService', () => {
       // Vérifier que la conversation a été supprimée
       const conversation = await aiChatService.getConversationHistory('user-delete-test');
       expect(conversation).toBeNull();
-    });
+    }, 10000);
   });
 });

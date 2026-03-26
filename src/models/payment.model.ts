@@ -2,6 +2,8 @@
  * Modèle pour les transactions de paiement Orange Money
  */
 
+// import { SubscriptionPlan } from './subscription.model'; // Removed - old model
+
 export type PaymentStatus = 
   | 'PENDING' 
   | 'SUCCESS' 
@@ -15,15 +17,29 @@ export type PaymentMethod =
   | 'free-money' 
   | 'card';
 
+export type PaymentType =
+  | 'course'        // Achat cours individuel
+  | 'subscription'; // Abonnement profil
+
 export interface Payment {
   id?: string;
   userId: string;
-  enrollmentId: string;
-  courseId: string;
+  
+  // Payment type
+  paymentType: PaymentType;
+  
+  // Course payment fields (si paymentType = 'course')
+  enrollmentId?: string;
+  courseId?: string;
+  
+  // Subscription payment fields (si paymentType = 'subscription')
+  subscriptionId?: string;
+  // subscriptionPlan?: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL'; // Removed - old model
+  typeAbonnement?: 'CLASSE' | 'MATIERE';
+  
   amount: number;
   currency: string;
   paymentMethod: PaymentMethod;
-  paymentId?: string;
   status: PaymentStatus;
   
   // Orange Money specific fields
@@ -55,12 +71,20 @@ export interface Payment {
 export class PaymentModel implements Payment {
   id?: string;
   userId: string;
-  enrollmentId: string;
-  courseId: string;
+  enrollmentId?: string;
+  courseId?: string;
   amount: number;
   currency: string;
   paymentMethod: PaymentMethod;
   status: PaymentStatus;
+  
+  // Type de paiement
+  paymentType: PaymentType;
+  
+  // Pour les paiements d'abonnement
+  subscriptionId?: string;
+  // subscriptionPlan?: SubscriptionPlan; // Removed - old model, use typeAbonnement
+  typeAbonnement?: 'CLASSE' | 'MATIERE';
   
   orderReferenceNumber?: string;
   payToken?: string;
@@ -85,12 +109,20 @@ export class PaymentModel implements Payment {
   constructor(data: Partial<Payment>) {
     this.id = data.id;
     this.userId = data.userId || '';
-    this.enrollmentId = data.enrollmentId || '';
-    this.courseId = data.courseId || '';
+    this.enrollmentId = data.enrollmentId;
+    this.courseId = data.courseId;
     this.amount = data.amount || 0;
-    this.currency = data.currency || 'XOF'; // Franc CFA
+    this.currency = data.currency || 'XOF';
     this.paymentMethod = data.paymentMethod || 'orange-money';
     this.status = data.status || 'PENDING';
+    
+    // Type de paiement
+    this.paymentType = data.paymentType || 'course';
+    
+    // Champs d'abonnement
+    this.subscriptionId = data.subscriptionId;
+    // this.subscriptionPlan = data.subscriptionPlan; // Removed - old model
+    this.typeAbonnement = data.typeAbonnement;
     
     this.orderReferenceNumber = data.orderReferenceNumber;
     this.payToken = data.payToken;

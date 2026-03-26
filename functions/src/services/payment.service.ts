@@ -129,11 +129,20 @@ export class PaymentService {
    */
   async getByWavePaymentId(wavePaymentId: string): Promise<PaymentModel | null> {
     try {
-      const snapshot = await db.collection(this.collectionName)
-        .where('metadata.wavePaymentId', '==', wavePaymentId)
+      // ✅ Chercher d'abord par wavePaymentId au niveau TOP du document (structure modifiée)
+      let snapshot = await db.collection(this.collectionName)
+        .where('wavePaymentId', '==', wavePaymentId)
         .limit(1)
         .get();
-      
+
+      // Si pas trouvé, essayer l'ancien emplacement dans metadata (compatibilité rétroactive)
+      if (snapshot.empty) {
+        snapshot = await db.collection(this.collectionName)
+          .where('metadata.wavePaymentId', '==', wavePaymentId)
+          .limit(1)
+          .get();
+      }
+
       if (snapshot.empty) {
         return null;
       }

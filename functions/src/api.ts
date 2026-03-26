@@ -65,6 +65,13 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  if (req.originalUrl.includes('/wave/webhook')) {
+    express.raw({ type: 'application/json' })(req, res, next);
+  } else {
+    next();
+  }
+});
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 

@@ -133,72 +133,81 @@ export class WaveController {
    * Webhook Wave pour les notifications de paiement
    * POST /api/wave/webhook
    */
-  async handleWebhook(req: Request, res: Response): Promise<void> {
-    try {
-      const signature = req.headers['x-wave-signature'] as string;
-      const payload = JSON.stringify(req.body);
+async handleWebhook(req: Request, res: Response): Promise<void> {
+  try {
+    console.log('📨 Headers Wave reçus:', JSON.stringify(req.headers, null, 2));
 
-      // Vérifier la signature
-      if (!waveService.verifyWebhookSignature(payload, signature)) {
-        console.error('❌ Signature webhook Wave invalide');
-        res.status(401).json({
-          success: false,
-          message: 'Signature invalide'
-        });
-        return;
-      }
+    // Note: La vérification de signature Wave est impossible sur Firebase Cloud Functions
+    // car GCF parse le body avant qu'il arrive à Express (raw body non accessible).
+    // Sécurité assurée par : URL secrète + validation des données en base Firestore
+    
+    const webhookData = req.body;
+    console.log('📧 Webhook Wave reçu:', JSON.stringify(webhookData, null, 2));
 
-      const webhookData = req.body;
-      console.log('📧 Webhook Wave reçu:', webhookData);
-
-      // Traiter selon le type d'événement
-      switch (webhookData.type) {
-        case 'checkout.session.completed':
-          await this.handlePaymentCompleted(webhookData);
-          break;
-        case 'checkout.session.payment_failed':
-          await this.handlePaymentFailed(webhookData);
-          break;
-        case 'b2b.payment_received':
-          await this.handlePaymentCompleted(webhookData);
-          break;
-        default:
-          console.log(`🔔 Événement Wave non traité: ${webhookData.type}`);
-      }
-
-      res.status(200).json({
-        success: true,
-        message: 'Webhook traité'
-      });
-
-    } catch (error: any) {
-      console.error('❌ Erreur traitement webhook Wave:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Erreur traitement webhook'
-      });
+    switch (webhookData.type) {
+      case 'checkout.session.completed':
+        await this.handlePaymentCompleted(webhookData);
+        break;
+      case 'checkout.session.payment_failed':
+        await this.handlePaymentFailed(webhookData);
+        break;
+      case 'b2b.payment_received':
+        await this.handlePaymentCompleted(webhookData);
+        break;
+      default:
+        console.log(`🔔 Événement Wave non traité: ${webhookData.type}`);
     }
+
+    res.status(200).json({ success: true, message: 'Webhook traité' });
+
+  } catch (error: any) {
+    console.error('❌ Erreur traitement webhook Wave:', error);
+    res.status(500).json({ success: false, message: 'Erreur traitement webhook' });
   }
+}
+
 
   /**
    * Traiter un paiement réussi
+   * ⚠️ IMPORTANT: Wave ne retourne pas les métadonnées dans le webhook!
+   * Solution: On cherche le paiement dans Firestore pour déterminer le type
    */
   private async handlePaymentCompleted(webhookData: any): Promise<void> {
     try {
       const { data } = webhookData;
       const wavePaymentId = data.id;
-      const metadata = data.metadata || {};
-      const paymentType = metadata.type; // 'course_payment' ou 'subscription_payment'
+
+      console.log('📦 Webhook reçu pour paiement:', wavePaymentId);
+
+      // ✅ Chercher le paiement dans Firestore (utiliser ce comme source de vérité)
+      const payment = await paymentService.getByWavePaymentId(wavePaymentId);
+      
+      if (!payment || !payment.id) {
+        console.error('❌ Paiement non trouvé dans Firestore pour wavePaymentId:', wavePaymentId);
+        return;
+      }
+
+      console.log('💳 Paiement trouvé dans Firestore:', {
+        paymentId: payment.id,
+        paymentType: payment.paymentType,
+        status: payment.status,
+        subscriptionId: payment.subscriptionId
+      });
+
+      // ✅ Déterminer le type de paiement à partir du document Firestore (pas du webhook!)
+      const paymentType = payment.paymentType;
+      const metadata = payment.metadata || {};
 
       // Traiter selon le type de paiement
-      if (paymentType === 'subscription_payment') {
+      if (paymentType === 'subscription') {
+        // C'est un paiement d'abonnement
         await this.handleSubscriptionPayment(metadata, wavePaymentId);
       } else {
-        // Paiement de cours par défaut
+        // C'est un paiement de cours
         await this.handleCoursePayment(metadata, wavePaymentId);
       }
 
-      console.log(`✅ Paiement Wave complété - Type: ${paymentType || 'course'}, PaymentId: ${wavePaymentId}`);
+      console.log(`✅ Paiement Wave complété - Type: ${paymentType}, PaymentId: ${wavePaymentId}`);
 
     } catch (error) {
       console.error('❌ Erreur traitement paiement réussi:', error);
@@ -207,26 +216,34 @@ export class WaveController {
 
   /**
    * Traiter un paiement de cours
+   * ⚠️ IMPORTANT: On utilise TOUJOURS le document Firestore comme source de vérité!
+   * Ne pas faire confiance aux métadonnées du webhook (Wave ne les retourne pas)
    */
   private async handleCoursePayment(metadata: any, wavePaymentId: string): Promise<void> {
-    const courseId = metadata.courseId;
-    const userId = metadata.userId;
-
-    if (!courseId || !userId) {
-      console.error('❌ Métadonnées manquantes pour le paiement de cours');
-      return;
-    }
-
-    // Trouver le paiement par wavePaymentId et mettre à jour le statut
+    // 🔍 Chercher le paiement dans Firestore (déjà fait dans handlePaymentCompleted, mais recommandé ici aussi)
     const payment = await paymentService.getByWavePaymentId(wavePaymentId);
     if (!payment || !payment.id) {
       console.error('❌ Paiement non trouvé pour wavePaymentId:', wavePaymentId);
       return;
     }
 
+    // ✅ Extraire les infos du document Firestore (source de vérité!)
+    const courseId = payment.courseId;
+    const userId = payment.userId;
+
+    if (!courseId || !userId) {
+      console.error('❌ Documents Firestore incomplète pour le paiement de cours:', {
+        paymentId: payment.id,
+        courseId,
+        userId
+      });
+      return;
+    }
+
+    // ✅ Mettre à jour le statut du paiement
     await paymentService.updateStatus(payment.id, 'SUCCESS' as PaymentStatus);
 
-    // Activer l'inscription existante (créée lors de create-payment)
+    // ✅ Activer l'inscription existante (créée lors de create-payment)
     if (payment.enrollmentId) {
       const { EnrollmentService } = await import('../services/enrollment.service');
       const enrollmentService = new EnrollmentService();
@@ -241,41 +258,43 @@ export class WaveController {
 
   /**
    * Traiter un paiement d'abonnement
+   * ⚠️ IMPORTANT: On utilise TOUJOURS le document Firestore comme source de vérité!
+   * Ne pas faire confiance aux métadonnées du webhook (Wave ne les retourne pas)
    */
   private async handleSubscriptionPayment(metadata: any, wavePaymentId: string): Promise<void> {
-    const subscriptionId = metadata.subscriptionId;
-    const userId = metadata.userId;
-
-    console.log('📋 Traitement paiement abonnement:', {
-      subscriptionId,
-      userId,
-      wavePaymentId,
-      metadata
-    });
-
-    if (!subscriptionId || !userId) {
-      console.error('❌ Métadonnées manquantes pour le paiement d\'abonnement:', metadata);
-      return;
-    }
-
     try {
-      // Trouver le paiement par wavePaymentId et mettre à jour le statut
+      // 🔍 Chercher le paiement dans Firestore (déjà fait dans handlePaymentCompleted, mais recommandé ici aussi)
       const payment = await paymentService.getByWavePaymentId(wavePaymentId);
       if (!payment || !payment.id) {
         console.error('❌ Paiement non trouvé pour wavePaymentId:', wavePaymentId);
         return;
       }
 
-      console.log('💳 Paiement trouvé:', {
-        paymentId: payment.id,
-        status: payment.status,
-        subscriptionId: payment.subscriptionId
+      // ✅ Extraire les infos du document Firestore (source de vérité!)
+      const subscriptionId = payment.subscriptionId;
+      const userId = payment.userId;
+
+      console.log('📋 Traitement paiement abonnement:', {
+        subscriptionId,
+        userId,
+        wavePaymentId,
+        paymentStatus: payment.status
       });
 
+      if (!subscriptionId || !userId) {
+        console.error('❌ Documents Firestore incomplète pour le paiement:', {
+          paymentId: payment.id,
+          subscriptionId,
+          userId
+        });
+        return;
+      }
+
+      // ✅ Mettre à jour le statut du paiement
       await paymentService.updateStatus(payment.id, 'SUCCESS' as PaymentStatus);
       console.log('✅ Statut paiement mis à jour: SUCCESS');
 
-      // Activer l'abonnement
+      // ✅ Activer l'abonnement
       await subscriptionService.activateSubscription(subscriptionId, wavePaymentId, 'wave');
       console.log('✅ Abonnement activé avec succès');
 

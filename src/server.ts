@@ -18,6 +18,7 @@ import chatRoutes from './routes/chat.routes';
 import pushNotificationRoutes from './routes/push-notification.routes';
 import waveRoutes from './routes/wave.routes';
 import promoCodeRoutes from './routes/promo-code.routes';
+import subscriptionRoutes from './routes/subscription.routes';
 import './config/firebase.config'; // Initialize Firebase
 
 const app: Application = express();
@@ -94,6 +95,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/push-notifications', pushNotificationRoutes);
 app.use('/api/wave', waveRoutes);
 app.use('/api/codes-promo', promoCodeRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
